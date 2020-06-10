@@ -48,14 +48,15 @@ public class MainActivity extends AppCompatActivity {
         Observation observation = Observation.builder()
                 .code(CodeableConcept.builder().id("123").text(of("12343434343")).build()).subject(builder.build())
                 .status(ObservationStatus.FINAL).build();
-        boolean exists = planEvaluator.evaluateBooleanExpression(patient, "Patient.where(name.given = 'Doe').exists()");
+        boolean result = planEvaluator.evaluateBooleanExpression(patient, "Patient.where(name.given = 'Doe').exists()");
         resultsTextView = findViewById(R.id.exists);
 
         expressionEditText = findViewById(R.id.expression);
-        resultsTextView.setText("Expression result " + exists);
+        resultsTextView.setText(getString(R.string.result, result));
     }
 
     public void evaluateExpression(View view) {
-        resultsTextView.setText("Expression result " + planEvaluator.evaluateBooleanExpression(patient, expressionEditText.getText().toString()));
+        boolean result = planEvaluator.evaluateBooleanExpression(patient, expressionEditText.getText().toString());
+        resultsTextView.setText(getString(R.string.result, result));
     }
 }

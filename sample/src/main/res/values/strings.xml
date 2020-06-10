@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">OpenSRP Client Tasking</string>
+    <string name="result">Expression result %1b</string>
 </resources>
