@@ -1,0 +1,2 @@
+include ':sample'
+rootProject.name = "opensrp-client-tasking"
