@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         planEvaluator = new PlanEvaluator();
 
         patient = Patient.builder().id("12345").birthDate(Date.of("1990-12-19"))
