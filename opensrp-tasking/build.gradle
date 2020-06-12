@@ -1,13 +1,33 @@
 apply plugin: 'com.android.library'
+apply plugin: 'jacoco'
+apply plugin: 'com.github.kt3k.coveralls'
+
+buildscript {
+    repositories {
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:4.0.0'
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.3'
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.0"
+}
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion androidCompileSdkVersion
+    buildToolsVersion androidBuildToolsVersion
+
+    defaultPublishConfig !isReleaseBuild() ? "debug" : "release"
 
     defaultConfig {
-        minSdkVersion 18
-        targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        minSdkVersion androidMinSdkVersion
+        targetSdkVersion androidTargetSdkVersion
+        versionCode Integer.parseInt(project.VERSION_CODE)
+        versionName project.VERSION_NAME
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -21,18 +41,47 @@ android {
         }
     }
 
-    android {
-        compileOptions {
-            sourceCompatibility 1.8
-            targetCompatibility 1.8
-            coreLibraryDesugaringEnabled true
-        }
+    dexOptions {
+        javaMaxHeapSize "4g"
+    }
+
+    lintOptions {
+        abortOnError false
+    }
+
+    compileOptions {
+        sourceCompatibility 1.8
+        targetCompatibility 1.8
+        coreLibraryDesugaringEnabled true
     }
 
     packagingOptions {
         exclude 'LICENSE.txt'
         exclude 'META-INF/*'
     }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+            returnDefaultValues = true
+        }
+    }
+}
+
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+}
+
+allprojects {
+    repositories {
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+        maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
+        mavenLocal()
+    }
+}
+
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
 }
 
 dependencies {
@@ -43,8 +92,42 @@ dependencies {
     implementation 'xerces:xercesImpl:2.12.0'
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.5'
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
+}
+
+task jacocoTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+
+    getReports().getXml().setDestination(file("${buildDir}/reports/jacoco/jacocoRootReport/merged.xml"))
+    getReports().getHtml().setDestination(file("${buildDir}/reports/jacoco/jacocoRootReport/html"))
+
+    def fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', '**/*Test*.*', 'android/**/*.*', '**/*$ViewBinder*.*']
+    def debugTree = fileTree(dir: "$project.buildDir/intermediates/classes/debug", excludes: fileFilter)
+    def mainSrc = "$project.projectDir/src/main/java"
+
+    sourceDirectories.setFrom(files([mainSrc]))
+    classDirectories.setFrom(files([debugTree]))
+    executionData.setFrom(fileTree(dir: project.buildDir, includes: [
+            'jacoco/testDebugUnitTest.exec', 'outputs/code-coverage/connected/*coverage.ec'
+    ]))
+}
+coveralls {
+    jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/merged.xml"
+}
+
+apply from: '../maven.gradle'
+
+task javadoc(type: Javadoc) {
+    failOnError false
+    def mainSrc = "$project.projectDir/src/main/java"
+    source = files([mainSrc])
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    classpath += configurations.compile
 }

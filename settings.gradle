@@ -1,3 +1,1 @@
-include ':opensrp-tasking'
-include ':sample'
-rootProject.name = "opensrp-client-tasking"
+include ':opensrp-tasking' , ':sample'
