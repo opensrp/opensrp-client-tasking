@@ -52,6 +52,7 @@ subprojects {
         mavenLocal()
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
         maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
+        maven { url "https://dl.bintray.com/ibm-watson-health/ibm-fhir-server-releases"}
     }
 
     // Improve build server performance by allowing disabling of pre-dexing
