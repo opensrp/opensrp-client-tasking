@@ -1,4 +1,4 @@
-package org.smartregister.tasking;
+package org.smartregister.tasking.sample;
 
 import android.os.Bundle;
 import android.view.View;
@@ -17,8 +17,7 @@ import com.ibm.fhir.model.type.Reference;
 import com.ibm.fhir.model.type.code.ObservationStatus;
 
 import org.smartregister.pathevaluator.PathEvaluatorLibrary;
-import org.smartregister.pathevaluator.PlanEvaluator;
-import org.smartregister.pathevaluator.plan.PlanEvaluator;
+import org.smartregister.tasking.sample.R;
 
 import static com.ibm.fhir.model.type.String.of;
 
