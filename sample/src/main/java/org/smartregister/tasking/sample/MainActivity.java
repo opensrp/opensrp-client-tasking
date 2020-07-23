@@ -16,7 +16,9 @@ import com.ibm.fhir.model.type.Identifier;
 import com.ibm.fhir.model.type.Reference;
 import com.ibm.fhir.model.type.code.ObservationStatus;
 
+import org.smartregister.pathevaluator.PathEvaluatorLibrary;
 import org.smartregister.pathevaluator.PlanEvaluator;
+import org.smartregister.pathevaluator.plan.PlanEvaluator;
 
 import static com.ibm.fhir.model.type.String.of;
 
@@ -26,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView resultsTextView;
 
-    private PlanEvaluator planEvaluator;
+    private PathEvaluatorLibrary pathEvaluatorLibrary;
 
     private EditText expressionEditText;
 
@@ -35,8 +37,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-        planEvaluator = new PlanEvaluator();
+        PathEvaluatorLibrary.init(null, null, null, null);
+        pathEvaluatorLibrary = PathEvaluatorLibrary.getInstance();
 
         patient = Patient.builder().id("12345").birthDate(Date.of("1990-12-19"))
                 .identifier(Identifier.builder().id("1234").value(of("1212313")).build())
@@ -48,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         Observation observation = Observation.builder()
                 .code(CodeableConcept.builder().id("123").text(of("12343434343")).build()).subject(builder.build())
                 .status(ObservationStatus.FINAL).build();
-        boolean result = planEvaluator.evaluateBooleanExpression(patient, "Patient.where(name.given = 'Doe').exists()");
+        boolean result = pathEvaluatorLibrary.evaluateBooleanExpression(patient, "Patient.where(name.given = 'Doe').exists()");
         resultsTextView = findViewById(R.id.exists);
 
         expressionEditText = findViewById(R.id.expression);
@@ -56,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void evaluateExpression(View view) {
-        boolean result = planEvaluator.evaluateBooleanExpression(patient, expressionEditText.getText().toString());
+        boolean result = pathEvaluatorLibrary.evaluateBooleanExpression(patient, expressionEditText.getText().toString());
         resultsTextView.setText(getString(R.string.result, result));
     }
 }
