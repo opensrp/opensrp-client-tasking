@@ -19,14 +19,11 @@ import androidx.annotation.StringRes;
 import androidx.cardview.widget.CardView;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.Task;
-import org.smartregister.family.fragment.NoMatchDialogFragment;
-import org.smartregister.family.util.DBConstants;
-import org.smartregister.tasking.BuildConfig;
 import org.smartregister.tasking.R;
+import org.smartregister.tasking.activity.TaskRegisterActivity;
 import org.smartregister.tasking.adapter.TaskRegisterAdapter;
 import org.smartregister.tasking.contract.BaseDrawerContract;
 import org.smartregister.tasking.contract.TaskRegisterFragmentContract;
@@ -34,19 +31,12 @@ import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.tasking.presenter.TaskRegisterFragmentPresenter;
-import org.smartregister.tasking.task.IndicatorsCalculatorTask;
 import org.smartregister.tasking.util.AlertDialogUtils;
-import org.smartregister.tasking.util.Constants.Properties;
 import org.smartregister.tasking.util.Constants.TaskRegister;
-import org.smartregister.tasking.util.Country;
 import org.smartregister.tasking.util.LocationUtils;
 import org.smartregister.tasking.util.RevealJsonFormUtils;
 import org.smartregister.tasking.util.Utils;
 import org.smartregister.tasking.view.DrawerMenuView;
-import org.smartregister.tasking.view.FilterTasksActivity;
-import org.smartregister.tasking.view.ListTasksActivity;
-import org.smartregister.tasking.view.TaskRegisterActivity;
-import org.smartregister.view.activity.BaseRegisterActivity;
 import org.smartregister.view.fragment.BaseRegisterFragment;
 
 import java.util.HashMap;
@@ -113,6 +103,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
             interventionTypeTv.setText(
                     getActivity().getIntent().getStringExtra(TaskRegister.INTERVENTION_TYPE));
         }
+
         view.findViewById(R.id.txt_map_label).setOnClickListener(v -> getPresenter().onOpenMapClicked());
         drawerView.initializeDrawerLayout();
         view.findViewById(R.id.drawerMenu).setOnClickListener(v -> drawerView.openDrawerLayout());
@@ -142,6 +133,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
 
     @Override
     public void startMapActivity(TaskFilterParams taskFilterParams) {
+        /*
         Intent intent = new Intent(getContext(), ListTasksActivity.class);
         if (taskFilterParams != null) {
             taskFilterParams.setSearchPhrase(getSearchView().getText().toString());
@@ -151,6 +143,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         }
         getActivity().setResult(RESULT_OK, intent);
         getActivity().finish();
+        */
     }
 
     @Override
@@ -242,9 +235,9 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
 
     @Override
     public void showNotFoundPopup(String opensrpId) {
-        if (this.getActivity() != null) {
+        /*if (this.getActivity() != null) {
             NoMatchDialogFragment.launchDialog((BaseRegisterActivity) this.getActivity(), "dialog", opensrpId);
-        }
+        }*/
     }
 
     private TaskRegisterFragmentPresenter getPresenter() {
@@ -268,10 +261,10 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
     }
 
     public void setTaskDetails(List<TaskDetails> tasks) {
-        taskAdapter.setTaskDetails(tasks);
+        /*taskAdapter.setTaskDetails(tasks);
         if (BuildConfig.BUILD_COUNTRY == Country.ZAMBIA) {
             new IndicatorsCalculatorTask(getActivity(), tasks).execute();
-        }
+        }*/
     }
 
     @Override
@@ -356,6 +349,8 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
 
     @Override
     public void openFamilyProfile(CommonPersonObjectClient family, BaseTaskDetails taskDetails) {
+        /*
+
         Intent intent = new Intent(getContext(), org.smartregister.family.util.Utils.metadata().profileActivity);
         intent.putExtra(org.smartregister.family.util.Constants.INTENT_KEY.FAMILY_BASE_ENTITY_ID, family.getCaseId());
         intent.putExtra(org.smartregister.family.util.Constants.INTENT_KEY.FAMILY_HEAD, org.smartregister.family.util.Utils.getValue(family.getColumnmaps(), DBConstants.KEY.FAMILY_HEAD, false));
@@ -371,6 +366,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
 
         startActivity(intent);
 
+*/
     }
 
     @Override
@@ -399,9 +395,11 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
 
     @Override
     public void openFilterActivity(TaskFilterParams filterParams) {
+        /*
         Intent intent = new Intent(getContext(), FilterTasksActivity.class);
         intent.putExtra(FILTER_SORT_PARAMS, filterParams);
         getActivity().startActivityForResult(intent, REQUEST_CODE_FILTER_TASKS);
+        */
     }
 
     @Override

@@ -13,6 +13,11 @@ import org.smartregister.reveal.model.BaseTaskDetails;
 import org.smartregister.reveal.model.TaskDetails;
 import org.smartregister.reveal.model.TaskFilterParams;
 import org.smartregister.reveal.util.LocationUtils;
+import org.smartregister.tasking.adapter.TaskRegisterAdapter;
+import org.smartregister.tasking.model.BaseTaskDetails;
+import org.smartregister.tasking.model.TaskDetails;
+import org.smartregister.tasking.model.TaskFilterParams;
+import org.smartregister.tasking.util.LocationUtils;
 import org.smartregister.view.contract.BaseRegisterFragmentContract;
 
 import java.util.List;

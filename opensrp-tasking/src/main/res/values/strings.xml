@@ -1,0 +1,10 @@
+<resources>
+    <string name="fetch_structures_title">Loading failed</string>
+    <string name="view_details">View Details</string>
+    <string name="choose_action">Choose action</string>
+    <string name="select_task_action">Select action to perform</string>
+    <string name="undo_task_title">Are you sure you want to clear all data associated with this event?</string>
+    <string name="undo_task_msg">You will not be able to recover this data and this task will be marked as incomplete</string>
+    <string name="confirm">Confirm</string>
+    <string name="filters">Filters (%1$d)</string>
+</resources>
