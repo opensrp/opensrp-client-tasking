@@ -20,14 +20,14 @@ import org.smartregister.configurableviews.model.View;
 import org.smartregister.configurableviews.model.ViewConfiguration;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.Task;
-import org.smartregister.reveal.R;
-import org.smartregister.reveal.contract.TaskRegisterFragmentContract;
-import org.smartregister.reveal.interactor.TaskRegisterFragmentInteractor;
-import org.smartregister.reveal.model.TaskDetails;
-import org.smartregister.reveal.model.TaskFilterParams;
-import org.smartregister.reveal.util.Constants;
-import org.smartregister.reveal.util.PreferencesUtil;
-import org.smartregister.reveal.util.Utils;
+import org.smartregister.tasking.R;
+import org.smartregister.tasking.contract.TaskRegisterFragmentContract;
+import org.smartregister.tasking.interactor.TaskRegisterFragmentInteractor;
+import org.smartregister.tasking.model.TaskDetails;
+import org.smartregister.tasking.model.TaskFilterParams;
+import org.smartregister.tasking.util.Constants;
+import org.smartregister.tasking.util.PreferencesUtil;
+import org.smartregister.tasking.util.Utils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -40,10 +40,10 @@ import java.util.regex.Pattern;
 import timber.log.Timber;
 
 import static org.smartregister.domain.Task.INACTIVE_TASK_STATUS;
-import static org.smartregister.reveal.util.Constants.Intervention.BEDNET_DISTRIBUTION;
-import static org.smartregister.reveal.util.Constants.Intervention.BLOOD_SCREENING;
-import static org.smartregister.reveal.util.Constants.Intervention.CASE_CONFIRMATION;
-import static org.smartregister.reveal.util.Constants.Intervention.REGISTER_FAMILY;
+import static org.smartregister.tasking.util.Constants.Intervention.BEDNET_DISTRIBUTION;
+import static org.smartregister.tasking.util.Constants.Intervention.BLOOD_SCREENING;
+import static org.smartregister.tasking.util.Constants.Intervention.CASE_CONFIRMATION;
+import static org.smartregister.tasking.util.Constants.Intervention.REGISTER_FAMILY;
 
 /**
  * Created by samuelgithengi on 3/11/19.

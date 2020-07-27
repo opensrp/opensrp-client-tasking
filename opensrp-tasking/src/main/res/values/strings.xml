@@ -7,4 +7,10 @@
     <string name="undo_task_msg">You will not be able to recover this data and this task will be marked as incomplete</string>
     <string name="confirm">Confirm</string>
     <string name="filters">Filters (%1$d)</string>
+
+
+    <plurals name="structures">
+        <item quantity="one">%1d structure within %2.0f m (%3$d total)</item>
+        <item quantity="other">%1d structures within %2.0f m (%3$d total)</item>
+    </plurals>
 </resources>
