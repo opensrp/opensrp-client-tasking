@@ -6,7 +6,7 @@ import androidx.annotation.StringRes;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
-import org.smartregister.reveal.presenter.ValidateUserLocationPresenter;
+import org.smartregister.tasking.presenter.ValidateUserLocationPresenter;
 
 /**
  * Created by samuelgithengi on 2/13/19.
