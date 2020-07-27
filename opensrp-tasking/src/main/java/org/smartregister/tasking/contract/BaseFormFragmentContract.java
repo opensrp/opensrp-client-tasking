@@ -6,8 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.domain.Location;
-import org.smartregister.reveal.model.BaseTaskDetails;
-import org.smartregister.reveal.util.RevealJsonFormUtils;
+import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.util.RevealJsonFormUtils;
 
 /**
