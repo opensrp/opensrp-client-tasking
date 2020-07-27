@@ -7,6 +7,7 @@ import android.content.Intent;
 import androidx.core.util.Pair;
 
 import com.mapbox.geojson.Feature;
+import com.vijay.jsonwizard.activities.FormConfigurationJsonFormActivity;
 import com.vijay.jsonwizard.constants.JsonFormConstants;
 import com.vijay.jsonwizard.utils.FormUtils;
 
@@ -18,15 +19,13 @@ import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.domain.Event;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.Obs;
-import org.smartregister.reveal.BuildConfig;
-import org.smartregister.reveal.activity.RevealJsonFormActivity;
-import org.smartregister.reveal.model.BaseTaskDetails;
-import org.smartregister.reveal.model.MosquitoHarvestCardDetails;
-import org.smartregister.reveal.model.TaskDetails;
-import org.smartregister.reveal.util.Constants.CONFIGURATION;
-import org.smartregister.reveal.util.Constants.Intervention;
-import org.smartregister.reveal.util.Constants.JsonForm;
-import org.smartregister.reveal.util.Constants.Properties;
+import org.smartregister.tasking.BuildConfig;
+import org.smartregister.tasking.model.BaseTaskDetails;
+import org.smartregister.tasking.model.TaskDetails;
+import org.smartregister.tasking.util.Constants.CONFIGURATION;
+import org.smartregister.tasking.util.Constants.Intervention;
+import org.smartregister.tasking.util.Constants.JsonForm;
+import org.smartregister.tasking.util.Constants.Properties;
 import org.smartregister.util.JsonFormUtils;
 
 import java.util.Arrays;
@@ -48,21 +47,21 @@ import static com.vijay.jsonwizard.constants.JsonFormConstants.VALUES;
 import static org.smartregister.AllConstants.JSON_FILE_EXTENSION;
 import static org.smartregister.AllConstants.OPTIONS;
 import static org.smartregister.AllConstants.TEXT;
-import static org.smartregister.reveal.util.Constants.BEDNET_DISTRIBUTION_EVENT;
-import static org.smartregister.reveal.util.Constants.BEHAVIOUR_CHANGE_COMMUNICATION;
-import static org.smartregister.reveal.util.Constants.BLOOD_SCREENING_EVENT;
-import static org.smartregister.reveal.util.Constants.DETAILS;
-import static org.smartregister.reveal.util.Constants.ENTITY_ID;
-import static org.smartregister.reveal.util.Constants.EventType.CASE_CONFIRMATION_EVENT;
-import static org.smartregister.reveal.util.Constants.EventType.IRS_VERIFICATION;
-import static org.smartregister.reveal.util.Constants.JSON_FORM_PARAM_JSON;
-import static org.smartregister.reveal.util.Constants.JsonForm.JSON_FORM_FOLDER;
-import static org.smartregister.reveal.util.Constants.LARVAL_DIPPING_EVENT;
-import static org.smartregister.reveal.util.Constants.MOSQUITO_COLLECTION_EVENT;
-import static org.smartregister.reveal.util.Constants.REGISTER_STRUCTURE_EVENT;
-import static org.smartregister.reveal.util.Constants.RequestCode.REQUEST_CODE_GET_JSON;
-import static org.smartregister.reveal.util.Constants.SPRAY_EVENT;
-import static org.smartregister.reveal.util.Utils.getPropertyValue;
+import static org.smartregister.tasking.util.Constants.BEDNET_DISTRIBUTION_EVENT;
+import static org.smartregister.tasking.util.Constants.BEHAVIOUR_CHANGE_COMMUNICATION;
+import static org.smartregister.tasking.util.Constants.BLOOD_SCREENING_EVENT;
+import static org.smartregister.tasking.util.Constants.DETAILS;
+import static org.smartregister.tasking.util.Constants.ENTITY_ID;
+import static org.smartregister.tasking.util.Constants.EventType.CASE_CONFIRMATION_EVENT;
+import static org.smartregister.tasking.util.Constants.EventType.IRS_VERIFICATION;
+import static org.smartregister.tasking.util.Constants.JSON_FORM_PARAM_JSON;
+import static org.smartregister.tasking.util.Constants.JsonForm.JSON_FORM_FOLDER;
+import static org.smartregister.tasking.util.Constants.LARVAL_DIPPING_EVENT;
+import static org.smartregister.tasking.util.Constants.MOSQUITO_COLLECTION_EVENT;
+import static org.smartregister.tasking.util.Constants.REGISTER_STRUCTURE_EVENT;
+import static org.smartregister.tasking.util.Constants.RequestCode.REQUEST_CODE_GET_JSON;
+import static org.smartregister.tasking.util.Constants.SPRAY_EVENT;
+import static org.smartregister.tasking.util.Utils.getPropertyValue;
 
 
 /**
@@ -188,7 +187,7 @@ public class RevealJsonFormUtils {
         formData.put(Properties.LOCATION_VERSION, structureVersion);
         formData.put(Properties.APP_VERSION_NAME, BuildConfig.VERSION_NAME);
         formData.put(Properties.FORM_VERSION, formJson.optString("form_version"));
-        String planIdentifier = PreferencesUtil.getInstance().getCurrentPlanId();
+        String planIdentifier = "";//PreferencesUtil.getInstance().getCurrentPlanId();
         formData.put(Properties.PLAN_IDENTIFIER, planIdentifier);
         formJson.put(DETAILS, formData);
         return formJson;
@@ -219,7 +218,7 @@ public class RevealJsonFormUtils {
     }
 
     public void startJsonForm(JSONObject form, Activity context, int requestCode) {
-        Intent intent = new Intent(context, RevealJsonFormActivity.class);
+        Intent intent = new Intent(context, FormConfigurationJsonFormActivity.class);
         try {
             intent.putExtra(JSON_FORM_PARAM_JSON, form.toString());
             context.startActivityForResult(intent, requestCode);
@@ -230,7 +229,7 @@ public class RevealJsonFormUtils {
 
     public String getFormName(String encounterType, String taskCode) {
         String formName = null;
-        if (SPRAY_EVENT.equals(encounterType) || Intervention.IRS.equals(taskCode)) {
+        /*if (SPRAY_EVENT.equals(encounterType) || Intervention.IRS.equals(taskCode)) {
             if (BuildConfig.BUILD_COUNTRY == Country.NAMIBIA) {
                 formName = JsonForm.SPRAY_FORM_NAMIBIA;
             } else if (BuildConfig.BUILD_COUNTRY == Country.BOTSWANA) {
@@ -324,14 +323,14 @@ public class RevealJsonFormUtils {
             }
         } else if (IRS_VERIFICATION.equals(encounterType) || Intervention.IRS_VERIFICATION.equals(taskCode)) {
             formName = JsonForm.ZAMBIA_IRS_VERIFICATION_FORM;
-        }
+        }*/
         return formName;
     }
 
     public String getFormName(String encounterType) {
         return getFormName(encounterType, null);
     }
-
+/*
     public void populatePAOTForm(MosquitoHarvestCardDetails cardDetails, JSONObject formJson) {
         if (formJson == null)
             return;
@@ -342,7 +341,7 @@ public class RevealJsonFormUtils {
         } catch (JSONException e) {
             Timber.e(e);
         }
-    }
+    }*/
 
     public void populateField(JSONObject formJson, String key, String value, String fieldToPopulate) throws JSONException {
         JSONObject field = JsonFormUtils.getFieldJSONObject(JsonFormUtils.fields(formJson), key);

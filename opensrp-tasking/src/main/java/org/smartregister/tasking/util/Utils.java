@@ -34,8 +34,6 @@ import org.smartregister.job.PullUniqueIdsServiceJob;
 import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.tasking.BuildConfig;
 import org.smartregister.tasking.R;
-import org.smartregister.tasking.application.RevealApplication;
-import org.smartregister.tasking.job.LocationTaskServiceJob;
 import org.smartregister.tasking.util.Constants.CONFIGURATION;
 import org.smartregister.tasking.util.Constants.Properties;
 import org.smartregister.tasking.util.Constants.Tags;
@@ -43,6 +41,7 @@ import org.smartregister.util.Cache;
 import org.smartregister.util.CacheableData;
 import org.smartregister.util.DatabaseMigrationUtils;
 import org.smartregister.util.RecreateECUtil;
+import org.smartregister.view.activity.DrishtiApplication;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -85,18 +84,18 @@ public class Utils {
     }
 
     public static void saveLanguage(String language) {
-        AllSharedPreferences allSharedPreferences = new AllSharedPreferences(PreferenceManager.getDefaultSharedPreferences(RevealApplication.getInstance().getApplicationContext()));
+        AllSharedPreferences allSharedPreferences = new AllSharedPreferences(PreferenceManager.getDefaultSharedPreferences(DrishtiApplication.getInstance().getApplicationContext()));
         allSharedPreferences.saveLanguagePreference(language);
         setLocale(new Locale(language));
     }
 
     public static void setLocale(Locale locale) {
-        Resources resources = RevealApplication.getInstance().getApplicationContext().getResources();
+        Resources resources = DrishtiApplication.getInstance().getApplicationContext().getResources();
         Configuration configuration = resources.getConfiguration();
         DisplayMetrics displayMetrics = resources.getDisplayMetrics();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             configuration.setLocale(locale);
-            RevealApplication.getInstance().getApplicationContext().createConfigurationContext(configuration);
+            DrishtiApplication.getInstance().getApplicationContext().createConfigurationContext(configuration);
         } else {
             configuration.locale = locale;
             resources.updateConfiguration(configuration, displayMetrics);
@@ -119,7 +118,7 @@ public class Utils {
     }
 
     public static void startImmediateSync() {
-        LocationTaskServiceJob.scheduleJobImmediately(LocationTaskServiceJob.TAG);
+        //LocationTaskServiceJob.scheduleJobImmediately(LocationTaskServiceJob.TAG);
         PullUniqueIdsServiceJob.scheduleJobImmediately(PullUniqueIdsServiceJob.TAG);
         DocumentConfigurationServiceJob.scheduleJobImmediately(DocumentConfigurationServiceJob.TAG);
     }
@@ -129,7 +128,7 @@ public class Utils {
         return cache.get(operationalArea, new CacheableData<Location>() {
             @Override
             public Location fetch() {
-                return RevealApplication.getInstance().getLocationRepository().getLocationByName(operationalArea);
+                return null; // DrishtiApplication.getInstance().getLocationRepository().getLocationByName(operationalArea);
             }
         });
     }
@@ -154,13 +153,13 @@ public class Utils {
     }
 
     public static String getGlobalConfig(String key, String defaultValue) {
-        Map<String, Object> globalConfigs = RevealApplication.getInstance().getServerConfigs();
+        Map<String, Object> globalConfigs = null;//DrishtiApplication.getInstance().getServerConfigs();
         Object val = globalConfigs != null ? globalConfigs.get(key) : null;
         return val == null ? defaultValue : val.toString();
     }
 
     public static Float getLocationBuffer() {
-        return Float.valueOf(getGlobalConfig(CONFIGURATION.LOCATION_BUFFER_RADIUS_IN_METRES, BuildConfig.MY_LOCATION_BUFFER + ""));
+        return 0f; // Float.valueOf(getGlobalConfig(CONFIGURATION.LOCATION_BUFFER_RADIUS_IN_METRES, BuildConfig.MY_LOCATION_BUFFER + ""));
     }
 
 
@@ -173,7 +172,7 @@ public class Utils {
     }
 
     public static int getInterventionLabel() {
-        String plan = PreferencesUtil.getInstance().getCurrentPlan();
+        /*String plan = PreferencesUtil.getInstance().getCurrentPlan();
         String interventionType = PreferencesUtil.getInstance().getInterventionTypeForPlan(plan);
         if (interventionType.equals(FI))
             return R.string.focus_investigation;
@@ -182,13 +181,14 @@ public class Utils {
         else if (interventionType.equals(MDA))
             return R.string.mda;
         else
-            return R.string.irs;
+            return R.string.irs;*/
+        return 0;
     }
 
-    public static String getAge(String dob) {
+   /* public static String getAge(String dob) {
         String dobString = org.smartregister.family.util.Utils.getDuration(dob);
         return dobString.contains("y") ? dobString.substring(0, dobString.indexOf("y")) : dobString;
-    }
+    }*/
 
     /**
      * Uses the server setting "draw_operational_area_boundary_and_label" to determine whether to draw the operational area boundary
@@ -327,7 +327,7 @@ public class Utils {
 
     public static FormTag getFormTag() {
         FormTag formTag = new FormTag();
-        AllSharedPreferences sharedPreferences = RevealApplication.getInstance().getContext().allSharedPreferences();
+        AllSharedPreferences sharedPreferences = DrishtiApplication.getInstance().getContext().allSharedPreferences();
         formTag.providerId = sharedPreferences.fetchRegisteredANM();
         formTag.locationId = PreferencesUtil.getInstance().getCurrentOperationalAreaId();
         formTag.teamId = sharedPreferences.fetchDefaultTeamId(formTag.providerId);
