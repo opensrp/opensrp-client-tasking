@@ -14,10 +14,9 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.smartregister.cursoradapter.SmartRegisterQueryBuilder;
-import org.smartregister.family.util.DBConstants;
 import org.smartregister.repository.EventClientRepository.event_column;
 import org.smartregister.repository.LocationRepository;
-import org.smartregister.tasking.application.RevealApplication;
+import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.TaskRegisterFragmentContract;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.util.Constants;
@@ -25,7 +24,6 @@ import org.smartregister.tasking.util.Constants.EventType;
 import org.smartregister.tasking.util.Constants.Properties;
 import org.smartregister.tasking.util.InteractorUtils;
 import org.smartregister.tasking.util.Utils;
-import org.smartregister.tasking.contract.TaskRegisterFragmentContract;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,10 +33,7 @@ import timber.log.Timber;
 
 import static org.smartregister.domain.Task.INACTIVE_TASK_STATUS;
 import static org.smartregister.domain.Task.TaskStatus.COMPLETED;
-import static org.smartregister.family.util.DBConstants.KEY.FIRST_NAME;
-import static org.smartregister.family.util.DBConstants.KEY.RELATIONAL_ID;
 import static org.smartregister.repository.EventClientRepository.Table.event;
-import static org.smartregister.tasking.util.Constants.DatabaseKeys.BASE_ENTITY_ID;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.BUSINESS_STATUS;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.CODE;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.COMPLETED_TASK_COUNT;
@@ -68,10 +63,6 @@ import static org.smartregister.tasking.util.Constants.DatabaseKeys.TASK_TABLE;
 import static org.smartregister.tasking.util.Constants.Intervention.BCC;
 import static org.smartregister.tasking.util.Constants.Intervention.BEDNET_DISTRIBUTION;
 import static org.smartregister.tasking.util.Constants.Intervention.CASE_CONFIRMATION;
-import static org.smartregister.tasking.util.Constants.Properties.FAMILY_MEMBER_NAMES;
-import static org.smartregister.tasking.util.FamilyConstants.DatabaseKeys.HOUSE_NUMBER;
-import static org.smartregister.tasking.util.FamilyConstants.TABLE_NAME.FAMILY;
-import static org.smartregister.tasking.util.FamilyConstants.TABLE_NAME.FAMILY_MEMBER;
 
 /**
  * Created by samuelgithengi on 3/18/19.
@@ -94,8 +85,8 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
                                           Float locationBuffer) {
         super(presenter);
         this.locationBuffer = locationBuffer;
-        locationRepository = RevealApplication.getInstance().getLocationRepository();
-        interactorUtils = new InteractorUtils(RevealApplication.getInstance().getTaskRepository(), eventClientRepository, clientProcessor);
+        locationRepository = null; //RevealApplication.getInstance().getLocationRepository();
+        interactorUtils = new InteractorUtils(TaskingLibrary.getInstance().getTaskRepository(), eventClientRepository, clientProcessor);
     }
 
     private String mainSelect(String mainCondition) {
@@ -104,10 +95,10 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
         queryBuilder.selectInitiateMainTable(tableName, mainColumns(tableName), ID);
         queryBuilder.customJoin(String.format(" JOIN %s ON %s.%s = %s.%s ",
                 STRUCTURES_TABLE, tableName, FOR, STRUCTURES_TABLE, ID));
-        queryBuilder.customJoin(String.format(" LEFT JOIN %s ON %s.%s = %s.%s ",
+        /*queryBuilder.customJoin(String.format(" LEFT JOIN %s ON %s.%s = %s.%s ",
                 SPRAYED_STRUCTURES, tableName, FOR, SPRAYED_STRUCTURES, DBConstants.KEY.BASE_ENTITY_ID));
         queryBuilder.customJoin(String.format(" LEFT JOIN %s ON %s.%s = %s.%s ",
-                FAMILY, STRUCTURES_TABLE, ID, FAMILY, STRUCTURE_ID));
+                FAMILY, STRUCTURES_TABLE, ID, FAMILY, STRUCTURE_ID));*/
         return queryBuilder.mainCondition(mainCondition);
     }
 
@@ -117,13 +108,13 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
         queryBuilder.selectInitiateMainTable(tableName, mainColumns(tableName), ID);
         queryBuilder.customJoin(String.format(" JOIN %s ON %s.%s = %s.%s ",
                 STRUCTURES_TABLE, tableName, FOR, STRUCTURES_TABLE, ID));
-        queryBuilder.customJoin(String.format(" LEFT JOIN %s ON %s.%s = %s.%s ",
+        /*queryBuilder.customJoin(String.format(" LEFT JOIN %s ON %s.%s = %s.%s ",
                 SPRAYED_STRUCTURES, tableName, FOR, SPRAYED_STRUCTURES, DBConstants.KEY.BASE_ENTITY_ID));
         queryBuilder.customJoin(String.format(" LEFT JOIN %s ON %s.%s = %s.%s ",
                 FAMILY, STRUCTURES_TABLE, ID, FAMILY, STRUCTURE_ID));
         queryBuilder.mainCondition(mainCondition);
         queryBuilder.addCondition(String.format(" AND %s.%s IS NULL",
-                FAMILY, STRUCTURE_ID));
+                FAMILY, STRUCTURE_ID));*/
         return queryBuilder.addCondition(String.format(" AND %s.%s != '%s'",
                 tableName, CODE, BEDNET_DISTRIBUTION));
     }
@@ -131,21 +122,21 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
     private String groupedRegisteredStructureTasksSelect(String mainCondition) {
         String tableName = TASK_TABLE;
         SmartRegisterQueryBuilder structureTasksQueryBuilder = new SmartRegisterQueryBuilder();
-        String[] columns = ArrayUtils.add(mainColumns(tableName), String.format("%s.%s||' '||%s.%s as %s ", FAMILY_MEMBER, FIRST_NAME, FAMILY_MEMBER, LAST_NAME, FAMILY_MEMBER_NAMES));
+        String[] columns = ArrayUtils.add(mainColumns(tableName), String.format("%s.%s||' '||%s.%s as %s ", "", "", "", LAST_NAME, ""));//FAMILY_MEMBER, FIRST_NAME, FAMILY_MEMBER, LAST_NAME, FAMILY_MEMBER_NAMES));
         structureTasksQueryBuilder.selectInitiateMainTable(tableName, columns, ID);
         structureTasksQueryBuilder.customJoin(String.format(" JOIN %s ON %s.%s = %s.%s ",
                 STRUCTURES_TABLE, tableName, STRUCTURE_ID, STRUCTURES_TABLE, ID));
-        structureTasksQueryBuilder.customJoin(String.format(" JOIN %s ON %s.%s = %s.%s  COLLATE NOCASE",
+        /*structureTasksQueryBuilder.customJoin(String.format(" JOIN %s ON %s.%s = %s.%s  COLLATE NOCASE",
                 FAMILY, STRUCTURES_TABLE, ID, FAMILY, STRUCTURE_ID));
         structureTasksQueryBuilder.customJoin(String.format(" JOIN %s ON %s.%s = %s.%s  COLLATE NOCASE",
                 FAMILY_MEMBER, FAMILY, BASE_ENTITY_ID, FAMILY_MEMBER, RELATIONAL_ID));
         structureTasksQueryBuilder.customJoin(String.format(" LEFT JOIN %s ON %s.%s = %s.%s ",
-                SPRAYED_STRUCTURES, tableName, FOR, SPRAYED_STRUCTURES, DBConstants.KEY.BASE_ENTITY_ID));
+                SPRAYED_STRUCTURES, tableName, FOR, SPRAYED_STRUCTURES, DBConstants.KEY.BASE_ENTITY_ID));*/
         structureTasksQueryBuilder.mainCondition(mainCondition);
 
         return String.format(" SELECT %s.* , SUM(CASE WHEN status='%s' THEN 1 ELSE 0 END ) AS %s , COUNT(_id ) AS %s, " +
                         "GROUP_CONCAT(%s || \"-\" || %s ) AS %s , GROUP_CONCAT(%s) as %s  FROM ( ",
-                GROUPED_TASKS, COMPLETED.toString(), COMPLETED_TASK_COUNT, TASK_COUNT, CODE, BUSINESS_STATUS, GROUPED_STRUCTURE_TASK_CODE_AND_STATUS, FAMILY_MEMBER_NAMES, FAMILY_MEMBER_NAMES) + structureTasksQueryBuilder +
+                GROUPED_TASKS, COMPLETED.toString(), COMPLETED_TASK_COUNT, TASK_COUNT, CODE, BUSINESS_STATUS, GROUPED_STRUCTURE_TASK_CODE_AND_STATUS, "", "") + structureTasksQueryBuilder +//FAMILY_MEMBER_NAMES, FAMILY_MEMBER_NAMES) + structureTasksQueryBuilder +
                 String.format(" ) AS %s GROUP BY %s ", GROUPED_TASKS, STRUCTURE_ID);
 
     }
@@ -181,8 +172,8 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
                 SPRAYED_STRUCTURES + "." + NOT_SRAYED_REASON,
                 SPRAYED_STRUCTURES + "." + NOT_SRAYED_OTHER_REASON,
                 STRUCTURES_TABLE + "." + ID + " AS " + STRUCTURE_ID,
-                FAMILY + "." + FIRST_NAME,
-                FAMILY + "." + HOUSE_NUMBER
+                /*FAMILY + "." + FIRST_NAME,
+                FAMILY + "." + HOUSE_NUMBER*/
 
         };
     }
@@ -265,8 +256,8 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
             task.setTaskCount(cursor.getInt(cursor.getColumnIndex(TASK_COUNT)));
             task.setCompleteTaskCount(cursor.getInt(cursor.getColumnIndex(COMPLETED_TASK_COUNT)));
             task.setGroupedTaskCodeStatus(cursor.getString(cursor.getColumnIndex(GROUPED_STRUCTURE_TASK_CODE_AND_STATUS)));
-            task.setHouseNumber(cursor.getString(cursor.getColumnIndex(HOUSE_NUMBER)));
-            task.setFamilyMemberNames(cursor.getString(cursor.getColumnIndex(FAMILY_MEMBER_NAMES)));
+            //task.setHouseNumber(cursor.getString(cursor.getColumnIndex(HOUSE_NUMBER)));
+            //task.setFamilyMemberNames(cursor.getString(cursor.getColumnIndex(FAMILY_MEMBER_NAMES)));
         }
         Location location = new Location((String) null);
 
@@ -281,7 +272,7 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
                 task.setStructureName(cursor.getString(cursor.getColumnIndex(STRUCTURE_NAME)));
             }
 
-            task.setFamilyName(cursor.getString(cursor.getColumnIndex(FIRST_NAME)));
+            //task.setFamilyName(cursor.getString(cursor.getColumnIndex(FIRST_NAME)));
             if (task.getFamilyName() == null) {
                 task.setFamilyName(cursor.getString(cursor.getColumnIndex(FAMILY_NAME)));
             }

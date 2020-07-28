@@ -151,10 +151,10 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
     private org.smartregister.domain.Event saveEvent(JSONObject jsonForm, String encounterType, String bindType) throws JSONException {
         String entityId = getString(jsonForm, ENTITY_ID);
         JSONArray fields = JsonFormUtils.fields(jsonForm);
-        JSONObject metadata = getJSONObject(jsonForm, METADATA);
+        JSONObject metadata = JsonFormUtils.getJSONObject(jsonForm, METADATA);
         Event event = JsonFormUtils.createEvent(fields, metadata, Utils.getFormTag(), entityId, encounterType, bindType);
         JSONObject eventJson = new JSONObject(gson.toJson(event));
-        eventJson.put(DETAILS, getJSONObject(jsonForm, DETAILS));
+        eventJson.put(DETAILS, JsonFormUtils.getJSONObject(jsonForm, DETAILS));
         eventClientRepository.addEvent(entityId, eventJson);
         return gson.fromJson(eventJson.toString(), org.smartregister.domain.Event.class);
     }
