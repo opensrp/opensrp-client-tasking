@@ -7,25 +7,22 @@ import net.sqlcipher.database.SQLiteDatabase;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.repository.EventClientRepository;
-import org.smartregister.reveal.application.RevealApplication;
-import org.smartregister.reveal.contract.BaseFormFragmentContract;
-import org.smartregister.reveal.util.AppExecutors;
-import org.smartregister.reveal.util.InteractorUtils;
+import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.BaseFormFragmentContract;
+import org.smartregister.tasking.util.InteractorUtils;
+import org.smartregister.util.AppExecutors;
+import org.smartregister.view.activity.DrishtiApplication;
 
 import timber.log.Timber;
 
 import static com.vijay.jsonwizard.constants.JsonFormConstants.KEY;
 import static com.vijay.jsonwizard.constants.JsonFormConstants.TEXT;
-import static org.smartregister.family.util.Utils.metadata;
-import static org.smartregister.reveal.util.Constants.DatabaseKeys.BASE_ENTITY_ID;
-import static org.smartregister.reveal.util.Constants.DatabaseKeys.FIRST_NAME;
-import static org.smartregister.reveal.util.Constants.DatabaseKeys.LAST_NAME;
-import static org.smartregister.reveal.util.Constants.DatabaseKeys.STRUCTURE_ID;
-import static org.smartregister.reveal.util.Constants.Intervention.IRS;
+import static org.smartregister.tasking.util.Constants.DatabaseKeys.BASE_ENTITY_ID;
+import static org.smartregister.tasking.util.Constants.DatabaseKeys.FIRST_NAME;
+import static org.smartregister.tasking.util.Constants.DatabaseKeys.LAST_NAME;
+import static org.smartregister.tasking.util.Constants.DatabaseKeys.STRUCTURE_ID;
 
 /**
  * Created by samuelgithengi on 6/14/19.
@@ -46,10 +43,10 @@ public class BaseFormFragmentInteractor implements BaseFormFragmentContract.Inte
 
     public BaseFormFragmentInteractor(BaseFormFragmentContract.Presenter presenter) {
         this.presenter = presenter;
-        this.commonRepository = RevealApplication.getInstance().getContext().commonrepository(metadata().familyMemberRegister.tableName);
-        appExecutors = RevealApplication.getInstance().getAppExecutors();
-        sqLiteDatabase = RevealApplication.getInstance().getRepository().getReadableDatabase();
-        eventClientRepository = RevealApplication.getInstance().getContext().getEventClientRepository();
+        //this.commonRepository = DrishtiApplication.getInstance().getContext().commonrepository(metadata().familyMemberRegister.tableName);
+        appExecutors = TaskingLibrary.getInstance().getAppExecutors();
+        sqLiteDatabase = DrishtiApplication.getInstance().getRepository().getReadableDatabase();
+        eventClientRepository = DrishtiApplication.getInstance().getContext().getEventClientRepository();
         interactorUtils = new InteractorUtils();
     }
 
@@ -62,7 +59,7 @@ public class BaseFormFragmentInteractor implements BaseFormFragmentContract.Inte
             try {
                 cursor = sqLiteDatabase.rawQuery(
                         String.format("SELECT count(*),SUM(CASE WHEN sleeps_outdoors='Yes' THEN 1 ELSE 0 END) FROM %s WHERE %s = ?",
-                                metadata().familyMemberRegister.tableName, STRUCTURE_ID), new String[]{structureId});
+                                "", STRUCTURE_ID), new String[]{structureId});//metadata().familyMemberRegister.tableName, STRUCTURE_ID), new String[]{structureId});
 
                 while (cursor.moveToNext()) {
                     numberOfMembers = cursor.getInt(0);
@@ -91,7 +88,7 @@ public class BaseFormFragmentInteractor implements BaseFormFragmentContract.Inte
             try {
                 cursor = sqLiteDatabase.rawQuery(
                         String.format("SELECT %s, %s, %s FROM %s WHERE %s = ?", BASE_ENTITY_ID, FIRST_NAME, LAST_NAME,
-                                metadata().familyMemberRegister.tableName, STRUCTURE_ID), new String[]{structureId});
+                                "", STRUCTURE_ID), new String[]{structureId});//metadata().familyMemberRegister.tableName, STRUCTURE_ID), new String[]{structureId});
                 while (cursor.moveToNext()) {
                     JSONObject member = new JSONObject();
                     member.put(KEY, cursor.getString(cursor.getColumnIndex(BASE_ENTITY_ID)));
@@ -113,7 +110,7 @@ public class BaseFormFragmentInteractor implements BaseFormFragmentContract.Inte
 
     @Override
     public void findSprayDetails(String interventionType, String structureId, JSONObject formJSON) {
-        if (IRS.equals(interventionType)) {
+        /*if (IRS.equals(interventionType)) {
 
             appExecutors.diskIO().execute(() -> {
                 CommonPersonObject commonPersonObject = interactorUtils.fetchSprayDetails(interventionType, structureId,
@@ -123,8 +120,10 @@ public class BaseFormFragmentInteractor implements BaseFormFragmentContract.Inte
                     presenter.onFetchedSprayDetails(commonPersonObject, formJSON);
                 });
             });
-        }
+        }*/
     }
+
+
 
 
 }
