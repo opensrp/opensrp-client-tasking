@@ -16,6 +16,7 @@ import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.smartregister.CoreLibrary;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
@@ -33,26 +34,30 @@ import org.smartregister.repository.BaseRepository;
 import org.smartregister.repository.EventClientRepository;
 import org.smartregister.repository.StructureRepository;
 import org.smartregister.repository.TaskRepository;
-import org.smartregister.reveal.BuildConfig;
-import org.smartregister.reveal.application.RevealApplication;
-import org.smartregister.reveal.contract.BaseContract;
-import org.smartregister.reveal.contract.BaseContract.BasePresenter;
-import org.smartregister.reveal.contract.StructureTasksContract;
-import org.smartregister.reveal.sync.RevealClientProcessor;
-import org.smartregister.reveal.util.AppExecutors;
-import org.smartregister.reveal.util.Constants.EventType;
-import org.smartregister.reveal.util.Constants.Intervention;
-import org.smartregister.reveal.util.Constants.JsonForm;
-import org.smartregister.reveal.util.Constants.Properties;
-import org.smartregister.reveal.util.FamilyConstants.TABLE_NAME;
-import org.smartregister.reveal.util.PreferencesUtil;
-import org.smartregister.reveal.util.TaskUtils;
-import org.smartregister.reveal.util.Utils;
-import org.smartregister.reveal.widget.GeoWidgetFactory;
+import org.smartregister.tasking.BuildConfig;
+import org.smartregister.tasking.application.RevealApplication;
 import org.smartregister.tasking.contract.BaseContract;
+import org.smartregister.tasking.contract.BaseContract.BasePresenter;
+import org.smartregister.tasking.contract.StructureTasksContract;
+import org.smartregister.tasking.sync.RevealClientProcessor;
+import org.smartregister.tasking.util.AppExecutors;
+import org.smartregister.tasking.util.Constants.EventType;
+import org.smartregister.tasking.util.Constants.Intervention;
+import org.smartregister.tasking.util.Constants.JsonForm;
+import org.smartregister.tasking.util.Constants.Properties;
+import org.smartregister.tasking.util.FamilyConstants.TABLE_NAME;
+import org.smartregister.tasking.util.PreferencesUtil;
+import org.smartregister.tasking.util.TaskUtils;
+import org.smartregister.tasking.util.Utils;
+import org.smartregister.tasking.widget.GeoWidgetFactory;
+import org.smartregister.sync.ClientProcessorForJava;
+import org.smartregister.tasking.TaskingLibrary;
+import org.smartregister.tasking.contract.BaseContract;
+import org.smartregister.util.AppExecutors;
 import org.smartregister.util.DateTimeTypeConverter;
 import org.smartregister.util.JsonFormUtils;
 import org.smartregister.util.PropertiesConverter;
+import org.smartregister.view.activity.DrishtiApplication;
 
 import java.util.Collections;
 import java.util.Date;
@@ -68,36 +73,36 @@ import static com.cocoahero.android.geojson.Geometry.JSON_COORDINATES;
 import static org.smartregister.family.util.DBConstants.KEY.BASE_ENTITY_ID;
 import static org.smartregister.family.util.DBConstants.KEY.DATE_REMOVED;
 import static org.smartregister.family.util.Utils.metadata;
-import static org.smartregister.reveal.util.Constants.BEDNET_DISTRIBUTION_EVENT;
-import static org.smartregister.reveal.util.Constants.BEHAVIOUR_CHANGE_COMMUNICATION;
-import static org.smartregister.reveal.util.Constants.BLOOD_SCREENING_EVENT;
-import static org.smartregister.reveal.util.Constants.DETAILS;
-import static org.smartregister.reveal.util.Constants.DatabaseKeys.FOR;
-import static org.smartregister.reveal.util.Constants.DatabaseKeys.ID;
-import static org.smartregister.reveal.util.Constants.DatabaseKeys.STRUCTURES_TABLE;
-import static org.smartregister.reveal.util.Constants.DatabaseKeys.STRUCTURE_ID;
-import static org.smartregister.reveal.util.Constants.DatabaseKeys.TASK_TABLE;
-import static org.smartregister.reveal.util.Constants.EventType.CASE_CONFIRMATION_EVENT;
-import static org.smartregister.reveal.util.Constants.Intervention.BCC;
-import static org.smartregister.reveal.util.Constants.Intervention.BEDNET_DISTRIBUTION;
-import static org.smartregister.reveal.util.Constants.Intervention.BLOOD_SCREENING;
-import static org.smartregister.reveal.util.Constants.Intervention.CASE_CONFIRMATION;
-import static org.smartregister.reveal.util.Constants.Intervention.IRS;
-import static org.smartregister.reveal.util.Constants.Intervention.LARVAL_DIPPING;
-import static org.smartregister.reveal.util.Constants.Intervention.MOSQUITO_COLLECTION;
-import static org.smartregister.reveal.util.Constants.Intervention.PAOT;
-import static org.smartregister.reveal.util.Constants.JsonForm.ENCOUNTER_TYPE;
-import static org.smartregister.reveal.util.Constants.JsonForm.LOCATION_COMPONENT_ACTIVE;
-import static org.smartregister.reveal.util.Constants.JsonForm.PHYSICAL_TYPE;
-import static org.smartregister.reveal.util.Constants.JsonForm.STRUCTURE_NAME;
-import static org.smartregister.reveal.util.Constants.JsonForm.STRUCTURE_TYPE;
-import static org.smartregister.reveal.util.Constants.LARVAL_DIPPING_EVENT;
-import static org.smartregister.reveal.util.Constants.METADATA;
-import static org.smartregister.reveal.util.Constants.MOSQUITO_COLLECTION_EVENT;
-import static org.smartregister.reveal.util.Constants.REGISTER_STRUCTURE_EVENT;
-import static org.smartregister.reveal.util.Constants.SPRAY_EVENT;
-import static org.smartregister.reveal.util.Constants.STRUCTURE;
-import static org.smartregister.reveal.util.FamilyConstants.TABLE_NAME.FAMILY_MEMBER;
+import static org.smartregister.tasking.util.Constants.BEDNET_DISTRIBUTION_EVENT;
+import static org.smartregister.tasking.util.Constants.BEHAVIOUR_CHANGE_COMMUNICATION;
+import static org.smartregister.tasking.util.Constants.BLOOD_SCREENING_EVENT;
+import static org.smartregister.tasking.util.Constants.DETAILS;
+import static org.smartregister.tasking.util.Constants.DatabaseKeys.FOR;
+import static org.smartregister.tasking.util.Constants.DatabaseKeys.ID;
+import static org.smartregister.tasking.util.Constants.DatabaseKeys.STRUCTURES_TABLE;
+import static org.smartregister.tasking.util.Constants.DatabaseKeys.STRUCTURE_ID;
+import static org.smartregister.tasking.util.Constants.DatabaseKeys.TASK_TABLE;
+import static org.smartregister.tasking.util.Constants.EventType.CASE_CONFIRMATION_EVENT;
+import static org.smartregister.tasking.util.Constants.Intervention.BCC;
+import static org.smartregister.tasking.util.Constants.Intervention.BEDNET_DISTRIBUTION;
+import static org.smartregister.tasking.util.Constants.Intervention.BLOOD_SCREENING;
+import static org.smartregister.tasking.util.Constants.Intervention.CASE_CONFIRMATION;
+import static org.smartregister.tasking.util.Constants.Intervention.IRS;
+import static org.smartregister.tasking.util.Constants.Intervention.LARVAL_DIPPING;
+import static org.smartregister.tasking.util.Constants.Intervention.MOSQUITO_COLLECTION;
+import static org.smartregister.tasking.util.Constants.Intervention.PAOT;
+import static org.smartregister.tasking.util.Constants.JsonForm.ENCOUNTER_TYPE;
+import static org.smartregister.tasking.util.Constants.JsonForm.LOCATION_COMPONENT_ACTIVE;
+import static org.smartregister.tasking.util.Constants.JsonForm.PHYSICAL_TYPE;
+import static org.smartregister.tasking.util.Constants.JsonForm.STRUCTURE_NAME;
+import static org.smartregister.tasking.util.Constants.JsonForm.STRUCTURE_TYPE;
+import static org.smartregister.tasking.util.Constants.LARVAL_DIPPING_EVENT;
+import static org.smartregister.tasking.util.Constants.METADATA;
+import static org.smartregister.tasking.util.Constants.MOSQUITO_COLLECTION_EVENT;
+import static org.smartregister.tasking.util.Constants.REGISTER_STRUCTURE_EVENT;
+import static org.smartregister.tasking.util.Constants.SPRAY_EVENT;
+import static org.smartregister.tasking.util.Constants.STRUCTURE;
+import static org.smartregister.tasking.util.FamilyConstants.TABLE_NAME.FAMILY_MEMBER;
 import static org.smartregister.util.JsonFormUtils.ENTITY_ID;
 import static org.smartregister.util.JsonFormUtils.getString;
 
@@ -111,7 +116,7 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
             .registerTypeAdapter(DateTime.class, new DateTimeTypeConverter())
             .registerTypeAdapter(LocationProperty.class, new PropertiesConverter()).create();
 
-    private RevealApplication revealApplication;
+    private TaskingLibrary taskingLibrary;
 
     protected TaskRepository taskRepository;
 
@@ -127,7 +132,7 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
 
     protected EventClientRepository eventClientRepository;
 
-    protected RevealClientProcessor clientProcessor;
+    protected ClientProcessorForJava clientProcessor;
 
     private TaskUtils taskUtils;
 
@@ -138,21 +143,21 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
     private PreferencesUtil prefsUtil;
 
     public BaseInteractor(BaseContract.BasePresenter presenterCallBack) {
-        revealApplication = RevealApplication.getInstance();
+        taskingLibrary = TaskingLibrary.getInstance();
         this.presenterCallBack = presenterCallBack;
-        appExecutors = revealApplication.getAppExecutors();
-        taskRepository = revealApplication.getTaskRepository();
-        structureRepository = revealApplication.getStructureRepository();
-        eventClientRepository = revealApplication.getContext().getEventClientRepository();
-        clientProcessor = RevealClientProcessor.getInstance(revealApplication.getApplicationContext());
-        sharedPreferences = revealApplication.getContext().allSharedPreferences();
+        appExecutors = taskingLibrary.getAppExecutors();
+        taskRepository = taskingLibrary.getTaskRepository();
+        structureRepository = taskingLibrary.getStructureRepository();
+        eventClientRepository = taskingLibrary.getEventClientRepository();
+        clientProcessor = ClientProcessorForJava.getInstance(DrishtiApplication.getInstance());
+        sharedPreferences = taskingLibrary.getAllSharedPreferences();
         taskUtils = TaskUtils.getInstance();
-        database = revealApplication.getRepository().getReadableDatabase();
+        database = taskingLibrary.getRepository().getReadableDatabase();
         prefsUtil = PreferencesUtil.getInstance();
     }
 
     @VisibleForTesting
-    public BaseInteractor(BasePresenter presenterCallBack, CommonRepository commonRepository) {
+    public BaseInteractor(BaseContract.BasePresenter presenterCallBack, CommonRepository commonRepository) {
         this(presenterCallBack);
         this.commonRepository = commonRepository;
     }
@@ -161,6 +166,7 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
     public void saveJsonForm(String json) {
         try {
             JSONObject jsonForm = new JSONObject(json);
+            /*
             String encounterType = jsonForm.getString(ENCOUNTER_TYPE);
             boolean refreshMapOnEventSaved = true;
             switch (encounterType) {
@@ -183,7 +189,8 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
                     }
                     break;
             }
-            revealApplication.setRefreshMapOnEventSaved(refreshMapOnEventSaved);
+            taskingLibrary.setRefreshMapOnEventSaved(refreshMapOnEventSaved);
+            */
         } catch (Exception e) {
             Timber.e(e, "Error saving Json Form data");
         }
@@ -203,7 +210,7 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
     private void saveLocationInterventionForm(JSONObject jsonForm) {
         String encounterType = null;
         String interventionType = null;
-        try {
+        /*try {
             encounterType = jsonForm.getString(ENCOUNTER_TYPE);
             if (encounterType.equals(SPRAY_EVENT)) {
                 interventionType = IRS;
@@ -251,7 +258,7 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
             }
         };
 
-        appExecutors.diskIO().execute(runnable);
+        appExecutors.diskIO().execute(runnable); */
     }
 
     private void saveRegisterStructureForm(JSONObject jsonForm) {
@@ -300,8 +307,8 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
                     structure.setProperties(properties);
                     structure.setSyncStatus(BaseRepository.TYPE_Created);
                     structureRepository.addOrUpdate(structure);
-                    revealApplication.setSynced(false);
-                    Context applicationContext = revealApplication.getApplicationContext();
+                    taskingLibrary.setSynced(false);
+                    Context applicationContext = taskingLibrary.getApplicationContext();
                     Task task = null;
                     clientProcessor.processClient(Collections.singletonList(new EventClient(event, null)), true);
                     //TODO add a way of fetching generated task
@@ -326,7 +333,7 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
                             Obs myLocationActiveObs = event.findObs(null, false, LOCATION_COMPONENT_ACTIVE);
 
                             boolean myLocationActive = myLocationActiveObs != null && Boolean.valueOf(myLocationActiveObs.getValue().toString());
-                            revealApplication.setMyLocationComponentEnabled(myLocationActive);
+                            taskingLibrary.setMyLocationComponentEnabled(myLocationActive);
 
 
                             Obs zoomObs = event.findObs(null, false, GeoWidgetFactory.ZOOM_LEVEL);
@@ -392,7 +399,7 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
                     taskRepository.addOrUpdate(bloodScreeningTask);
                     removedTasks.add(bloodScreeningTask);
                 }
-                revealApplication.setSynced(false);
+                taskingLibrary.setSynced(false);
                 clientProcessor.processClient(Collections.singletonList(new EventClient(event, client)), true);
                 appExecutors.mainThread().execute(() -> {
                     ((StructureTasksContract.Presenter) presenterCallBack).onIndexConfirmationFormSaved(taskID, Task.TaskStatus.COMPLETED, businessStatus, removedTasks);
@@ -448,7 +455,7 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
 
     public void setCommonRepository() {
         if (commonRepository == null) {
-            commonRepository = revealApplication.getContext().commonrepository(metadata().familyRegister.tableName);
+            commonRepository = CoreLibrary.getInstance().context().commonrepository(metadata().familyRegister.tableName);
 
         }
     }

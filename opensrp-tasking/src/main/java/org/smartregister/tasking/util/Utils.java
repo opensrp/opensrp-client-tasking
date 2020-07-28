@@ -207,7 +207,7 @@ public class Utils {
      * @return validateFarStructures
      */
     public static Boolean validateFarStructures() {
-        return Boolean.valueOf(getGlobalConfig(CONFIGURATION.VALIDATE_FAR_STRUCTURES, BuildConfig.VALIDATE_FAR_STRUCTURES + ""));
+        return true;//return Boolean.valueOf(getGlobalConfig(CONFIGURATION.VALIDATE_FAR_STRUCTURES, BuildConfig.VALIDATE_FAR_STRUCTURES + ""));
     }
 
     /**
@@ -217,7 +217,7 @@ public class Utils {
      * @return ResolveLocationTimeoutInSeconds
      */
     public static int getResolveLocationTimeoutInSeconds() {
-        return Integer.valueOf(getGlobalConfig(CONFIGURATION.RESOLVE_LOCATION_TIMEOUT_IN_SECONDS, BuildConfig.RESOLVE_LOCATION_TIMEOUT_IN_SECONDS + ""));
+        return 0;//return Integer.valueOf(getGlobalConfig(CONFIGURATION.RESOLVE_LOCATION_TIMEOUT_IN_SECONDS, BuildConfig.RESOLVE_LOCATION_TIMEOUT_IN_SECONDS + ""));
     }
 
     /**
@@ -227,7 +227,7 @@ public class Utils {
      * @return AdminPassword
      */
     public static String getAdminPasswordNotNearStructures() {
-        return getGlobalConfig(CONFIGURATION.ADMIN_PASSWORD_NOT_NEAR_STRUCTURES, BuildConfig.ADMIN_PASSWORD_NOT_NEAR_STRUCTURES);
+        return null; //return getGlobalConfig(CONFIGURATION.ADMIN_PASSWORD_NOT_NEAR_STRUCTURES, BuildConfig.ADMIN_PASSWORD_NOT_NEAR_STRUCTURES);
     }
 
     /**
@@ -309,11 +309,11 @@ public class Utils {
     }
 
     public static boolean isFocusInvestigation() {
-        return getInterventionLabel() == R.string.focus_investigation;
+        return true; //return getInterventionLabel() == R.string.focus_investigation;
     }
 
     public static boolean isMDA() {
-        return getInterventionLabel() == R.string.mda;
+        return true;//return getInterventionLabel() == R.string.mda;
     }
 
     public static boolean isFocusInvestigationOrMDA() {
@@ -321,18 +321,18 @@ public class Utils {
     }
 
     public static String getCurrentLocationId() {
-        Location currentOperationalArea = getOperationalAreaLocation(PreferencesUtil.getInstance().getCurrentOperationalArea());
-        return currentOperationalArea == null ? null : currentOperationalArea.getId();
+        //Location currentOperationalArea = getOperationalAreaLocation(PreferencesUtil.getInstance().getCurrentOperationalArea());
+        return null; //return currentOperationalArea == null ? null : currentOperationalArea.getId();
     }
 
     public static FormTag getFormTag() {
         FormTag formTag = new FormTag();
         AllSharedPreferences sharedPreferences = DrishtiApplication.getInstance().getContext().allSharedPreferences();
         formTag.providerId = sharedPreferences.fetchRegisteredANM();
-        formTag.locationId = PreferencesUtil.getInstance().getCurrentOperationalAreaId();
+        //formTag.locationId = PreferencesUtil.getInstance().getCurrentOperationalAreaId();
         formTag.teamId = sharedPreferences.fetchDefaultTeamId(formTag.providerId);
         formTag.team = sharedPreferences.fetchDefaultTeam(formTag.providerId);
-        formTag.databaseVersion = BuildConfig.DATABASE_VERSION;
+        //formTag.databaseVersion = BuildConfig.DATABASE_VERSION;
         formTag.appVersion = BuildConfig.VERSION_CODE;
         formTag.appVersionName = BuildConfig.VERSION_NAME;
         return formTag;
@@ -357,7 +357,7 @@ public class Utils {
             }
             Pair<List<Event>, List<Client>> events = util.createEventAndClients(db, tableName, query, params, eventType, entityType, formTag);
             if (events.first != null) {
-                TaskUtils.getInstance().tagEventTaskDetails(events.first, db);
+                //TaskUtils.getInstance().tagEventTaskDetails(events.first, db);
             }
             util.saveEventAndClients(events, db);
         } catch (Exception e) {
@@ -401,7 +401,7 @@ public class Utils {
      * @return displayDistanceScale
      */
     public static Boolean displayDistanceScale() {
-        return Boolean.valueOf(getGlobalConfig(CONFIGURATION.DISPLAY_DISTANCE_SCALE, BuildConfig.DISPLAY_DISTANCE_SCALE + ""));
+        return true;//return Boolean.valueOf(getGlobalConfig(CONFIGURATION.DISPLAY_DISTANCE_SCALE, BuildConfig.DISPLAY_DISTANCE_SCALE + ""));
     }
 
 }
