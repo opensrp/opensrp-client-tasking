@@ -294,7 +294,7 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
                             presenterCallBack.onStructureAdded(Feature.fromJson(gson.toJson(structure)), featureCoordinates, zoomLevel);
                         }
                     });
-                } catch (JSONException e) {
+                } catch (Exception e) {
                     Timber.e(e, "Error saving new Structure");
                     presenterCallBack.onFormSaveFailure(REGISTER_STRUCTURE_EVENT);
                 }
