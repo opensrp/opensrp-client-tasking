@@ -36,7 +36,6 @@ import org.smartregister.tasking.util.Constants.TaskRegister;
 import org.smartregister.tasking.util.LocationUtils;
 import org.smartregister.tasking.util.RevealJsonFormUtils;
 import org.smartregister.tasking.util.Utils;
-import org.smartregister.tasking.view.DrawerMenuView;
 import org.smartregister.view.fragment.BaseRegisterFragment;
 
 import java.util.HashMap;
@@ -80,7 +79,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        drawerView = new DrawerMenuView(this);
+        drawerView = null;//new DrawerMenuView(this);
         progressDialog = new ProgressDialog(getContext());
         progressDialog.setCancelable(false);
     }
