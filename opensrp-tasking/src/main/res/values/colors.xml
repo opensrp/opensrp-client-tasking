@@ -3,4 +3,5 @@
 
     <color name="task_not_done">#FAAB00</color>
     <color name="structure_tasks_complete">#68BB0C</color>
+    <color name="toolbar_background">#007CD7</color>
 </resources>

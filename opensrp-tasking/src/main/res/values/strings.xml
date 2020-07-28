@@ -68,4 +68,11 @@
     <string name="wrong_admin_password">Wrong admin password</string>
     <string name="request_password_title">You are not near the structure</string>
     <string name="form_not_found">Form not Found</string>
+    <string name="case_classification_data">Case Classification Data</string>
+    <string name="family_member_data">Family Member Data</string>
+    <string name="family_details">Family Details</string>
+    <string name="no_matching_record_found_on_this_device">No matching record found on this device.</string>
+    <string name="enter_admin_password"> Input admin password</string>
+    <string name="focus_investigation">Focus Investigation</string>
+    <string name="detect_case_button">Detect Case</string>
 </resources>
