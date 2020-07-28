@@ -5,13 +5,13 @@ import android.os.SystemClock;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
-import org.smartregister.reveal.R;
-import org.smartregister.reveal.application.RevealApplication;
-import org.smartregister.reveal.contract.UserLocationContract;
-import org.smartregister.reveal.contract.UserLocationContract.UserLocationCallback;
-import org.smartregister.reveal.contract.UserLocationContract.UserLocationView;
-import org.smartregister.reveal.util.AppExecutors;
-import org.smartregister.reveal.util.Utils;
+import org.smartregister.tasking.R;
+import org.smartregister.tasking.TaskingLibrary;
+import org.smartregister.tasking.contract.UserLocationContract;
+import org.smartregister.tasking.contract.UserLocationContract.UserLocationCallback;
+import org.smartregister.tasking.contract.UserLocationContract.UserLocationView;
+import org.smartregister.tasking.util.Utils;
+import org.smartregister.util.AppExecutors;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -23,9 +23,9 @@ import timber.log.Timber;
  */
 public class ValidateUserLocationPresenter implements UserLocationContract.UserLocationPresenter {
 
-    private UserLocationView locationView;
+    private UserLocationContract.UserLocationView locationView;
 
-    private UserLocationCallback callback;
+    private UserLocationContract.UserLocationCallback callback;
 
     private long resolutionStarted;
 
@@ -34,7 +34,7 @@ public class ValidateUserLocationPresenter implements UserLocationContract.UserL
     protected ValidateUserLocationPresenter(UserLocationView locationView, UserLocationCallback callback) {
         this.locationView = locationView;
         this.callback = callback;
-        appExecutors = RevealApplication.getInstance().getAppExecutors();
+        appExecutors = TaskingLibrary.getInstance().getAppExecutors();
     }
 
     @Override

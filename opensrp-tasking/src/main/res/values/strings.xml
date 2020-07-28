@@ -40,4 +40,7 @@
     <string name="tasks_complete">Tasks Complete</string>
     <string name="view_tasks">View \nTasks</string>
     <string name="not_eligible">Not Eligible</string>
+
+    <string name="narrowing_location_title">Calculating your location</string>
+    <string name="narrowing_location_message">Calculating your location. Please wait</string>
 </resources>
