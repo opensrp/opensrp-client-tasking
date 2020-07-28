@@ -16,7 +16,6 @@ import org.json.JSONObject;
 import org.smartregister.tasking.R;
 import org.smartregister.tasking.contract.CaseClassificationContract;
 import org.smartregister.tasking.util.Constants;
-import org.smartregister.tasking.contract.CaseClassificationContract;
 import org.smartregister.util.Utils;
 
 public class CaseClassificationFragment extends Fragment implements CaseClassificationContract.View {
