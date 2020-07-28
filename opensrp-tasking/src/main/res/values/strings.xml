@@ -13,4 +13,9 @@
         <item quantity="one">%1d structure within %2.0f m (%3$d total)</item>
         <item quantity="other">%1d structures within %2.0f m (%3$d total)</item>
     </plurals>
+
+    <string name="record_status">Record\nStatus</string>
+    <string name="numero_sign">No.</string>
+    <string name="unenumerated_structure">Unenumerated Structure</string>
+    <string name="ineligible_location">Ineligible Location</string>
 </resources>
