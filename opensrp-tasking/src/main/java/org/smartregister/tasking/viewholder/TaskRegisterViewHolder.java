@@ -11,14 +11,15 @@ import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.smartregister.reveal.R;
-import org.smartregister.reveal.model.CardDetails;
-import org.smartregister.reveal.model.TaskDetails;
-import org.smartregister.reveal.util.Constants;
-import org.smartregister.reveal.util.PreferencesUtil;
-import org.smartregister.reveal.util.Utils;
+import org.smartregister.tasking.R;
 import org.smartregister.tasking.model.CardDetails;
 import org.smartregister.tasking.model.TaskDetails;
+import org.smartregister.tasking.util.Constants;
+import org.smartregister.tasking.util.PreferencesUtil;
+import org.smartregister.tasking.util.Utils;
+import org.smartregister.tasking.model.CardDetails;
+import org.smartregister.tasking.model.TaskDetails;
+import org.smartregister.tasking.util.PreferencesUtil;
 
 
 /**
@@ -151,7 +152,7 @@ public class TaskRegisterViewHolder extends RecyclerView.ViewHolder {
         if (Utils.isFocusInvestigation()) {
             actionView.setBackground(context.getResources().getDrawable(R.drawable.tasks_complete_bg));
         } else if (Utils.isMDA()){
-            actionView.setBackground(context.getResources().getDrawable(R.drawable.mda_adhered_bg));
+            //actionView.setBackground(context.getResources().getDrawable(R.drawable.mda_adhered_bg));
         }
         actionView.setTextColor(context.getResources().getColor(R.color.text_black));
         actionView.setText(context.getText(R.string.tasks_complete));
@@ -164,7 +165,7 @@ public class TaskRegisterViewHolder extends RecyclerView.ViewHolder {
         Drawable actionBg = null;
         String actionText = context.getText(R.string.view_tasks).toString();
 
-        if (Utils.isFocusInvestigation()) {
+        /*if (Utils.isFocusInvestigation()) {
             if (familyRegTaskMissingOrFamilyRegComplete && task.isBednetDistributed() && task.isBloodScreeningDone()) {
                 actionBg = context.getResources().getDrawable(R.drawable.tasks_complete_bg);
                 actionText = context.getText(R.string.tasks_complete).toString();
@@ -194,7 +195,7 @@ public class TaskRegisterViewHolder extends RecyclerView.ViewHolder {
             } else {
                 actionBg = context.getResources().getDrawable(R.drawable.no_task_complete_bg);
             }
-        }
+        }*/
 
         return new Pair<>(actionBg, actionText);
     }
