@@ -43,4 +43,6 @@
 
     <string name="narrowing_location_title">Calculating your location</string>
     <string name="narrowing_location_message">Calculating your location. Please wait</string>
+
+    <string name="saving_dialog_title">Saving…</string>
 </resources>

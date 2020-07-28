@@ -7,9 +7,9 @@ import com.mapbox.geojson.Feature;
 import org.json.JSONArray;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.Task;
-import org.smartregister.reveal.R;
-import org.smartregister.reveal.contract.TaskRegisterContract;
-import org.smartregister.reveal.interactor.TaskRegisterInteractor;
+import org.smartregister.tasking.R;
+import org.smartregister.tasking.contract.TaskRegisterContract;
+import org.smartregister.tasking.interactor.TaskRegisterInteractor;
 import org.smartregister.view.contract.BaseRegisterContract;
 
 import java.util.List;
