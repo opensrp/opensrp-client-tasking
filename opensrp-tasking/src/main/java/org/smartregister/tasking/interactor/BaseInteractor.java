@@ -137,7 +137,7 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
 
     private PreferencesUtil prefsUtil;
 
-    public BaseInteractor(BasePresenter presenterCallBack) {
+    public BaseInteractor(BaseContract.BasePresenter presenterCallBack) {
         revealApplication = RevealApplication.getInstance();
         this.presenterCallBack = presenterCallBack;
         appExecutors = revealApplication.getAppExecutors();
