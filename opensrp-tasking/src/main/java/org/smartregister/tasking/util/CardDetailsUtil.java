@@ -1,39 +1,12 @@
 package org.smartregister.tasking.util;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.res.Resources;
-import android.text.TextUtils;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ScrollView;
-import android.widget.TextView;
 
-import org.smartregister.AllConstants;
-import org.smartregister.reveal.R;
-import org.smartregister.reveal.application.RevealApplication;
-import org.smartregister.reveal.model.CardDetails;
-import org.smartregister.reveal.model.FamilyCardDetails;
-import org.smartregister.reveal.model.IRSVerificationCardDetails;
-import org.smartregister.reveal.model.MosquitoHarvestCardDetails;
-import org.smartregister.reveal.model.SprayCardDetails;
-import org.smartregister.reveal.util.Constants.BusinessStatus;
+import org.smartregister.tasking.R;
 import org.smartregister.tasking.model.CardDetails;
+import org.smartregister.view.activity.DrishtiApplication;
 
 import timber.log.Timber;
-
-import static org.smartregister.reveal.util.Constants.BusinessStatus.COMPLETE;
-import static org.smartregister.reveal.util.Constants.BusinessStatus.INCOMPLETE;
-import static org.smartregister.reveal.util.Constants.BusinessStatus.IN_PROGRESS;
-import static org.smartregister.reveal.util.Constants.BusinessStatus.NOT_ELIGIBLE;
-import static org.smartregister.reveal.util.Constants.BusinessStatus.NOT_SPRAYABLE;
-import static org.smartregister.reveal.util.Constants.BusinessStatus.NOT_SPRAYED;
-import static org.smartregister.reveal.util.Constants.BusinessStatus.NOT_VISITED;
-import static org.smartregister.reveal.util.Constants.BusinessStatus.PARTIALLY_SPRAYED;
-import static org.smartregister.reveal.util.Constants.BusinessStatus.SPRAYED;
-import static org.smartregister.reveal.util.Constants.Intervention.LARVAL_DIPPING;
-import static org.smartregister.reveal.util.Constants.Intervention.MOSQUITO_COLLECTION;
-import static org.smartregister.reveal.util.Constants.Intervention.PAOT;
 
 /**
  * Created by samuelgithengi on 3/22/19.
@@ -46,7 +19,7 @@ public class CardDetailsUtil {
         // extract status color
         String status = cardDetails.getStatus();
         switch (status) {
-            case BusinessStatus.NOT_SPRAYED:
+            /*case BusinessStatus.NOT_SPRAYED:
             case BusinessStatus.INCOMPLETE:
             case BusinessStatus.IN_PROGRESS:
             case BusinessStatus.NONE_RECEIVED:
@@ -69,14 +42,14 @@ public class CardDetailsUtil {
             case PARTIALLY_SPRAYED:
                 cardDetails.setStatusColor(R.color.partially_sprayed);
                 cardDetails.setStatusMessage(R.string.partially_sprayed);
-                break;
+                break;*/
             default:
                 Timber.w("business status not defined :" + cardDetails.getStatus());
                 break;
         }
     }
 
-    public void populateSprayCardTextViews(SprayCardDetails sprayCardDetails, Activity activity) {
+    /*public void populateSprayCardTextViews(SprayCardDetails sprayCardDetails, Activity activity) {
         try {
             TextView tvSprayStatus = activity.findViewById(R.id.spray_status);
             TextView tvPropertyType = activity.findViewById(R.id.property_type);
@@ -211,7 +184,7 @@ public class CardDetailsUtil {
         } catch (Resources.NotFoundException e) {
             Timber.e(e);
         }
-    }
+    }*/
 
     /**
      * Takes in a business status and returns the translated value according to locale set.
@@ -220,12 +193,12 @@ public class CardDetailsUtil {
      * @return status Translated status according to locale set
      */
     public static String getTranslatedBusinessStatus(String businessStatus) {
-        Context context = RevealApplication.getInstance().getApplicationContext();
+        Context context = DrishtiApplication.getInstance().getApplicationContext();
 
         if (businessStatus == null)
             return context.getString(R.string.not_eligible);
         switch (businessStatus) {
-            case NOT_VISITED:
+            /*case NOT_VISITED:
                 return context.getString(R.string.not_visited);
             case NOT_SPRAYED:
                 return context.getString(R.string.not_sprayed);
@@ -242,7 +215,7 @@ public class CardDetailsUtil {
             case IN_PROGRESS:
                 return context.getString(R.string.in_progress);
             case PARTIALLY_SPRAYED:
-                return context.getString(R.string.partially_sprayed);
+                return context.getString(R.string.partially_sprayed);*/
             default:
                 return businessStatus;
         }
@@ -256,19 +229,19 @@ public class CardDetailsUtil {
      * @return status Translated status
      */
     public static String getTranslatedIRSVerificationStatus(String status) {
-        Context context = RevealApplication.getInstance().getApplicationContext();
+        Context context = DrishtiApplication.getInstance().getApplicationContext();
 
-        if (status == null)
-            return context.getString(R.string.not_sprayed);
+        /*if (status == null)
+            return context.getString(R.string.not_sprayed);*/
         switch (status) {
-            case Constants.IRSVerificationStatus.SPRAYED:
+            /*case Constants.IRSVerificationStatus.SPRAYED:
                 return context.getString(R.string.sprayed);
             case Constants.IRSVerificationStatus.NOT_SPRAYED:
                 return context.getString(R.string.not_sprayed);
             case Constants.IRSVerificationStatus.NOT_FOUND_OR_VISITED:
                 return context.getString(R.string.structure_not_found_or_visited_during_campaign);
             case Constants.IRSVerificationStatus.OTHER:
-                return context.getString(R.string.other);
+                return context.getString(R.string.other);*/
             default:
                 return status;
         }

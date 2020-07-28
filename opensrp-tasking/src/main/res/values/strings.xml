@@ -39,4 +39,5 @@
     <string name="distance_from_center">%1.0f m from %2s center </string>
     <string name="tasks_complete">Tasks Complete</string>
     <string name="view_tasks">View \nTasks</string>
+    <string name="not_eligible">Not Eligible</string>
 </resources>
