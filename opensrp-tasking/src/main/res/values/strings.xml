@@ -75,4 +75,11 @@
     <string name="enter_admin_password"> Input admin password</string>
     <string name="focus_investigation">Focus Investigation</string>
     <string name="detect_case_button">Detect Case</string>
+    <string name="sort_by">Sort by</string>
+    <string name="status">Status</string>
+    <string name="task_type">Task type</string>
+    <string name="apply_filters">Apply Filters</string>
+    <string name="intervention_unit">Intervention Unit</string>
+
+    <string name="apply_filters_formatter">Apply Filters (%1$d)</string>
 </resources>
