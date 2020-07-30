@@ -16,14 +16,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 
-import org.smartregister.reveal.BuildConfig;
-import org.smartregister.reveal.R;
-import org.smartregister.reveal.adapter.DownloadedOfflineMapAdapter;
-import org.smartregister.reveal.contract.DownloadedOfflineMapsContract;
-import org.smartregister.reveal.contract.OfflineMapDownloadCallback;
-import org.smartregister.reveal.model.OfflineMapModel;
-import org.smartregister.reveal.presenter.DownloadedOfflineMapsPresenter;
+import org.smartregister.tasking.BuildConfig;
+import org.smartregister.tasking.R;
+import org.smartregister.tasking.adapter.DownloadedOfflineMapAdapter;
+import org.smartregister.tasking.contract.DownloadedOfflineMapsContract;
 import org.smartregister.tasking.contract.OfflineMapDownloadCallback;
+import org.smartregister.tasking.model.OfflineMapModel;
+import org.smartregister.tasking.presenter.DownloadedOfflineMapsPresenter;
 
 import java.util.ArrayList;
 import java.util.List;
