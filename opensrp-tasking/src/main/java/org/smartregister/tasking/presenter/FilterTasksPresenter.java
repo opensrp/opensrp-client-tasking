@@ -7,15 +7,15 @@ import android.widget.ToggleButton;
 import androidx.annotation.StringRes;
 
 import org.apache.commons.lang3.StringUtils;
-import org.smartregister.reveal.R;
-import org.smartregister.reveal.contract.FilterTasksContract;
-import org.smartregister.reveal.model.TaskFilterParams;
-import org.smartregister.reveal.util.Constants;
-import org.smartregister.reveal.util.Constants.BusinessStatus;
-import org.smartregister.reveal.util.Constants.Filter;
-import org.smartregister.reveal.util.Constants.Intervention;
-import org.smartregister.reveal.util.Constants.InterventionType;
-import org.smartregister.reveal.util.Utils;
+import org.smartregister.tasking.R;
+import org.smartregister.tasking.contract.FilterTasksContract;
+import org.smartregister.tasking.model.TaskFilterParams;
+import org.smartregister.tasking.util.Constants;
+import org.smartregister.tasking.util.Constants.BusinessStatus;
+import org.smartregister.tasking.util.Constants.Filter;
+import org.smartregister.tasking.util.Constants.Intervention;
+import org.smartregister.tasking.util.Constants.InterventionType;
+import org.smartregister.tasking.util.Utils;
 import org.smartregister.tasking.contract.FilterTasksContract;
 
 import java.util.Arrays;
@@ -46,6 +46,7 @@ public class FilterTasksPresenter implements FilterTasksContract.Presenter {
     private void populateLabels() {
         labelsMap = new HashMap<>();
         //Interventions
+        /*
         labelsMap.put(Intervention.IRS, R.string.irs);
         labelsMap.put(Intervention.MOSQUITO_COLLECTION, R.string.mosquito_collection);
         labelsMap.put(Intervention.LARVAL_DIPPING, R.string.larval_dipping);
@@ -75,6 +76,7 @@ public class FilterTasksPresenter implements FilterTasksContract.Presenter {
         labelsMap.put(BusinessStatus.INCOMPLETE, R.string.incomplete);
         labelsMap.put(BusinessStatus.NOT_ELIGIBLE, R.string.not_eligible);
         labelsMap.put(BusinessStatus.IN_PROGRESS, R.string.in_progress);
+        */
     }
 
 
