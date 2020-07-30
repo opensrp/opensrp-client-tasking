@@ -11,8 +11,8 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import org.smartregister.reveal.R;
-import org.smartregister.reveal.contract.OfflineMapsFragmentContract;
+import org.smartregister.tasking.R;
+import org.smartregister.tasking.contract.OfflineMapsFragmentContract;
 
 import io.ona.kujaku.services.MapboxOfflineDownloaderService;
 import io.ona.kujaku.utils.Constants;
