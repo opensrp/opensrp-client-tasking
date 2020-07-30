@@ -82,4 +82,8 @@
     <string name="intervention_unit">Intervention Unit</string>
 
     <string name="apply_filters_formatter">Apply Filters (%1$d)</string>
+    <string name="offline_maps">Offline Maps</string>
+    <string name="available">available</string>
+    <string name="downloaded">Downloaded</string>
+    <string name="localhost_url">http://localhost:%1$d/</string>
 </resources>
