@@ -33,7 +33,7 @@ import org.smartregister.util.PropertiesConverter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implements AvailableOfflineMapsContract.View, View.OnClickListener {
+public abstract class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implements AvailableOfflineMapsContract.View, View.OnClickListener {
 
     private RecyclerView offlineMapRecyclerView;
 
@@ -53,7 +53,7 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
                 .registerTypeAdapter(DateTime.class, new DateTimeTypeConverter())
             .registerTypeAdapter(LocationProperty.class, new PropertiesConverter()).create();
 
-
+/*
     public static AvailableOfflineMapsFragment newInstance(Bundle bundle) {
 
         AvailableOfflineMapsFragment fragment = new AvailableOfflineMapsFragment();
@@ -63,7 +63,7 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
         fragment.setPresenter(new AvailableOfflineMapsPresenter(fragment));
 
         return fragment;
-    }
+    }*/
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,9 +73,7 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
         }
         btnDownloadMap = null;
 
-        new FileHttpServerTask(getContext()).execute();
-
-
+        new FileHttpServerTask(getContext(), getMapStyleAssetPath()).execute();
     }
 
     @Nullable
@@ -247,15 +245,14 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.offline_map_checkbox:
-                updateOperationalAreasToDownload(view);
-                break;
-            case R.id.download_map:
-                initiateMapDownload();
-                break;
-            default:
-                break;
+        int viewId = view.getId();
+        if (viewId == R.id.offline_map_checkbox) {
+            updateOperationalAreasToDownload(view);
+        } else if (viewId == R.id.download_map) {
+            initiateMapDownload();
         }
     }
+
+    @NonNull
+    public abstract String getMapStyleAssetPath();
 }

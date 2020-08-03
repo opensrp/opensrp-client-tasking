@@ -11,15 +11,18 @@ import org.smartregister.tasking.util.OfflineMapHelper;
  */
 
 public class FileHttpServerTask extends AsyncTask<Void, Void, Void> {
-    private Context context;
 
-    public FileHttpServerTask(Context context) {
+    private Context context;
+    private String mapStyleAssetPath;
+
+    public FileHttpServerTask(Context context, String mapStyleAssetPath) {
         this.context = context;
+        this.mapStyleAssetPath = mapStyleAssetPath;
     }
 
     @Override
     protected Void doInBackground(Void... params) {
-        OfflineMapHelper.initializeFileHTTPServer(context, Constants.DG_ID_PLACEHOLDER);
+        OfflineMapHelper.initializeFileHTTPServer(context, Constants.DG_ID_PLACEHOLDER, mapStyleAssetPath);
         return null;
     }
 }

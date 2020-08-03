@@ -31,6 +31,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import timber.log.Timber;
+
 import static org.smartregister.tasking.util.Constants.Action.STRUCTURE_TASK_SYNCED;
 import static org.smartregister.tasking.util.Constants.TABLE_NAME.FAMILY_MEMBER;
 
@@ -190,7 +192,12 @@ public class LocationTaskIntentService extends IntentService {
         EventClientRepository ecRepository = DrishtiApplication.getInstance().getContext().getEventClientRepository();
         List<EventClient> eventClients = ecRepository.getEventsByBaseEntityIdsAndSyncStatus(BaseRepository.TYPE_Task_Unprocessed, new ArrayList<>(syncedStructuresIds));
         if (!eventClients.isEmpty()) {
-            DrishtiApplication.getInstance().getClientProcessor().getInstance(getApplicationContext()).processClient(eventClients);
+
+            try {
+                DrishtiApplication.getInstance().getClientProcessor().getInstance(getApplicationContext()).processClient(eventClients);
+            } catch (Exception ex) {
+                Timber.e(ex);
+            }
         }
     }
 

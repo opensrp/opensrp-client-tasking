@@ -88,7 +88,7 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.1.0'
 
-    api 'org.smartregister:opensrp-client-core:1.13.4-SNAPSHOT'
+    api 'org.smartregister:opensrp-client-core:1.15.3-SNAPSHOT'
     api 'org.smartregister:opensrp-client-native-form:1.13.2-SNAPSHOT'
 
     implementation('org.smartregister:opensrp-client-configurable-views:1.1.5-SNAPSHOT@aar') {

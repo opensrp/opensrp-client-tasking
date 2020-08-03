@@ -12,10 +12,8 @@ import com.mapbox.turf.TurfMeasurement;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.smartregister.tasking.BuildConfig;
 import org.smartregister.tasking.R;
 import org.smartregister.tasking.TaskingLibrary;
-import org.smartregister.tasking.application.RevealApplication;
 import org.smartregister.tasking.server.FileHTTPServer;
 
 import java.io.IOException;
@@ -123,7 +121,7 @@ public class OfflineMapHelper {
                 OfflineServiceHelper.requestOfflineMapDownload(context
                         , mapName
                         , mapboxStyle
-                        , BuildConfig.MAPBOX_SDK_ACCESS_TOKEN
+                        , TaskingLibrary.getInstance().getMapboxAccessToken()
                         , topLeftBound
                         , topRightBound
                         , bottomRightBound
@@ -136,9 +134,9 @@ public class OfflineMapHelper {
         TaskingLibrary.getInstance().getAppExecutors().diskIO().execute(runnable);
     }
 
-    public static void initializeFileHTTPServer(Context context, String digitalGlobeIdPlaceholder) {
+    public static void initializeFileHTTPServer(Context context, String digitalGlobeIdPlaceholder, String mapStyleAssetPath) {
         try {
-            FileHTTPServer httpServer = new FileHTTPServer(context, context.getString(R.string.reveal_offline_map_download_style), digitalGlobeIdPlaceholder);
+            FileHTTPServer httpServer = new FileHTTPServer(context, mapStyleAssetPath, digitalGlobeIdPlaceholder);
             httpServer.start();
         } catch (IOException e) {
             e.printStackTrace();

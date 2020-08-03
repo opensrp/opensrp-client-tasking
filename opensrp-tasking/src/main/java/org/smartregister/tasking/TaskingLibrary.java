@@ -1,6 +1,7 @@
 package org.smartregister.tasking;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.smartregister.CoreLibrary;
 import org.smartregister.repository.AllSharedPreferences;
@@ -23,6 +24,9 @@ public class TaskingLibrary {
     private StructureRepository structureRepository;
     private EventClientRepository eventClientRepository;
     private AllSharedPreferences allSharedPreferences;
+
+    private String digitalGlobeConnectId;
+    private String mapboxAccessToken;
 
     public void init() {
         instance = new TaskingLibrary();
@@ -86,5 +90,23 @@ public class TaskingLibrary {
     public Repository getRepository() {
         //return CoreLibrary.getInstance().context().
         return null;
+    }
+
+    @Nullable
+    public String getDigitalGlobeConnectId() {
+        return digitalGlobeConnectId;
+    }
+
+    public void setDigitalGlobeConnectId(@Nullable String digitalGlobeConnectId) {
+        this.digitalGlobeConnectId = digitalGlobeConnectId;
+    }
+
+    @Nullable
+    public String getMapboxAccessToken() {
+        return mapboxAccessToken;
+    }
+
+    public void setMapboxAccessToken(String mapboxAccessToken) {
+        this.mapboxAccessToken = mapboxAccessToken;
     }
 }
