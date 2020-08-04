@@ -97,6 +97,8 @@ dependencies {
         exclude group: 'com.android.support', module: 'appcompat-v7'
     }
 
+    implementation 'org.smartregister:opensrp-client-reporting:0.0.6-RVL-SNAPSHOT@aar'
+
     api 'io.ona.kujaku:library:0.8.3'
     implementation 'xerces:xercesImpl:2.12.0'
 

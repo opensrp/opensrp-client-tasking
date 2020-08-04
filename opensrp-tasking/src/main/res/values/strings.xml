@@ -91,4 +91,8 @@
     <string name="delete">Delete</string>
     <string name="download_finished_successfuly">Download finished successfuly</string>
     <string name="map_download_progress">Downloading: %,.2f %%</string>
+
+    <string name="found_coverage">Found Coverage</string>
+    <string name="spray_coverage">Spray Coverage</string>
+    <string name="spray_success_rate">Spray Success Rate</string>
 </resources>
