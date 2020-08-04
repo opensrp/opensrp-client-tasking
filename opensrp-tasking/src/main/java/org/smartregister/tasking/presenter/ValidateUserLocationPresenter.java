@@ -31,7 +31,7 @@ public class ValidateUserLocationPresenter implements UserLocationContract.UserL
 
     private AppExecutors appExecutors;
 
-    protected ValidateUserLocationPresenter(UserLocationView locationView, UserLocationCallback callback) {
+    public ValidateUserLocationPresenter(UserLocationView locationView, UserLocationCallback callback) {
         this.locationView = locationView;
         this.callback = callback;
         appExecutors = TaskingLibrary.getInstance().getAppExecutors();
