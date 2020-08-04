@@ -1,5 +1,7 @@
 package org.smartregister.tasking;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -11,6 +13,8 @@ import org.smartregister.repository.StructureRepository;
 import org.smartregister.repository.TaskNotesRepository;
 import org.smartregister.repository.TaskRepository;
 import org.smartregister.util.AppExecutors;
+
+import io.ona.kujaku.data.realm.RealmDatabase;
 
 /**
  * Created by samuelgithengi on 6/10/20.
@@ -27,6 +31,8 @@ public class TaskingLibrary {
 
     private String digitalGlobeConnectId;
     private String mapboxAccessToken;
+
+    private RealmDatabase realmDatabase;
 
     public void init() {
         instance = new TaskingLibrary();
@@ -108,5 +114,13 @@ public class TaskingLibrary {
 
     public void setMapboxAccessToken(String mapboxAccessToken) {
         this.mapboxAccessToken = mapboxAccessToken;
+    }
+
+    public RealmDatabase getRealmDatabase(@NonNull Context context) {
+        if (realmDatabase == null) {
+            realmDatabase = RealmDatabase.init(context);
+        }
+
+        return realmDatabase;
     }
 }
