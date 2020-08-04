@@ -33,7 +33,7 @@ import org.smartregister.util.PropertiesConverter;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implements AvailableOfflineMapsContract.View, View.OnClickListener {
+public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implements AvailableOfflineMapsContract.View, View.OnClickListener {
 
     private RecyclerView offlineMapRecyclerView;
 
@@ -49,21 +49,24 @@ public abstract class AvailableOfflineMapsFragment extends BaseOfflineMapsFragme
 
     private Button btnDownloadMap;
 
+    private String mapStyleAssetPath;
+
     private static Gson gson = new GsonBuilder().setDateFormat(Constants.DateFormat.EVENT_DATE_FORMAT_Z)
                 .registerTypeAdapter(DateTime.class, new DateTimeTypeConverter())
             .registerTypeAdapter(LocationProperty.class, new PropertiesConverter()).create();
 
-/*
-    public static AvailableOfflineMapsFragment newInstance(Bundle bundle) {
+    public static AvailableOfflineMapsFragment newInstance(Bundle bundle, @NonNull String mapStyleAssetPath) {
 
         AvailableOfflineMapsFragment fragment = new AvailableOfflineMapsFragment();
         if (bundle != null) {
             fragment.setArguments(bundle);
         }
+
         fragment.setPresenter(new AvailableOfflineMapsPresenter(fragment));
+        fragment.setMapStyleAssetPath(mapStyleAssetPath);
 
         return fragment;
-    }*/
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -254,5 +257,11 @@ public abstract class AvailableOfflineMapsFragment extends BaseOfflineMapsFragme
     }
 
     @NonNull
-    public abstract String getMapStyleAssetPath();
+    public String getMapStyleAssetPath() {
+        return mapStyleAssetPath;
+    }
+
+    public void setMapStyleAssetPath(String mapStyleAssetPath) {
+        this.mapStyleAssetPath = mapStyleAssetPath;
+    }
 }
