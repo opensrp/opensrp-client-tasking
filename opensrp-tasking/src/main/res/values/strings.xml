@@ -95,4 +95,5 @@
     <string name="found_coverage">Found Coverage</string>
     <string name="spray_coverage">Spray Coverage</string>
     <string name="spray_success_rate">Spray Success Rate</string>
+    <string name="offline_map_size">Size %1$s Downloaded %2$s </string>
 </resources>
