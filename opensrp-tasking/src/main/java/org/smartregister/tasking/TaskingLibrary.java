@@ -34,7 +34,7 @@ public class TaskingLibrary {
 
     private RealmDatabase realmDatabase;
 
-    public void init() {
+    public static void init() {
         instance = new TaskingLibrary();
     }
 
