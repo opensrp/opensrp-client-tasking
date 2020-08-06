@@ -12,6 +12,7 @@ import androidx.core.util.Pair;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.smartregister.tasking.R;
+import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.model.CardDetails;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.util.Constants;
@@ -165,6 +166,8 @@ public class TaskRegisterViewHolder extends RecyclerView.ViewHolder {
         Drawable actionBg = null;
         String actionText = context.getText(R.string.view_tasks).toString();
 
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getActionDrawable(task);
+
         /*if (Utils.isFocusInvestigation()) {
             if (familyRegTaskMissingOrFamilyRegComplete && task.isBednetDistributed() && task.isBloodScreeningDone()) {
                 actionBg = context.getResources().getDrawable(R.drawable.tasks_complete_bg);
@@ -195,8 +198,8 @@ public class TaskRegisterViewHolder extends RecyclerView.ViewHolder {
             } else {
                 actionBg = context.getResources().getDrawable(R.drawable.no_task_complete_bg);
             }
-        }*/
+        }
 
-        return new Pair<>(actionBg, actionText);
+        return new Pair<>(actionBg, actionText);*/
     }
 }

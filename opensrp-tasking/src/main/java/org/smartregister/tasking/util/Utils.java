@@ -34,6 +34,7 @@ import org.smartregister.job.PullUniqueIdsServiceJob;
 import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.tasking.BuildConfig;
 import org.smartregister.tasking.R;
+import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.util.Constants.CONFIGURATION;
 import org.smartregister.tasking.util.Constants.Properties;
 import org.smartregister.tasking.util.Constants.Tags;
@@ -121,6 +122,8 @@ public class Utils {
         //LocationTaskServiceJob.scheduleJobImmediately(LocationTaskServiceJob.TAG);
         PullUniqueIdsServiceJob.scheduleJobImmediately(PullUniqueIdsServiceJob.TAG);
         DocumentConfigurationServiceJob.scheduleJobImmediately(DocumentConfigurationServiceJob.TAG);
+
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().startImmediateSync();
     }
 
 
@@ -159,7 +162,8 @@ public class Utils {
     }
 
     public static Float getLocationBuffer() {
-        return 0f; // Float.valueOf(getGlobalConfig(CONFIGURATION.LOCATION_BUFFER_RADIUS_IN_METRES, BuildConfig.MY_LOCATION_BUFFER + ""));
+        // Float.valueOf(getGlobalConfig(CONFIGURATION.LOCATION_BUFFER_RADIUS_IN_METRES, BuildConfig.MY_LOCATION_BUFFER + ""));
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getLocationBuffer();
     }
 
 
@@ -182,23 +186,13 @@ public class Utils {
             return R.string.mda;
         else
             return R.string.irs;*/
-        return 0;
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getInterventionLabel();
     }
-
-   /* public static String getAge(String dob) {
+/*
+    public static String getAge(String dob) {
         String dobString = org.smartregister.family.util.Utils.getDuration(dob);
         return dobString.contains("y") ? dobString.substring(0, dobString.indexOf("y")) : dobString;
     }*/
-
-    /**
-     * Uses the server setting "draw_operational_area_boundary_and_label" to determine whether to draw the operational area boundary
-     * If this variable is not available on the server the DEFAULT_DRAW_OPERATIONAL_AREA_BOUNDARY_AND_LABEL value from the constants file is used
-     *
-     * @return drawOperationalAreaBoundaryAndLabel
-     */
-    public static Boolean getDrawOperationalAreaBoundaryAndLabel() {
-        return Boolean.valueOf(getGlobalConfig(CONFIGURATION.DRAW_OPERATIONAL_AREA_BOUNDARY_AND_LABEL, CONFIGURATION.DEFAULT_DRAW_OPERATIONAL_AREA_BOUNDARY_AND_LABEL.toString()));
-    }
 
     /**
      * Uses the server setting "validate_far_structures" to determine whether to Validate Far Structures
@@ -207,7 +201,8 @@ public class Utils {
      * @return validateFarStructures
      */
     public static Boolean validateFarStructures() {
-        return true;//return Boolean.valueOf(getGlobalConfig(CONFIGURATION.VALIDATE_FAR_STRUCTURES, BuildConfig.VALIDATE_FAR_STRUCTURES + ""));
+        //return Boolean.valueOf(getGlobalConfig(CONFIGURATION.VALIDATE_FAR_STRUCTURES, BuildConfig.VALIDATE_FAR_STRUCTURES + ""));
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().validateFarStructures();
     }
 
     /**
@@ -217,7 +212,8 @@ public class Utils {
      * @return ResolveLocationTimeoutInSeconds
      */
     public static int getResolveLocationTimeoutInSeconds() {
-        return 0;//return Integer.valueOf(getGlobalConfig(CONFIGURATION.RESOLVE_LOCATION_TIMEOUT_IN_SECONDS, BuildConfig.RESOLVE_LOCATION_TIMEOUT_IN_SECONDS + ""));
+        //return Integer.valueOf(getGlobalConfig(CONFIGURATION.RESOLVE_LOCATION_TIMEOUT_IN_SECONDS, BuildConfig.RESOLVE_LOCATION_TIMEOUT_IN_SECONDS + ""));
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getResolveLocationTimeoutInSeconds();
     }
 
     /**
@@ -227,7 +223,8 @@ public class Utils {
      * @return AdminPassword
      */
     public static String getAdminPasswordNotNearStructures() {
-        return null; //return getGlobalConfig(CONFIGURATION.ADMIN_PASSWORD_NOT_NEAR_STRUCTURES, BuildConfig.ADMIN_PASSWORD_NOT_NEAR_STRUCTURES);
+        //return getGlobalConfig(CONFIGURATION.ADMIN_PASSWORD_NOT_NEAR_STRUCTURES, BuildConfig.ADMIN_PASSWORD_NOT_NEAR_STRUCTURES);
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getAdminPasswordNotNearStructures();
     }
 
     /**
@@ -295,25 +292,15 @@ public class Utils {
         return !(MOSQUITO_COLLECTION.equals(taskCode) || LARVAL_DIPPING.equals(taskCode) || PAOT.equals(taskCode));
     }
 
-    /**
-     * Uses the server setting "display_add_structure_out_of_boundary_warning_dialog" to determine
-     * whether to display the "Register structure outside area boundary" warning dialog
-     *
-     * <p>
-     * If this variable is not available on the server the DEFAULT_DRAW_OPERATIONAL_AREA_BOUNDARY_AND_LABEL value from the constants file is used
-     *
-     * @return displayAddStructureOutOfBoundaryWarningDialog
-     */
-    public static Boolean displayAddStructureOutOfBoundaryWarningDialog() {
-        return Boolean.valueOf(getGlobalConfig(CONFIGURATION.DISPLAY_ADD_STRUCTURE_OUT_OF_BOUNDARY_WARNING_DIALOG, CONFIGURATION.DEFAULT_DISPLAY_ADD_STRUCTURE_OUT_OF_BOUNDARY_WARNING_DIALOG.toString()));
-    }
 
     public static boolean isFocusInvestigation() {
-        return true; //return getInterventionLabel() == R.string.focus_investigation;
+        //return getInterventionLabel() == R.string.focus_investigation;
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().isFocusInvestigation();
     }
 
     public static boolean isMDA() {
-        return true;//return getInterventionLabel() == R.string.mda;
+        //return getInterventionLabel() == R.string.mda;
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().isMDA();
     }
 
     public static boolean isFocusInvestigationOrMDA() {
@@ -322,17 +309,18 @@ public class Utils {
 
     public static String getCurrentLocationId() {
         //Location currentOperationalArea = getOperationalAreaLocation(PreferencesUtil.getInstance().getCurrentOperationalArea());
-        return null; //return currentOperationalArea == null ? null : currentOperationalArea.getId();
+        //return currentOperationalArea == null ? null : currentOperationalArea.getId();
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getCurrentLocationId();
     }
 
     public static FormTag getFormTag() {
         FormTag formTag = new FormTag();
         AllSharedPreferences sharedPreferences = DrishtiApplication.getInstance().getContext().allSharedPreferences();
         formTag.providerId = sharedPreferences.fetchRegisteredANM();
-        //formTag.locationId = PreferencesUtil.getInstance().getCurrentOperationalAreaId();
+        formTag.locationId = TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getCurrentOperationalAreaId();
         formTag.teamId = sharedPreferences.fetchDefaultTeamId(formTag.providerId);
         formTag.team = sharedPreferences.fetchDefaultTeam(formTag.providerId);
-        //formTag.databaseVersion = BuildConfig.DATABASE_VERSION;
+        formTag.databaseVersion = TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getDatabaseVersion();
         formTag.appVersion = BuildConfig.VERSION_CODE;
         formTag.appVersionName = BuildConfig.VERSION_NAME;
         return formTag;
@@ -357,7 +345,7 @@ public class Utils {
             }
             Pair<List<Event>, List<Client>> events = util.createEventAndClients(db, tableName, query, params, eventType, entityType, formTag);
             if (events.first != null) {
-                //TaskUtils.getInstance().tagEventTaskDetails(events.first, db);
+                TaskingLibrary.getInstance().getTaskingLibraryConfiguration().tagEventTaskDetails(events.first, db);
             }
             util.saveEventAndClients(events, db);
         } catch (Exception e) {
@@ -401,7 +389,8 @@ public class Utils {
      * @return displayDistanceScale
      */
     public static Boolean displayDistanceScale() {
-        return true;//return Boolean.valueOf(getGlobalConfig(CONFIGURATION.DISPLAY_DISTANCE_SCALE, BuildConfig.DISPLAY_DISTANCE_SCALE + ""));
+        //return Boolean.valueOf(getGlobalConfig(CONFIGURATION.DISPLAY_DISTANCE_SCALE, BuildConfig.DISPLAY_DISTANCE_SCALE + ""));
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().displayDistanceScale();
     }
 
 }

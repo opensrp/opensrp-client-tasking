@@ -12,6 +12,7 @@ import org.smartregister.repository.Repository;
 import org.smartregister.repository.StructureRepository;
 import org.smartregister.repository.TaskNotesRepository;
 import org.smartregister.repository.TaskRepository;
+import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 import org.smartregister.util.AppExecutors;
 
 import io.ona.kujaku.data.realm.RealmDatabase;
@@ -33,13 +34,18 @@ public class TaskingLibrary {
     private String mapboxAccessToken;
 
     private RealmDatabase realmDatabase;
+    private TaskingLibraryConfiguration taskingLibraryConfiguration;
 
-    public static void init() {
-        instance = new TaskingLibrary();
+    public static void init(@NonNull TaskingLibraryConfiguration taskingLibraryConfiguration) {
+        instance = new TaskingLibrary(taskingLibraryConfiguration);
     }
 
     public static TaskingLibrary getInstance() {
         return instance;
+    }
+
+    public TaskingLibrary(@NonNull TaskingLibraryConfiguration taskingLibraryConfiguration) {
+        this.taskingLibraryConfiguration = taskingLibraryConfiguration;
     }
 
     @NonNull
@@ -122,5 +128,9 @@ public class TaskingLibrary {
         }
 
         return realmDatabase;
+    }
+
+    public TaskingLibraryConfiguration getTaskingLibraryConfiguration() {
+        return taskingLibraryConfiguration;
     }
 }
