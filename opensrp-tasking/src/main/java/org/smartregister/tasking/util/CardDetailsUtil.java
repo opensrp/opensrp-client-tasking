@@ -3,6 +3,7 @@ package org.smartregister.tasking.util;
 import android.content.Context;
 
 import org.smartregister.tasking.R;
+import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.model.CardDetails;
 import org.smartregister.view.activity.DrishtiApplication;
 
@@ -14,12 +15,12 @@ import timber.log.Timber;
 public class CardDetailsUtil {
 
     public static void formatCardDetails(CardDetails cardDetails) {
-        if (cardDetails == null || cardDetails.getStatus() == null)
+        /*if (cardDetails == null || cardDetails.getStatus() == null)
             return;
         // extract status color
         String status = cardDetails.getStatus();
         switch (status) {
-            /*case BusinessStatus.NOT_SPRAYED:
+            case BusinessStatus.NOT_SPRAYED:
             case BusinessStatus.INCOMPLETE:
             case BusinessStatus.IN_PROGRESS:
             case BusinessStatus.NONE_RECEIVED:
@@ -42,11 +43,13 @@ public class CardDetailsUtil {
             case PARTIALLY_SPRAYED:
                 cardDetails.setStatusColor(R.color.partially_sprayed);
                 cardDetails.setStatusMessage(R.string.partially_sprayed);
-                break;*/
+                break;
             default:
                 Timber.w("business status not defined :" + cardDetails.getStatus());
                 break;
-        }
+        }*/
+
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().formatCardDetails(cardDetails);
     }
 
     /*public void populateSprayCardTextViews(SprayCardDetails sprayCardDetails, Activity activity) {
@@ -193,12 +196,12 @@ public class CardDetailsUtil {
      * @return status Translated status according to locale set
      */
     public static String getTranslatedBusinessStatus(String businessStatus) {
-        Context context = DrishtiApplication.getInstance().getApplicationContext();
+        /*Context context = DrishtiApplication.getInstance().getApplicationContext();
 
         if (businessStatus == null)
             return context.getString(R.string.not_eligible);
         switch (businessStatus) {
-            /*case NOT_VISITED:
+            case NOT_VISITED:
                 return context.getString(R.string.not_visited);
             case NOT_SPRAYED:
                 return context.getString(R.string.not_sprayed);
@@ -215,10 +218,12 @@ public class CardDetailsUtil {
             case IN_PROGRESS:
                 return context.getString(R.string.in_progress);
             case PARTIALLY_SPRAYED:
-                return context.getString(R.string.partially_sprayed);*/
+                return context.getString(R.string.partially_sprayed);
             default:
                 return businessStatus;
-        }
+        }*/
+
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTranslatedIRSVerificationStatus(businessStatus);
 
     }
 
@@ -229,24 +234,24 @@ public class CardDetailsUtil {
      * @return status Translated status
      */
     public static String getTranslatedIRSVerificationStatus(String status) {
-        Context context = DrishtiApplication.getInstance().getApplicationContext();
+        /*Context context = DrishtiApplication.getInstance().getApplicationContext();
 
-        /*if (status == null)
-            return context.getString(R.string.not_sprayed);*/
+        if (status == null)
+            return context.getString(R.string.not_sprayed);
         switch (status) {
-            /*case Constants.IRSVerificationStatus.SPRAYED:
+            case Constants.IRSVerificationStatus.SPRAYED:
                 return context.getString(R.string.sprayed);
             case Constants.IRSVerificationStatus.NOT_SPRAYED:
                 return context.getString(R.string.not_sprayed);
             case Constants.IRSVerificationStatus.NOT_FOUND_OR_VISITED:
                 return context.getString(R.string.structure_not_found_or_visited_during_campaign);
             case Constants.IRSVerificationStatus.OTHER:
-                return context.getString(R.string.other);*/
+                return context.getString(R.string.other);
             default:
                 return status;
-        }
+        }*/
 
-
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTranslatedIRSVerificationStatus(status);
     }
 
 

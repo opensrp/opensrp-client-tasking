@@ -23,6 +23,7 @@ import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.Task;
 import org.smartregister.tasking.R;
+import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.activity.TaskRegisterActivity;
 import org.smartregister.tasking.adapter.TaskRegisterAdapter;
 import org.smartregister.tasking.contract.BaseDrawerContract;
@@ -143,6 +144,8 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         getActivity().setResult(RESULT_OK, intent);
         getActivity().finish();
         */
+
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().startMapActivity(getActivity(), getSearchView().getText().toString(), taskFilterParams);
     }
 
     @Override
@@ -237,6 +240,8 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         /*if (this.getActivity() != null) {
             NoMatchDialogFragment.launchDialog((BaseRegisterActivity) this.getActivity(), "dialog", opensrpId);
         }*/
+
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().showNotFoundPopup(getActivity(), opensrpId);
     }
 
     private TaskRegisterFragmentPresenter getPresenter() {
@@ -264,6 +269,8 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         if (BuildConfig.BUILD_COUNTRY == Country.ZAMBIA) {
             new IndicatorsCalculatorTask(getActivity(), tasks).execute();
         }*/
+
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().setTaskDetails(getActivity(), tasks);
     }
 
     @Override
@@ -364,8 +371,9 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         intent.putExtra(Properties.TASK_STATUS, taskDetails.getTaskStatus());
 
         startActivity(intent);
+        */
 
-*/
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().openFamilyProfile(getActivity(), family, taskDetails);
     }
 
     @Override
@@ -394,11 +402,10 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
 
     @Override
     public void openFilterActivity(TaskFilterParams filterParams) {
-        /*
-        Intent intent = new Intent(getContext(), FilterTasksActivity.class);
+        /*Intent intent = new Intent(getContext(), FilterTasksActivity.class);
         intent.putExtra(FILTER_SORT_PARAMS, filterParams);
-        getActivity().startActivityForResult(intent, REQUEST_CODE_FILTER_TASKS);
-        */
+        getActivity().startActivityForResult(intent, REQUEST_CODE_FILTER_TASKS);*/
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().openFilterActivity(getActivity(), filterParams);
     }
 
     @Override

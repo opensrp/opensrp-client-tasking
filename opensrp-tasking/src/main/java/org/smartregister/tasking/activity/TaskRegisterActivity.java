@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.List;
 
 import timber.log.Timber;
-//import static org.smartregister.tasking.util.FamilyConstants.Intent.START_REGISTRATION;
 
 /**
  * Created by samuelgithengi on 3/11/19.

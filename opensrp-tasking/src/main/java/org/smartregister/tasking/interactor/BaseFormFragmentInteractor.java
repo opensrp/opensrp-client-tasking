@@ -7,10 +7,12 @@ import net.sqlcipher.database.SQLiteDatabase;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.repository.EventClientRepository;
 import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.BaseFormFragmentContract;
+import org.smartregister.tasking.util.Constants;
 import org.smartregister.tasking.util.InteractorUtils;
 import org.smartregister.util.AppExecutors;
 import org.smartregister.view.activity.DrishtiApplication;
@@ -43,7 +45,8 @@ public class BaseFormFragmentInteractor implements BaseFormFragmentContract.Inte
 
     public BaseFormFragmentInteractor(BaseFormFragmentContract.Presenter presenter) {
         this.presenter = presenter;
-        //this.commonRepository = DrishtiApplication.getInstance().getContext().commonrepository(metadata().familyMemberRegister.tableName);
+        this.commonRepository = DrishtiApplication.getInstance().getContext()
+                .commonrepository(TaskingLibrary.getInstance().getTaskingLibraryConfiguration().familyRegisterTableName());
         appExecutors = TaskingLibrary.getInstance().getAppExecutors();
         sqLiteDatabase = DrishtiApplication.getInstance().getRepository().getReadableDatabase();
         eventClientRepository = DrishtiApplication.getInstance().getContext().getEventClientRepository();
@@ -110,7 +113,7 @@ public class BaseFormFragmentInteractor implements BaseFormFragmentContract.Inte
 
     @Override
     public void findSprayDetails(String interventionType, String structureId, JSONObject formJSON) {
-        /*if (IRS.equals(interventionType)) {
+        if (Constants.Intervention.IRS.equals(interventionType)) {
 
             appExecutors.diskIO().execute(() -> {
                 CommonPersonObject commonPersonObject = interactorUtils.fetchSprayDetails(interventionType, structureId,
@@ -120,7 +123,7 @@ public class BaseFormFragmentInteractor implements BaseFormFragmentContract.Inte
                     presenter.onFetchedSprayDetails(commonPersonObject, formJSON);
                 });
             });
-        }*/
+        }
     }
 
 

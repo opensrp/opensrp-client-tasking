@@ -1,5 +1,7 @@
 package org.smartregister.tasking.util;
 
+import android.app.Activity;
+import android.content.Context;
 import android.graphics.drawable.Drawable;
 
 import androidx.annotation.NonNull;
@@ -8,24 +10,20 @@ import androidx.core.util.Pair;
 
 import net.sqlcipher.database.SQLiteDatabase;
 
-import org.apache.commons.lang3.StringUtils;
-import org.smartregister.clientandeventmodel.Client;
+import org.json.JSONObject;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.clientandeventmodel.Event;
-import org.smartregister.domain.tag.FormTag;
-import org.smartregister.repository.AllSharedPreferences;
-import org.smartregister.tasking.BuildConfig;
+import org.smartregister.domain.Location;
+import org.smartregister.domain.Task;
+import org.smartregister.tasking.contract.BaseFormFragmentContract;
 import org.smartregister.tasking.model.BaseTaskDetails;
+import org.smartregister.tasking.model.CardDetails;
 import org.smartregister.tasking.model.TaskDetails;
-import org.smartregister.util.DatabaseMigrationUtils;
-import org.smartregister.util.RecreateECUtil;
-import org.smartregister.view.activity.DrishtiApplication;
+import org.smartregister.tasking.model.TaskFilterParams;
+import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
-import timber.log.Timber;
+import java.util.Map;
 
 /**
  * Created by Ephraim Kigamba - nek.eam@gmail.com on 06-08-2020.
@@ -74,5 +72,61 @@ public abstract class TaskingLibraryConfiguration {
     public abstract boolean resetTaskInfo(@NonNull SQLiteDatabase db, @NonNull BaseTaskDetails taskDetails);
 
     public abstract boolean archiveClient(String baseEntityId, boolean isFamily);
+
+    public abstract String getTranslatedIRSVerificationStatus(String status);
+
+    public abstract String getTranslatedBusinessStatus(String businessStatus);
+
+    public abstract void formatCardDetails(CardDetails cardDetails);
+
+    public abstract void processServerConfigs();
+
+    public abstract Map<String, Integer> populateLabels();
+
+    public abstract void showBasicForm(String formName);
+
+    public abstract void onLocationValidated(@NonNull Context context, @NonNull BaseFormFragmentContract.View view, @NonNull BaseFormFragmentContract.Interactor interactor, @NonNull BaseTaskDetails baseTaskDetails, @NonNull Location structure);
+
+    public abstract String mainSelect(String mainCondition);
+
+    public abstract String nonRegisteredStructureTasksSelect(String mainCondition);
+
+    public abstract String groupedRegisteredStructureTasksSelect(String mainCondition);
+
+    public abstract String[] taskRegisterMainColumns(String tableName);
+
+    public abstract String familyRegisterTableName();
+
+    public abstract void saveCaseConfirmation(JSONObject jsonForm, String eventType);
+
+    public abstract String calculateBusinessStatus(@NonNull org.smartregister.domain.Event event);
+
+    public abstract String getCurrentPlanId();
+
+    public abstract boolean getSynced();
+
+    public abstract void setSynced(boolean synced);
+
+    public abstract boolean isMyLocationComponentEnabled();
+
+    public abstract void setMyLocationComponentEnabled(boolean myLocationComponentEnabled);
+
+    public abstract Task generateTaskFromStructureType(@NonNull Context context, @NonNull String structureId, @NonNull String structureType);
+
+    public abstract void saveLocationInterventionForm(JSONObject jsonForm);
+
+    public abstract void saveJsonForm(String json);
+
+    public abstract  void openFilterActivity(Activity activity, TaskFilterParams filterParams);
+
+    public abstract void openFamilyProfile(Activity activity, CommonPersonObjectClient family, BaseTaskDetails taskDetails);
+
+    public abstract void setTaskDetails(Activity activity, List<TaskDetails> tasks);
+
+    public abstract void showNotFoundPopup(Activity activity, String opensrpId);
+
+    public abstract void startMapActivity(Activity activity, String searchViewText, TaskFilterParams taskFilterParams);
+
+    public abstract void onTaskRegisterBindViewHolder(@NonNull TaskRegisterViewHolder viewHolder, @NonNull TaskDetails taskDetails, int position);
 
 }
