@@ -3,6 +3,7 @@ package org.smartregister.tasking.util;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -15,6 +16,8 @@ import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.Task;
+import org.smartregister.tasking.adapter.TaskRegisterAdapter;
+import org.smartregister.tasking.contract.BaseContract;
 import org.smartregister.tasking.contract.BaseFormFragmentContract;
 import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.model.CardDetails;
@@ -31,7 +34,7 @@ import java.util.Map;
 public abstract class TaskingLibraryConfiguration {
 
     @NonNull
-    public abstract Pair<Drawable, String> getActionDrawable(TaskDetails task);
+    public abstract Pair<Drawable, String> getActionDrawable(Context context, TaskDetails task);
 
     public abstract int getInterventionLabel();
 
@@ -83,7 +86,7 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract Map<String, Integer> populateLabels();
 
-    public abstract void showBasicForm(String formName);
+    public abstract void showBasicForm(BaseFormFragmentContract.View view, Context context, String formName);
 
     public abstract void onLocationValidated(@NonNull Context context, @NonNull BaseFormFragmentContract.View view, @NonNull BaseFormFragmentContract.Interactor interactor, @NonNull BaseTaskDetails baseTaskDetails, @NonNull Location structure);
 
@@ -97,7 +100,7 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract String familyRegisterTableName();
 
-    public abstract void saveCaseConfirmation(JSONObject jsonForm, String eventType);
+    public abstract void saveCaseConfirmation(BaseContract.BaseInteractor baseInteractor, BaseContract.BasePresenter presenterCallBack, JSONObject jsonForm, String eventType);
 
     public abstract String calculateBusinessStatus(@NonNull org.smartregister.domain.Event event);
 
@@ -113,20 +116,20 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract Task generateTaskFromStructureType(@NonNull Context context, @NonNull String structureId, @NonNull String structureType);
 
-    public abstract void saveLocationInterventionForm(JSONObject jsonForm);
+    public abstract void saveLocationInterventionForm(BaseContract.BaseInteractor baseInteractor, BaseContract.BasePresenter presenterCallBack, JSONObject jsonForm);
 
-    public abstract void saveJsonForm(String json);
+    public abstract void saveJsonForm(BaseContract.BaseInteractor baseInteractor, String json);
 
     public abstract  void openFilterActivity(Activity activity, TaskFilterParams filterParams);
 
     public abstract void openFamilyProfile(Activity activity, CommonPersonObjectClient family, BaseTaskDetails taskDetails);
 
-    public abstract void setTaskDetails(Activity activity, List<TaskDetails> tasks);
+    public abstract void setTaskDetails(Activity activity, TaskRegisterAdapter taskAdapter, List<TaskDetails> tasks);
 
     public abstract void showNotFoundPopup(Activity activity, String opensrpId);
 
     public abstract void startMapActivity(Activity activity, String searchViewText, TaskFilterParams taskFilterParams);
 
-    public abstract void onTaskRegisterBindViewHolder(@NonNull TaskRegisterViewHolder viewHolder, @NonNull TaskDetails taskDetails, int position);
+    public abstract void onTaskRegisterBindViewHolder(@NonNull Context context, @NonNull TaskRegisterViewHolder viewHolder, @NonNull View.OnClickListener registerActionHandler, @NonNull TaskDetails taskDetails, int position);
 
 }

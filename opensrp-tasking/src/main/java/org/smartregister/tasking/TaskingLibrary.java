@@ -14,6 +14,7 @@ import org.smartregister.repository.TaskNotesRepository;
 import org.smartregister.repository.TaskRepository;
 import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 import org.smartregister.util.AppExecutors;
+import org.smartregister.view.activity.DrishtiApplication;
 
 import io.ona.kujaku.data.realm.RealmDatabase;
 
@@ -100,8 +101,7 @@ public class TaskingLibrary {
 
     @NonNull
     public Repository getRepository() {
-        //return CoreLibrary.getInstance().context().
-        return null;
+        return DrishtiApplication.getInstance().getRepository();
     }
 
     @Nullable

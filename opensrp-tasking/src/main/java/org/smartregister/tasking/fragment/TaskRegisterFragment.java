@@ -270,7 +270,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
             new IndicatorsCalculatorTask(getActivity(), tasks).execute();
         }*/
 
-        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().setTaskDetails(getActivity(), tasks);
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().setTaskDetails(getActivity(), taskAdapter, tasks);
     }
 
     @Override

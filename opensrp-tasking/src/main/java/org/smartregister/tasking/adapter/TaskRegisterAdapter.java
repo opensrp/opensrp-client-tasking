@@ -115,7 +115,7 @@ public class TaskRegisterAdapter extends RecyclerView.Adapter<TaskRegisterViewHo
             viewHolder.hideHouseNumber();
         }*/
 
-        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().onTaskRegisterBindViewHolder(viewHolder, taskDetails.get(position), position);
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().onTaskRegisterBindViewHolder(context, viewHolder, registerActionHandler, taskDetails.get(position), position);
     }
 
     @Override

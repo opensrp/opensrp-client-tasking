@@ -119,7 +119,6 @@ public class Utils {
     }
 
     public static void startImmediateSync() {
-        //LocationTaskServiceJob.scheduleJobImmediately(LocationTaskServiceJob.TAG);
         PullUniqueIdsServiceJob.scheduleJobImmediately(PullUniqueIdsServiceJob.TAG);
         DocumentConfigurationServiceJob.scheduleJobImmediately(DocumentConfigurationServiceJob.TAG);
 
@@ -162,7 +161,6 @@ public class Utils {
     }
 
     public static Float getLocationBuffer() {
-        // Float.valueOf(getGlobalConfig(CONFIGURATION.LOCATION_BUFFER_RADIUS_IN_METRES, BuildConfig.MY_LOCATION_BUFFER + ""));
         return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getLocationBuffer();
     }
 

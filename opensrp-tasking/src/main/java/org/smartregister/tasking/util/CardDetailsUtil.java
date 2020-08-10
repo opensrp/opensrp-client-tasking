@@ -223,7 +223,7 @@ public class CardDetailsUtil {
                 return businessStatus;
         }*/
 
-        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTranslatedIRSVerificationStatus(businessStatus);
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTranslatedBusinessStatus(businessStatus);
 
     }
 

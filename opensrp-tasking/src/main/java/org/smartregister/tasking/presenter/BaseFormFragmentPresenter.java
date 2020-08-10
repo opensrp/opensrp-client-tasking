@@ -183,7 +183,7 @@ public class BaseFormFragmentPresenter extends BaseLocationListener implements B
         getView().startForm(formJSON);*/
         TaskingLibrary.getInstance()
                 .getTaskingLibraryConfiguration()
-                .showBasicForm(formName);
+                .showBasicForm(getView(), context, formName);
     }
 
     @Override

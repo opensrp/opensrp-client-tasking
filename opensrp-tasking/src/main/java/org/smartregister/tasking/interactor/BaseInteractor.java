@@ -156,10 +156,11 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
         } catch (Exception e) {
             Timber.e(e, "Error saving Json Form data");
         }*/
-        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().saveJsonForm(json);
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().saveJsonForm(this, json);
     }
 
-    private org.smartregister.domain.Event saveEvent(JSONObject jsonForm, String encounterType, String bindType) throws JSONException {
+    @Override
+    public org.smartregister.domain.Event saveEvent(JSONObject jsonForm, String encounterType, String bindType) throws JSONException {
         String entityId = getString(jsonForm, ENTITY_ID);
         JSONArray fields = JsonFormUtils.fields(jsonForm);
         JSONObject metadata = JsonFormUtils.getJSONObject(jsonForm, METADATA);
@@ -170,7 +171,8 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
         return gson.fromJson(eventJson.toString(), org.smartregister.domain.Event.class);
     }
 
-    private void saveLocationInterventionForm(JSONObject jsonForm) {
+    @Override
+    public void saveLocationInterventionForm(JSONObject jsonForm) {
         /*String encounterType = null;
         String interventionType = null;
         try {
@@ -222,10 +224,11 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
         };
 
         appExecutors.diskIO().execute(runnable); */
-        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().saveLocationInterventionForm(jsonForm);
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().saveLocationInterventionForm(this, presenterCallBack, jsonForm);
     }
 
-    private void saveRegisterStructureForm(JSONObject jsonForm) {
+    @Override
+    public void saveRegisterStructureForm(JSONObject jsonForm) {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -334,7 +337,8 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
         appExecutors.diskIO().execute(runnable);
     }
 
-    private void saveMemberForm(JSONObject jsonForm, String eventType, String intervention) {
+    @Override
+    public void saveMemberForm(JSONObject jsonForm, String eventType, String intervention) {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -358,7 +362,8 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
         appExecutors.diskIO().execute(runnable);
     }
 
-    private void saveCaseConfirmation(JSONObject jsonForm, String eventType) {
+    @Override
+    public void saveCaseConfirmation(JSONObject jsonForm, String eventType) {
         /*appExecutors.diskIO().execute(() -> {
             try {
                 String baseEntityId = JsonFormUtils.getFieldValue(JsonFormUtils.fields(jsonForm), Constants.JsonForm.FAMILY_MEMBER);
@@ -390,7 +395,7 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
                 Timber.e("Error saving case confirmation data");
             }
         });*/
-        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().saveCaseConfirmation(jsonForm, eventType);
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().saveCaseConfirmation(this, presenterCallBack, jsonForm, eventType);
     }
 
     protected String getMemberTasksSelect(String mainCondition, String[] memberColumns) {
