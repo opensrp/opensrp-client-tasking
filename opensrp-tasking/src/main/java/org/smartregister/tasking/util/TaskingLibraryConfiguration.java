@@ -24,6 +24,7 @@ import org.smartregister.tasking.model.CardDetails;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
+import org.smartregister.util.AppExecutors;
 
 import java.util.List;
 import java.util.Map;
@@ -131,5 +132,8 @@ public abstract class TaskingLibraryConfiguration {
     public abstract void startMapActivity(Activity activity, String searchViewText, TaskFilterParams taskFilterParams);
 
     public abstract void onTaskRegisterBindViewHolder(@NonNull Context context, @NonNull TaskRegisterViewHolder viewHolder, @NonNull View.OnClickListener registerActionHandler, @NonNull TaskDetails taskDetails, int position);
+
+    @NonNull
+    public abstract AppExecutors getAppExecutors();
 
 }

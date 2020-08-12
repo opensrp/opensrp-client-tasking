@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 
 import org.smartregister.CoreLibrary;
 import org.smartregister.repository.AllSharedPreferences;
@@ -51,11 +52,7 @@ public class TaskingLibrary {
 
     @NonNull
     public AppExecutors getAppExecutors() {
-        if (appExecutors == null) {
-            appExecutors = new AppExecutors();
-        }
-
-        return appExecutors;
+        return taskingLibraryConfiguration.getAppExecutors();
     }
 
     @NonNull

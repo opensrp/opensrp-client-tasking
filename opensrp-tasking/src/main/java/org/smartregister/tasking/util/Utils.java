@@ -25,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.smartregister.CoreLibrary;
 import org.smartregister.clientandeventmodel.Client;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.domain.Location;
@@ -130,7 +131,8 @@ public class Utils {
         return cache.get(operationalArea, new CacheableData<Location>() {
             @Override
             public Location fetch() {
-                return null; // DrishtiApplication.getInstance().getLocationRepository().getLocationByName(operationalArea);
+                return CoreLibrary.getInstance().context()
+                        .getLocationRepository().getLocationByName(operationalArea);
             }
         });
     }

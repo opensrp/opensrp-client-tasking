@@ -104,7 +104,7 @@ dependencies {
 
     implementation 'org.smartregister:opensrp-client-reporting:0.0.6-RVL-SNAPSHOT@aar'
 
-    api 'io.ona.kujaku:library:0.8.3'
+    implementation 'io.ona.kujaku:library:0.8.3'
     implementation 'xerces:xercesImpl:2.12.0'
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.5'
@@ -119,6 +119,16 @@ dependencies {
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    testImplementation 'org.mockito:mockito-inline:2.13.0'
+    testImplementation 'org.robolectric:robolectric:4.2'
+    testImplementation 'org.robolectric:shadows-multidex:4.2'
+    // PowerMock
+    def powerMockVersion = '2.0.0'
+    testImplementation "org.powermock:powermock-module-junit4:$powerMockVersion"
+    testImplementation "org.powermock:powermock-module-junit4-rule:$powerMockVersion"
+    testImplementation "org.powermock:powermock-api-mockito2:$powerMockVersion"
+    testImplementation "org.powermock:powermock-classloading-xstream:$powerMockVersion"
 
 }
 
