@@ -144,7 +144,7 @@ public abstract class OfflineMapsActivity extends AppCompatActivity implements O
 
 
     /**
-     * Provide the asset path to the mapbox style eg asset://download_mapbox_style.json
+     * Provide the asset path to the mapbox style eg download_mapbox_style.json without the "asset://" prefix
      *
      * @return
      */

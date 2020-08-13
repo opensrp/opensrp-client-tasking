@@ -157,7 +157,7 @@ public class Utils {
     }
 
     public static String getGlobalConfig(String key, String defaultValue) {
-        Map<String, Object> globalConfigs = null;//DrishtiApplication.getInstance().getServerConfigs();
+        Map<String, Object> globalConfigs = TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getServerConfigs();//DrishtiApplication.getInstance().getServerConfigs();
         Object val = globalConfigs != null ? globalConfigs.get(key) : null;
         return val == null ? defaultValue : val.toString();
     }

@@ -4,6 +4,7 @@ package org.smartregister.tasking;
 import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +15,7 @@ import com.vijay.jsonwizard.NativeFormLibrary;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.json.JSONObject;
+import org.mockito.Mockito;
 import org.smartregister.Context;
 import org.smartregister.CoreLibrary;
 import org.smartregister.clientandeventmodel.Event;
@@ -24,6 +26,7 @@ import org.smartregister.domain.Task;
 import org.smartregister.repository.Repository;
 import org.smartregister.tasking.adapter.TaskRegisterAdapter;
 import org.smartregister.tasking.contract.BaseContract;
+import org.smartregister.tasking.contract.BaseDrawerContract;
 import org.smartregister.tasking.contract.BaseFormFragmentContract;
 import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.model.CardDetails;
@@ -34,6 +37,7 @@ import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
 import org.smartregister.util.AppExecutors;
 import org.smartregister.view.activity.DrishtiApplication;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -91,7 +95,7 @@ public class TestRevealApplication extends DrishtiApplication {
         @NonNull
         @Override
         public Pair<Drawable, String> getActionDrawable(android.content.Context context, TaskDetails task) {
-            return null;
+            return new Pair<>(Mockito.mock(Drawable.class), task.getTaskDetails());
         }
 
         @Override
@@ -319,6 +323,21 @@ public class TestRevealApplication extends DrishtiApplication {
         @Override
         public AppExecutors getAppExecutors() {
             return ((TestRevealApplication) TestRevealApplication.getInstance()).getAppExecutors();
+        }
+
+        @Override
+        public BaseDrawerContract.View getDrawerMenuView(BaseDrawerContract.DrawerActivity activity) {
+            return Mockito.mock(BaseDrawerContract.View.class);
+        }
+
+        @Override
+        public void showTasksCompleteActionView(TextView actionView) {
+
+        }
+
+        @Override
+        public Map<String, Object> getServerConfigs() {
+            return new HashMap<>();
         }
     }
 }

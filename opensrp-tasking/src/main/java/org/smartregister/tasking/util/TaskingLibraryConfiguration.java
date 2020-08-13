@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +19,7 @@ import org.smartregister.domain.Location;
 import org.smartregister.domain.Task;
 import org.smartregister.tasking.adapter.TaskRegisterAdapter;
 import org.smartregister.tasking.contract.BaseContract;
+import org.smartregister.tasking.contract.BaseDrawerContract;
 import org.smartregister.tasking.contract.BaseFormFragmentContract;
 import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.model.CardDetails;
@@ -136,4 +138,9 @@ public abstract class TaskingLibraryConfiguration {
     @NonNull
     public abstract AppExecutors getAppExecutors();
 
+    public abstract BaseDrawerContract.View getDrawerMenuView(BaseDrawerContract.DrawerActivity activity);
+
+    public abstract void showTasksCompleteActionView(TextView actionView);
+
+    public abstract Map<String, Object> getServerConfigs();
 }

@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.cardview.widget.CardView;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -80,7 +81,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        drawerView = null;//new DrawerMenuView(this);
+        drawerView = TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getDrawerMenuView(this);//new DrawerMenuView(this);
         progressDialog = new ProgressDialog(getContext());
         progressDialog.setCancelable(false);
     }

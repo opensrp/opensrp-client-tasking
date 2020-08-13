@@ -117,15 +117,16 @@ public class TaskRegisterFragmentTest extends BaseUnitTest {
     @Before
     public void setUp() {
         org.smartregister.Context.bindtypes = new ArrayList<>();
-        fragment = new TaskRegisterFragment();
+        fragment = Mockito.spy(new TaskRegisterFragment());
         Whitebox.setInternalState(fragment, "presenter", presenter);
-        activity = Robolectric.buildActivity(TestTaskRegisterActivity.class).create().start().get();
+        activity = Mockito.spy(Robolectric.buildActivity(TestTaskRegisterActivity.class).create().start().get());
         activity.setContentView(R.layout.activity_base_register);
         activity.getSupportFragmentManager().beginTransaction().add(0, fragment).commit();
 
-        activity = Mockito.spy(activity);
         taskingLibraryConfiguration = Mockito.spy(TaskingLibrary.getInstance().getTaskingLibraryConfiguration());
         ReflectionHelpers.setField(TaskingLibrary.getInstance(), "taskingLibraryConfiguration", taskingLibraryConfiguration);
+
+        Mockito.doReturn(activity).when(fragment).getActivity();
     }
 
 
@@ -163,17 +164,12 @@ public class TaskRegisterFragmentTest extends BaseUnitTest {
     }
 
     @Test
-    public void testStartMapActivity() {
+    public void testStartMapActivityShouldCallConfigurationStartMapActivity() {
         TaskFilterParams params = new TaskFilterParams("Doe");
         fragment.startMapActivity(params);
-        assertTrue(activity.isFinishing());
-    }
 
 
-    @Test
-    public void testStartMapActivityWithNullParams() {
-        fragment.startMapActivity(null);
-        assertTrue(activity.isFinishing());
+        Mockito.verify(taskingLibraryConfiguration).startMapActivity(activity, fragment.getSearchView().getText().toString(), params);
     }
 
     @Test
@@ -228,11 +224,11 @@ public class TaskRegisterFragmentTest extends BaseUnitTest {
     }
 
     @Test
-    public void testSetTaskDetails() {
+    public void testSetTaskDetailsShouldCallTaskLibraryConfigurationSetTaskDetails() {
         Whitebox.setInternalState(fragment, "taskAdapter", taskAdapter);
         List<TaskDetails> taskDetailsList = Collections.singletonList(TestingUtils.getTaskDetails());
         fragment.setTaskDetails(taskDetailsList);
-        verify(taskAdapter).setTaskDetails(taskDetailsList);
+        verify(taskingLibraryConfiguration).setTaskDetails(activity, taskAdapter, taskDetailsList);
     }
 
     @Test
@@ -240,7 +236,7 @@ public class TaskRegisterFragmentTest extends BaseUnitTest {
         fragment.displayNotification(R.string.saving_dialog_title, R.string.loading_form_message);
         AlertDialog dialog = (AlertDialog) ShadowAlertDialog.getLatestDialog();
         assertTrue(dialog.isShowing());
-        assertEquals(activity.getString(R.string.saving_dialog_title), ((TextView) dialog.findViewById(android.R.id.message)).getText());
+        assertEquals(activity.getString(R.string.loading_form_message), ((TextView) dialog.findViewById(android.R.id.message)).getText());
     }
 
     @Test
@@ -384,7 +380,7 @@ public class TaskRegisterFragmentTest extends BaseUnitTest {
     }
 
     @Test
-    public void testOpenFilterActivity() {
+    public void testOpenFilterActivityShouldCallTaskLibraryConfigurationOpenFilterActivity() {
         fragment.openFilterActivity(null);
         Intent intent = shadowOf(activity).getNextStartedActivity();
         assertEquals(FilterTasksActivity.class, shadowOf(intent).getIntentClass());

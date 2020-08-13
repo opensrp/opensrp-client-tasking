@@ -17,10 +17,6 @@ import org.smartregister.tasking.model.CardDetails;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.util.Constants;
 import org.smartregister.tasking.util.PreferencesUtil;
-import org.smartregister.tasking.util.Utils;
-import org.smartregister.tasking.model.CardDetails;
-import org.smartregister.tasking.model.TaskDetails;
-import org.smartregister.tasking.util.PreferencesUtil;
 
 
 /**
@@ -150,13 +146,15 @@ public class TaskRegisterViewHolder extends RecyclerView.ViewHolder {
     }
 
     private void showTasksCompleteActionView() {
-        if (Utils.isFocusInvestigation()) {
+        /*if (Utils.isFocusInvestigation()) {
             actionView.setBackground(context.getResources().getDrawable(R.drawable.tasks_complete_bg));
         } else if (Utils.isMDA()){
-            //actionView.setBackground(context.getResources().getDrawable(R.drawable.mda_adhered_bg));
+            actionView.setBackground(context.getResources().getDrawable(R.drawable.mda_adhered_bg));
         }
         actionView.setTextColor(context.getResources().getColor(R.color.text_black));
-        actionView.setText(context.getText(R.string.tasks_complete));
+        actionView.setText(context.getText(R.string.tasks_complete));*/
+
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().showTasksCompleteActionView(actionView);
     }
 
     private Pair<Drawable, String> getActionDrawable(TaskDetails task) {

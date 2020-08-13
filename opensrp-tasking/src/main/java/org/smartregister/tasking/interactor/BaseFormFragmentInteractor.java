@@ -62,7 +62,7 @@ public class BaseFormFragmentInteractor implements BaseFormFragmentContract.Inte
             try {
                 cursor = sqLiteDatabase.rawQuery(
                         String.format("SELECT count(*),SUM(CASE WHEN sleeps_outdoors='Yes' THEN 1 ELSE 0 END) FROM %s WHERE %s = ?",
-                                "", STRUCTURE_ID), new String[]{structureId});//metadata().familyMemberRegister.tableName, STRUCTURE_ID), new String[]{structureId});
+                                TaskingLibrary.getInstance().getTaskingLibraryConfiguration().familyRegisterTableName(), STRUCTURE_ID), new String[]{structureId});//metadata().familyMemberRegister.tableName, STRUCTURE_ID), new String[]{structureId});
 
                 while (cursor.moveToNext()) {
                     numberOfMembers = cursor.getInt(0);
@@ -91,7 +91,7 @@ public class BaseFormFragmentInteractor implements BaseFormFragmentContract.Inte
             try {
                 cursor = sqLiteDatabase.rawQuery(
                         String.format("SELECT %s, %s, %s FROM %s WHERE %s = ?", BASE_ENTITY_ID, FIRST_NAME, LAST_NAME,
-                                "", STRUCTURE_ID), new String[]{structureId});//metadata().familyMemberRegister.tableName, STRUCTURE_ID), new String[]{structureId});
+                                TaskingLibrary.getInstance().getTaskingLibraryConfiguration().familyRegisterTableName(), STRUCTURE_ID), new String[]{structureId});//metadata().familyMemberRegister.tableName, STRUCTURE_ID), new String[]{structureId});
                 while (cursor.moveToNext()) {
                     JSONObject member = new JSONObject();
                     member.put(KEY, cursor.getString(cursor.getColumnIndex(BASE_ENTITY_ID)));
