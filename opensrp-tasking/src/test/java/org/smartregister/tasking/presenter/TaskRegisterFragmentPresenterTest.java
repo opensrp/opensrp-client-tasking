@@ -11,10 +11,12 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.powermock.reflect.Whitebox;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.Context;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.configurableviews.helper.ConfigurableViewsHelper;
@@ -23,7 +25,9 @@ import org.smartregister.configurableviews.model.ViewConfiguration;
 import org.smartregister.domain.Task;
 import org.smartregister.tasking.BaseUnitTest;
 import org.smartregister.tasking.R;
+import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.TaskRegisterFragmentContract;
+import org.smartregister.tasking.interactor.BaseFormFragmentInteractor;
 import org.smartregister.tasking.interactor.TaskRegisterFragmentInteractor;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
@@ -36,6 +40,7 @@ import org.smartregister.tasking.util.Constants.TaskRegister;
 import org.smartregister.tasking.util.LocationUtils;
 import org.smartregister.tasking.util.PreferencesUtil;
 import org.smartregister.tasking.util.RevealJsonFormUtils;
+import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 import org.smartregister.tasking.util.TestingUtils;
 import org.smartregister.tasking.util.Utils;
 import org.smartregister.util.Cache;
@@ -120,6 +125,7 @@ public class TaskRegisterFragmentPresenterTest extends BaseUnitTest {
     private TaskDetails task1;
     private TaskDetails task2;
     private List<TaskDetails> taskList;
+    private TaskingLibraryConfiguration taskingLibraryConfiguration;
 
     @Before
     public void setUp() {
@@ -138,6 +144,9 @@ public class TaskRegisterFragmentPresenterTest extends BaseUnitTest {
         cache.get("MTI_84", () -> operationalArea);
         Whitebox.setInternalState(Utils.class, cache);
         when(this.view.getLocationUtils()).thenReturn(locationUtils);
+
+        taskingLibraryConfiguration = spy(TaskingLibrary.getInstance().getTaskingLibraryConfiguration());
+        ReflectionHelpers.setField(TaskingLibrary.getInstance(), "taskingLibraryConfiguration", taskingLibraryConfiguration);
     }
 
     @Test
@@ -355,9 +364,13 @@ public class TaskRegisterFragmentPresenterTest extends BaseUnitTest {
         when(jsonFormUtils.getFormName(null, taskDetails.getTaskCode())).thenReturn(Constants.JsonForm.SPRAY_FORM);
         presenter = spy(presenter);
         doReturn(false).when(presenter).validateFarStructures();
-        presenter.onStructureFound(new org.smartregister.domain.Location(), taskDetails);
-        verify(view, timeout(ASYNC_TIMEOUT)).startForm(any());
-        verify(view).hideProgressDialog();
+
+        org.smartregister.domain.Location structure = new org.smartregister.domain.Location();
+        presenter.onStructureFound(structure, taskDetails);
+
+        verify(taskingLibraryConfiguration).onLocationValidated(Mockito.eq(RuntimeEnvironment.application)
+                , Mockito.eq(view), Mockito.any(BaseFormFragmentInteractor.class)
+                , Mockito.eq(taskDetails), Mockito.eq(structure));
     }
 
     @Test
@@ -454,10 +467,16 @@ public class TaskRegisterFragmentPresenterTest extends BaseUnitTest {
         TaskDetails taskDetails = TestingUtils.getTaskDetails();
         taskDetails.setTaskCode(Intervention.REGISTER_FAMILY);
         presenter.setTaskDetails(taskDetails);
+
+        // Actual call
         presenter.onLocationValidated();
+
+        // Verifications
         verify(view).registerFamily(taskDetails);
-        verify(view).hideProgressDialog();
         verifyNoMoreInteractions(interactor);
+        verify(taskingLibraryConfiguration).onLocationValidated(Mockito.eq(RuntimeEnvironment.application)
+                , Mockito.eq(view), Mockito.any(BaseFormFragmentInteractor.class)
+                , Mockito.eq(taskDetails), Mockito.nullable(org.smartregister.domain.Location.class));
     }
 
     @Test
