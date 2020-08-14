@@ -15,13 +15,16 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.powermock.reflect.Whitebox;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.domain.Task;
 import org.smartregister.repository.StructureRepository;
 import org.smartregister.tasking.BaseUnitTest;
+import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.TaskRegisterFragmentContract;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.util.Constants;
@@ -29,6 +32,7 @@ import org.smartregister.tasking.util.Constants.BusinessStatus;
 import org.smartregister.tasking.util.Constants.Intervention;
 import org.smartregister.tasking.util.InteractorUtils;
 import org.smartregister.tasking.util.PreferencesUtil;
+import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 import org.smartregister.tasking.util.TestingUtils;
 
 import java.util.ArrayList;
@@ -39,6 +43,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
@@ -107,6 +112,7 @@ public class TaskRegisterFragmentInteractorTest extends BaseUnitTest {
     private String groupedRegisteredStructureTasksSelectQuery;
     private String bccSelectQuery;
     private String indexSelectQuery;
+    private TaskingLibraryConfiguration taskingLibraryConfiguration;
 
     @Before
     public void setUp() {
@@ -121,6 +127,9 @@ public class TaskRegisterFragmentInteractorTest extends BaseUnitTest {
         groupedRegisteredStructureTasksSelectQuery = " SELECT grouped_tasks.* , SUM(CASE WHEN status='COMPLETED' THEN 1 ELSE 0 END ) AS completed_task_count , COUNT(_id ) AS task_count, GROUP_CONCAT(code || \"-\" || business_status ) AS grouped_structure_task_code_and_status , GROUP_CONCAT(family_member_names) as family_member_names  FROM ( Select task._id as _id , task._id , task.code , task.for , task.business_status , task.status , task.reason_reference , structure.latitude , structure.longitude , structure.name , sprayed_structures.structure_name , sprayed_structures.family_head_name , sprayed_structures.spray_status , sprayed_structures.not_sprayed_reason , sprayed_structures.not_sprayed_other_reason , structure._id AS structure_id , ec_family.first_name , ec_family.house_number , ec_family_member.first_name||' '||ec_family_member.last_name as family_member_names  FROM task  JOIN structure ON task.structure_id = structure._id   JOIN ec_family ON structure._id = ec_family.structure_id  COLLATE NOCASE  JOIN ec_family_member ON ec_family.base_entity_id = ec_family_member.relational_id  COLLATE NOCASE  LEFT JOIN sprayed_structures ON task.for = sprayed_structures.base_entity_id  WHERE task.group_id = ? AND task.plan_id = ? AND status NOT IN (?,?)  ) AS grouped_tasks GROUP BY structure_id ";
         bccSelectQuery = "SELECT * FROM task WHERE for = ? AND plan_id = ? AND code ='BCC' AND status NOT IN (?,?)";
         indexSelectQuery = "SELECT * FROM task WHERE group_id = ? AND plan_id = ? AND status NOT IN (?,?) AND code = ? ";
+
+        taskingLibraryConfiguration = Mockito.spy(TaskingLibrary.getInstance().getTaskingLibraryConfiguration());
+        ReflectionHelpers.setField(TaskingLibrary.getInstance(), "taskingLibraryConfiguration", taskingLibraryConfiguration);
     }
 
     @Test
@@ -144,7 +153,13 @@ public class TaskRegisterFragmentInteractorTest extends BaseUnitTest {
         when(database.rawQuery(mainSelectQuery, new String[]{groupId, planId, CANCELLED.name(), ARCHIVED.name()})).thenReturn(createCursor(taskId, Intervention.IRS));
         when(database.rawQuery(bccSelectQuery, new String[]{groupId, planId, CANCELLED.name(), ARCHIVED.name()})).thenReturn(createCursor(bccTask, Intervention.BCC));
         when(database.rawQuery(indexSelectQuery, new String[]{groupId, planId, CANCELLED.name(), Intervention.CASE_CONFIRMATION})).thenReturn(createEmptyCursor());
+
+        doReturn(mainSelectQuery).when(taskingLibraryConfiguration).mainSelect(pair.first);
+
+        // Run the method
         interactor.findTasks(pair, null, center, "House");
+
+        // Perform verifications
         verify(database, timeout(ASYNC_TIMEOUT)).rawQuery(mainSelectQuery, new String[]{groupId, planId, CANCELLED.name(), ARCHIVED.name()});
         verify(database, timeout(ASYNC_TIMEOUT)).rawQuery(bccSelectQuery, new String[]{groupId, planId, CANCELLED.name(), ARCHIVED.name()});
         verify(presenter, timeout(ASYNC_TIMEOUT)).onTasksFound(taskListCaptor.capture(), structuresCaptor.capture());
@@ -183,7 +198,14 @@ public class TaskRegisterFragmentInteractorTest extends BaseUnitTest {
         when(database.rawQuery(mainSelectQuery, new String[]{groupId, planId, CANCELLED.name(), ARCHIVED.name()})).thenReturn(createCursor(memberTask, Intervention.BLOOD_SCREENING));
         when(database.rawQuery(bccSelectQuery, new String[]{groupId, planId, CANCELLED.name(), ARCHIVED.name()})).thenReturn(createCursor(bccTask, Intervention.BCC));
         when(database.rawQuery(indexSelectQuery, new String[]{groupId, planId, CANCELLED.name(), ARCHIVED.name(), Intervention.CASE_CONFIRMATION})).thenReturn(createEmptyCursor());
+
+        // Mock the query generator
+        doReturn(mainSelectQuery).when(taskingLibraryConfiguration).mainSelect(pair.first);
+
+        // Call the method
         interactor.findTasks(pair, userLocation, null, "House");
+
+        // Perform verifications and assertions
         verify(database, timeout(ASYNC_TIMEOUT)).rawQuery(mainSelectQuery, new String[]{groupId, planId, CANCELLED.name(), ARCHIVED.name()});
         verify(database, timeout(ASYNC_TIMEOUT)).rawQuery(bccSelectQuery, new String[]{groupId, planId, CANCELLED.name(), ARCHIVED.name()});
         verify(presenter, timeout(ASYNC_TIMEOUT)).onTasksFound(taskListCaptor.capture(), structuresCaptor.capture());
@@ -263,7 +285,16 @@ public class TaskRegisterFragmentInteractorTest extends BaseUnitTest {
         when(database.rawQuery(nonRegisteredStructureTasksQuery, new String[]{groupId, planId, CANCELLED.name(), ARCHIVED.name()})).thenReturn(createCursor(UUID.randomUUID().toString(), Intervention.LARVAL_DIPPING));
         when(database.rawQuery(bccSelectQuery, new String[]{groupId, planId, CANCELLED.name(), ARCHIVED.name()})).thenReturn(createCursor(bccTask, Intervention.BCC));
         when(database.rawQuery(indexSelectQuery, new String[]{groupId, planId, CANCELLED.name(), ARCHIVED.name(), Intervention.CASE_CONFIRMATION})).thenReturn(createCursor(indexTask, Intervention.CASE_CONFIRMATION));
+
+        // Mock the query generator
+        doReturn(groupedRegisteredStructureTasksSelectQuery).when(taskingLibraryConfiguration).groupedRegisteredStructureTasksSelect(pair.first);
+        doReturn(nonRegisteredStructureTasksQuery).when(taskingLibraryConfiguration).nonRegisteredStructureTasksSelect(pair.first);
+        doReturn(true).when(taskingLibraryConfiguration).isFocusInvestigation();
+
+        // Call the method
         interactor.findTasks(pair, userLocation, null, "House");
+
+        // Perform the verifications and assertions
         verify(database, timeout(ASYNC_TIMEOUT)).rawQuery(groupedRegisteredStructureTasksSelectQuery, new String[]{groupId, planId, CANCELLED.name(), ARCHIVED.name()});
         verify(database, timeout(ASYNC_TIMEOUT)).rawQuery(nonRegisteredStructureTasksQuery, new String[]{groupId, planId, CANCELLED.name(), ARCHIVED.name()});
         verify(database, timeout(ASYNC_TIMEOUT)).rawQuery(bccSelectQuery, new String[]{groupId, planId, CANCELLED.name(), ARCHIVED.name()});
