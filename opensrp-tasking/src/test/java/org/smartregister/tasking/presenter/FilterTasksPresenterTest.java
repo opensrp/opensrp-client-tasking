@@ -41,6 +41,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -83,9 +84,9 @@ public class FilterTasksPresenterTest extends BaseUnitTest {
     @Test
     public void testPopulateLabels() {
         Map<String, Integer> labelsMap = Whitebox.getInternalState(filterTasksPresenter, "labelsMap");
-        assertNull(labelsMap);
 
         Mockito.verify(taskingLibraryConfiguration).populateLabels();
+        assertEquals(taskingLibraryConfiguration.populateLabels(), labelsMap);
     }
 
     @Test
@@ -134,40 +135,51 @@ public class FilterTasksPresenterTest extends BaseUnitTest {
 
     @Test
     public void testGetIntentionTypesMDA() {
-        PreferencesUtil.getInstance().setInterventionTypeForPlan(planId, Intervention.MDA);
+        doReturn(true).when(taskingLibraryConfiguration).isMDA();
+        doReturn(false).when(taskingLibraryConfiguration).isFocusInvestigation();
+
         assertEquals(Intervention.MDA_INTERVENTIONS, filterTasksPresenter.getIntentionTypes());
     }
 
 
     @Test
     public void testGetIntentionTypesFI() {
-        PreferencesUtil.getInstance().setInterventionTypeForPlan(planId, Intervention.FI);
+        doReturn(false).when(taskingLibraryConfiguration).isMDA();
+        doReturn(true).when(taskingLibraryConfiguration).isFocusInvestigation();
+
         assertEquals(Intervention.FI_INTERVENTIONS, filterTasksPresenter.getIntentionTypes());
     }
 
     @Test
     public void testGetIntentionTypesIRS() {
-        PreferencesUtil.getInstance().setInterventionTypeForPlan(planId, Intervention.IRS);
+        doReturn(false).when(taskingLibraryConfiguration).isMDA();
+        doReturn(false).when(taskingLibraryConfiguration).isFocusInvestigation();
+
         assertEquals(Intervention.IRS_INTERVENTIONS, filterTasksPresenter.getIntentionTypes());
     }
 
 
     @Test
     public void testGetBusinessStatusOptionsMDA() {
-        PreferencesUtil.getInstance().setInterventionTypeForPlan(planId, Intervention.MDA);
+        doReturn(false).when(taskingLibraryConfiguration).isFocusInvestigation();
+        doReturn(true).when(taskingLibraryConfiguration).isMDA();
+
         assertEquals(BusinessStatus.MDA_BUSINESS_STATUS, filterTasksPresenter.getBusinessStatusOptions());
     }
 
 
     @Test
     public void testGetBusinessStatusOptionsFI() {
-        PreferencesUtil.getInstance().setInterventionTypeForPlan(planId, Intervention.FI);
+        doReturn(true).when(taskingLibraryConfiguration).isFocusInvestigation();
+
         assertEquals(BusinessStatus.FI_BUSINESS_STATUS, filterTasksPresenter.getBusinessStatusOptions());
     }
 
     @Test
     public void testGetBusinessStatusOptionsIRS() {
-        PreferencesUtil.getInstance().setInterventionTypeForPlan(planId, Intervention.IRS);
+        doReturn(false).when(taskingLibraryConfiguration).isFocusInvestigation();
+        doReturn(false).when(taskingLibraryConfiguration).isMDA();
+
         assertEquals(BusinessStatus.IRS_BUSINESS_STATUS, filterTasksPresenter.getBusinessStatusOptions());
     }
 
