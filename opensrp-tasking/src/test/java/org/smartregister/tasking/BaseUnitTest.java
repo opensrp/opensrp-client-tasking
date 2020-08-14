@@ -21,6 +21,7 @@ import org.smartregister.tasking.shadow.LayerShadow;
 import org.smartregister.tasking.shadow.LineLayerShadow;
 import org.smartregister.tasking.shadow.MapViewShadow;
 import org.smartregister.tasking.shadow.OfflineManagerShadow;
+import org.smartregister.tasking.shadow.ShadowRealmDatabase;
 import org.smartregister.tasking.shadow.SourceShadow;
 import org.smartregister.tasking.shadow.SymbolLayerShadow;
 import org.smartregister.util.DateTimeTypeConverter;
@@ -32,7 +33,7 @@ import org.smartregister.util.DateTimeTypeConverter;
         MapViewShadow.class, KujakuMapViewShadow.class,
         LayerShadow.class, SymbolLayerShadow.class, LineLayerShadow.class,
         GeoJsonSourceShadow.class, SourceShadow.class, OfflineManagerShadow.class,
-        AsyncTaskShadow.class, CloudantDataHandlerShadowUtils.class}, sdk = Build.VERSION_CODES.P)
+        AsyncTaskShadow.class, CloudantDataHandlerShadowUtils.class, ShadowRealmDatabase.class}, sdk = Build.VERSION_CODES.P)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
 public abstract class BaseUnitTest {
 
