@@ -65,6 +65,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -117,16 +118,14 @@ public class TaskRegisterFragmentTest extends BaseUnitTest {
     @Before
     public void setUp() {
         org.smartregister.Context.bindtypes = new ArrayList<>();
-        fragment = Mockito.spy(new TaskRegisterFragment());
+        fragment = new TaskRegisterFragment();
         Whitebox.setInternalState(fragment, "presenter", presenter);
-        activity = Mockito.spy(Robolectric.buildActivity(TestTaskRegisterActivity.class).create().start().get());
+        activity = Robolectric.buildActivity(TestTaskRegisterActivity.class).create().start().get();
         activity.setContentView(R.layout.activity_base_register);
         activity.getSupportFragmentManager().beginTransaction().add(0, fragment).commit();
 
         taskingLibraryConfiguration = Mockito.spy(TaskingLibrary.getInstance().getTaskingLibraryConfiguration());
         ReflectionHelpers.setField(TaskingLibrary.getInstance(), "taskingLibraryConfiguration", taskingLibraryConfiguration);
-
-        Mockito.doReturn(activity).when(fragment).getActivity();
     }
 
 
@@ -338,6 +337,10 @@ public class TaskRegisterFragmentTest extends BaseUnitTest {
 
     @Test
     public void testRegisterFamily() {
+        activity = spy(activity);
+        fragment = spy(fragment);
+        doReturn(activity).when(fragment).getActivity();
+
         TaskDetails details = TestingUtils.getTaskDetails();
         fragment.registerFamily(details);
 
@@ -382,8 +385,7 @@ public class TaskRegisterFragmentTest extends BaseUnitTest {
     @Test
     public void testOpenFilterActivityShouldCallTaskLibraryConfigurationOpenFilterActivity() {
         fragment.openFilterActivity(null);
-        Intent intent = shadowOf(activity).getNextStartedActivity();
-        assertEquals(FilterTasksActivity.class, shadowOf(intent).getIntentClass());
+        verify(taskingLibraryConfiguration).openFilterActivity(activity, null);
     }
 
     @Test
