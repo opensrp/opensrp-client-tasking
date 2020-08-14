@@ -1,28 +1,36 @@
 package org.smartregister.tasking.viewholder;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.core.util.Pair;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.powermock.reflect.Whitebox;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.Shadows;
+import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.tasking.BaseUnitTest;
 import org.smartregister.tasking.R;
+import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.model.CardDetails;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.util.Constants;
 import org.smartregister.tasking.util.PreferencesUtil;
+import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.smartregister.tasking.util.Constants.Intervention.FI;
@@ -51,11 +59,15 @@ public class TaskRegisterViewHolderTest extends BaseUnitTest {
     private Context context = RuntimeEnvironment.application;
 
     private TaskRegisterViewHolder viewHolder;
+    private TaskingLibraryConfiguration taskingLibraryConfiguration;
 
     @Before
     public void setUp() {
         View view = LayoutInflater.from(context).inflate(R.layout.task_register_row, null);
         viewHolder = new TaskRegisterViewHolder(view);
+
+        taskingLibraryConfiguration = Mockito.spy(TaskingLibrary.getInstance().getTaskingLibraryConfiguration());
+        ReflectionHelpers.setField(TaskingLibrary.getInstance(), "taskingLibraryConfiguration", taskingLibraryConfiguration);
     }
 
     @Test
@@ -153,7 +165,12 @@ public class TaskRegisterViewHolderTest extends BaseUnitTest {
         when(taskDetails.isFamilyRegistered()).thenReturn(true);
         when(taskDetails.isBednetDistributed()).thenReturn(true);
         when(taskDetails.isBloodScreeningDone()).thenReturn(true);
+
+        doReturn(new Pair<Drawable, String>(context.getResources().getDrawable(R.drawable.tasks_complete_bg)
+                , RuntimeEnvironment.application.getString(R.string.tasks_complete))).when(taskingLibraryConfiguration).getActionDrawable(context, taskDetails);
+
         viewHolder.setTaskAction("Record\n Status", taskDetails, cardDetails, onClickListener);
+
         TextView taskDetails = viewHolder.itemView.findViewById(R.id.task_action);
         assertEquals(View.VISIBLE, taskDetails.getVisibility());
         assertEquals(context.getString(R.string.tasks_complete), taskDetails.getText());
@@ -171,12 +188,17 @@ public class TaskRegisterViewHolderTest extends BaseUnitTest {
         when(taskDetails.isFamilyRegistered()).thenReturn(true);
         when(taskDetails.isBednetDistributed()).thenReturn(false);
         when(taskDetails.isBloodScreeningDone()).thenReturn(false);
+
+        doReturn(new Pair<Drawable, String>(context.getResources().getDrawable(R.drawable.tasks_complete_bg)
+                , RuntimeEnvironment.application.getString(R.string.view_tasks))).when(taskingLibraryConfiguration).getActionDrawable(context, taskDetails);
+
         viewHolder.setTaskAction("Record\n Status", taskDetails, cardDetails, onClickListener);
+
         TextView taskDetails = viewHolder.itemView.findViewById(R.id.task_action);
         assertEquals(View.VISIBLE, taskDetails.getVisibility());
         assertEquals(context.getString(R.string.view_tasks), taskDetails.getText());
         assertEquals(context.getColor(R.color.text_black), taskDetails.getCurrentTextColor());
-        //assertEquals(context.getResources().getDrawable(R.drawable.family_registered_bg).getConstantState(), taskDetails.getBackground().getConstantState());
+        assertEquals(context.getResources().getDrawable(R.drawable.tasks_complete_bg).getConstantState(), taskDetails.getBackground().getConstantState());
         taskDetails.performClick();
         verify(onClickListener).onClick(taskDetails);
 
@@ -189,12 +211,17 @@ public class TaskRegisterViewHolderTest extends BaseUnitTest {
         when(taskDetails.isFamilyRegistered()).thenReturn(true);
         when(taskDetails.isBednetDistributed()).thenReturn(true);
         when(taskDetails.isBloodScreeningDone()).thenReturn(false);
+
+        doReturn(new Pair<Drawable, String>(context.getResources().getDrawable(R.drawable.tasks_complete_bg)
+                , RuntimeEnvironment.application.getString(R.string.view_tasks))).when(taskingLibraryConfiguration).getActionDrawable(context, taskDetails);
+
         viewHolder.setTaskAction("Record\n Status", taskDetails, cardDetails, onClickListener);
+
         TextView taskDetails = viewHolder.itemView.findViewById(R.id.task_action);
         assertEquals(View.VISIBLE, taskDetails.getVisibility());
         assertEquals(context.getString(R.string.view_tasks), taskDetails.getText());
         assertEquals(context.getColor(R.color.text_black), taskDetails.getCurrentTextColor());
-        //assertEquals(context.getResources().getDrawable(R.drawable.bednet_distributed_bg).getConstantState(), taskDetails.getBackground().getConstantState());
+        assertEquals(context.getResources().getDrawable(R.drawable.tasks_complete_bg).getConstantState(), taskDetails.getBackground().getConstantState());
         taskDetails.performClick();
         verify(onClickListener).onClick(taskDetails);
 
@@ -207,12 +234,17 @@ public class TaskRegisterViewHolderTest extends BaseUnitTest {
         when(taskDetails.isFamilyRegistered()).thenReturn(true);
         when(taskDetails.isBednetDistributed()).thenReturn(false);
         when(taskDetails.isBloodScreeningDone()).thenReturn(true);
+
+        doReturn(new Pair<Drawable, String>(context.getResources().getDrawable(R.drawable.tasks_complete_bg)
+                , RuntimeEnvironment.application.getString(R.string.view_tasks))).when(taskingLibraryConfiguration).getActionDrawable(context, taskDetails);
+
         viewHolder.setTaskAction("Record\n Status", taskDetails, cardDetails, onClickListener);
+
         TextView taskDetails = viewHolder.itemView.findViewById(R.id.task_action);
         assertEquals(View.VISIBLE, taskDetails.getVisibility());
         assertEquals(context.getString(R.string.view_tasks), taskDetails.getText());
         assertEquals(context.getColor(R.color.text_black), taskDetails.getCurrentTextColor());
-        //assertEquals(context.getResources().getDrawable(R.drawable.blood_screening_complete_bg).getConstantState(), taskDetails.getBackground().getConstantState());
+        assertEquals(context.getResources().getDrawable(R.drawable.tasks_complete_bg).getConstantState(), taskDetails.getBackground().getConstantState());
         taskDetails.performClick();
         verify(onClickListener).onClick(taskDetails);
 
@@ -226,12 +258,16 @@ public class TaskRegisterViewHolderTest extends BaseUnitTest {
         when(taskDetails.isFamilyRegistered()).thenReturn(false);
         when(taskDetails.isBednetDistributed()).thenReturn(false);
         when(taskDetails.isBloodScreeningDone()).thenReturn(false);
+
+        doReturn(new Pair<Drawable, String>(context.getResources().getDrawable(R.drawable.tasks_complete_bg), RuntimeEnvironment.application.getString(R.string.view_tasks))).when(taskingLibraryConfiguration).getActionDrawable(context, taskDetails);
+
         viewHolder.setTaskAction("Record\n Status", taskDetails, cardDetails, onClickListener);
+
         TextView taskDetails = viewHolder.itemView.findViewById(R.id.task_action);
         assertEquals(View.VISIBLE, taskDetails.getVisibility());
         assertEquals(context.getString(R.string.view_tasks), taskDetails.getText());
         assertEquals(context.getColor(R.color.text_black), taskDetails.getCurrentTextColor());
-        //assertEquals(context.getResources().getDrawable(R.drawable.no_task_complete_bg).getConstantState(), taskDetails.getBackground().getConstantState());
+        assertEquals(context.getResources().getDrawable(R.drawable.tasks_complete_bg).getConstantState(), taskDetails.getBackground().getConstantState());
         taskDetails.performClick();
         verify(onClickListener).onClick(taskDetails);
 
@@ -243,12 +279,17 @@ public class TaskRegisterViewHolderTest extends BaseUnitTest {
         when(taskDetails.getTaskCount()).thenReturn(2);
         when(taskDetails.isFamilyRegistered()).thenReturn(true);
         when(taskDetails.isMdaAdhered()).thenReturn(true);
+
+        doReturn(new Pair<Drawable, String>(context.getResources().getDrawable(R.drawable.tasks_complete_bg)
+                , RuntimeEnvironment.application.getString(R.string.tasks_complete))).when(taskingLibraryConfiguration).getActionDrawable(context, taskDetails);
+
         viewHolder.setTaskAction("Record\n Status", taskDetails, cardDetails, onClickListener);
+
         TextView taskDetails = viewHolder.itemView.findViewById(R.id.task_action);
         assertEquals(View.VISIBLE, taskDetails.getVisibility());
         assertEquals(context.getString(R.string.tasks_complete), taskDetails.getText());
         assertEquals(context.getColor(R.color.text_black), taskDetails.getCurrentTextColor());
-        //assertEquals(context.getResources().getDrawable(R.drawable.mda_adhered_bg).getConstantState(), taskDetails.getBackground().getConstantState());
+        assertEquals(context.getResources().getDrawable(R.drawable.tasks_complete_bg).getConstantState(), taskDetails.getBackground().getConstantState());
         taskDetails.performClick();
         verify(onClickListener).onClick(taskDetails);
 
@@ -261,12 +302,16 @@ public class TaskRegisterViewHolderTest extends BaseUnitTest {
         when(taskDetails.isFamilyRegistered()).thenReturn(true);
         when(taskDetails.isMdaAdhered()).thenReturn(false);
         when(taskDetails.isFullyReceived()).thenReturn(true);
+
+        doReturn(new Pair<Drawable, String>(context.getResources().getDrawable(R.drawable.tasks_complete_bg)
+                , RuntimeEnvironment.application.getString(R.string.view_tasks))).when(taskingLibraryConfiguration).getActionDrawable(context, taskDetails);
+
         viewHolder.setTaskAction("Record\n Status", taskDetails, cardDetails, onClickListener);
         TextView taskDetails = viewHolder.itemView.findViewById(R.id.task_action);
         assertEquals(View.VISIBLE, taskDetails.getVisibility());
         assertEquals(context.getString(R.string.view_tasks), taskDetails.getText());
         assertEquals(context.getColor(R.color.text_black), taskDetails.getCurrentTextColor());
-        //assertEquals(context.getResources().getDrawable(R.drawable.mda_dispensed_bg).getConstantState(), taskDetails.getBackground().getConstantState());
+        assertEquals(context.getResources().getDrawable(R.drawable.tasks_complete_bg).getConstantState(), taskDetails.getBackground().getConstantState());
         taskDetails.performClick();
         verify(onClickListener).onClick(taskDetails);
 
@@ -280,12 +325,17 @@ public class TaskRegisterViewHolderTest extends BaseUnitTest {
         when(taskDetails.isMdaAdhered()).thenReturn(false);
         when(taskDetails.isFullyReceived()).thenReturn(false);
         when(taskDetails.isPartiallyReceived()).thenReturn(true);
+
+        doReturn(new Pair<Drawable, String>(context.getResources().getDrawable(R.drawable.tasks_complete_bg)
+                , RuntimeEnvironment.application.getString(R.string.view_tasks))).when(taskingLibraryConfiguration).getActionDrawable(context, taskDetails);
+
         viewHolder.setTaskAction("Record\n Status", taskDetails, cardDetails, onClickListener);
+
         TextView taskDetails = viewHolder.itemView.findViewById(R.id.task_action);
         assertEquals(View.VISIBLE, taskDetails.getVisibility());
         assertEquals(context.getString(R.string.view_tasks), taskDetails.getText());
         assertEquals(context.getColor(R.color.text_black), taskDetails.getCurrentTextColor());
-        //assertEquals(context.getResources().getDrawable(R.drawable.mda_partially_received_bg).getConstantState(), taskDetails.getBackground().getConstantState());
+        assertEquals(context.getResources().getDrawable(R.drawable.tasks_complete_bg).getConstantState(), taskDetails.getBackground().getConstantState());
         taskDetails.performClick();
         verify(onClickListener).onClick(taskDetails);
 
@@ -300,12 +350,17 @@ public class TaskRegisterViewHolderTest extends BaseUnitTest {
         when(taskDetails.isFullyReceived()).thenReturn(false);
         when(taskDetails.isPartiallyReceived()).thenReturn(false);
         when(taskDetails.isNoneReceived()).thenReturn(true);
+
+        doReturn(new Pair<Drawable, String>(context.getResources().getDrawable(R.drawable.tasks_complete_bg)
+                , RuntimeEnvironment.application.getString(R.string.view_tasks))).when(taskingLibraryConfiguration).getActionDrawable(context, taskDetails);
+
         viewHolder.setTaskAction("Record\n Status", taskDetails, cardDetails, onClickListener);
+
         TextView taskDetails = viewHolder.itemView.findViewById(R.id.task_action);
         assertEquals(View.VISIBLE, taskDetails.getVisibility());
         assertEquals(context.getString(R.string.view_tasks), taskDetails.getText());
         assertEquals(context.getColor(R.color.text_black), taskDetails.getCurrentTextColor());
-        //assertEquals(context.getResources().getDrawable(R.drawable.mda_none_received_bg).getConstantState(), taskDetails.getBackground().getConstantState());
+        assertEquals(context.getResources().getDrawable(R.drawable.tasks_complete_bg).getConstantState(), taskDetails.getBackground().getConstantState());
         taskDetails.performClick();
         verify(onClickListener).onClick(taskDetails);
 
@@ -321,12 +376,17 @@ public class TaskRegisterViewHolderTest extends BaseUnitTest {
         when(taskDetails.isPartiallyReceived()).thenReturn(false);
         when(taskDetails.isNoneReceived()).thenReturn(false);
         when(taskDetails.isNotEligible()).thenReturn(true);
+
+        doReturn(new Pair<Drawable, String>(context.getResources().getDrawable(R.drawable.tasks_complete_bg)
+                , RuntimeEnvironment.application.getString(R.string.view_tasks))).when(taskingLibraryConfiguration).getActionDrawable(context, taskDetails);
+
         viewHolder.setTaskAction("Record\n Status", taskDetails, cardDetails, onClickListener);
+
         TextView taskDetails = viewHolder.itemView.findViewById(R.id.task_action);
         assertEquals(View.VISIBLE, taskDetails.getVisibility());
         assertEquals(context.getString(R.string.view_tasks), taskDetails.getText());
         assertEquals(context.getColor(R.color.text_black), taskDetails.getCurrentTextColor());
-        //assertEquals(context.getResources().getDrawable(R.drawable.mda_not_eligible_bg).getConstantState(), taskDetails.getBackground().getConstantState());
+        assertEquals(context.getResources().getDrawable(R.drawable.tasks_complete_bg).getConstantState(), taskDetails.getBackground().getConstantState());
         taskDetails.performClick();
         verify(onClickListener).onClick(taskDetails);
 
@@ -342,12 +402,17 @@ public class TaskRegisterViewHolderTest extends BaseUnitTest {
         when(taskDetails.isPartiallyReceived()).thenReturn(false);
         when(taskDetails.isNoneReceived()).thenReturn(false);
         when(taskDetails.isNotEligible()).thenReturn(false);
+
+        doReturn(new Pair<Drawable, String>(context.getResources().getDrawable(R.drawable.tasks_complete_bg)
+                , RuntimeEnvironment.application.getString(R.string.view_tasks))).when(taskingLibraryConfiguration).getActionDrawable(context, taskDetails);
+
         viewHolder.setTaskAction("Record\n Status", taskDetails, cardDetails, onClickListener);
+
         TextView taskDetails = viewHolder.itemView.findViewById(R.id.task_action);
         assertEquals(View.VISIBLE, taskDetails.getVisibility());
         assertEquals(context.getString(R.string.view_tasks), taskDetails.getText());
         assertEquals(context.getColor(R.color.text_black), taskDetails.getCurrentTextColor());
-        //assertEquals(context.getResources().getDrawable(R.drawable.family_registered_bg).getConstantState(), taskDetails.getBackground().getConstantState());
+        assertEquals(context.getResources().getDrawable(R.drawable.tasks_complete_bg).getConstantState(), taskDetails.getBackground().getConstantState());
         taskDetails.performClick();
         verify(onClickListener).onClick(taskDetails);
 
@@ -364,12 +429,17 @@ public class TaskRegisterViewHolderTest extends BaseUnitTest {
         when(taskDetails.isPartiallyReceived()).thenReturn(false);
         when(taskDetails.isNoneReceived()).thenReturn(false);
         when(taskDetails.isNotEligible()).thenReturn(false);
+
+        doReturn(new Pair<Drawable, String>(context.getResources().getDrawable(R.drawable.tasks_complete_bg)
+                , RuntimeEnvironment.application.getString(R.string.view_tasks))).when(taskingLibraryConfiguration).getActionDrawable(context, taskDetails);
+
         viewHolder.setTaskAction("Record\n Status", taskDetails, cardDetails, onClickListener);
+
         TextView taskDetails = viewHolder.itemView.findViewById(R.id.task_action);
         assertEquals(View.VISIBLE, taskDetails.getVisibility());
         assertEquals(context.getString(R.string.view_tasks), taskDetails.getText());
         assertEquals(context.getColor(R.color.text_black), taskDetails.getCurrentTextColor());
-        //assertEquals(context.getResources().getDrawable(R.drawable.no_task_complete_bg).getConstantState(), taskDetails.getBackground().getConstantState());
+        assertEquals(context.getResources().getDrawable(R.drawable.tasks_complete_bg).getConstantState(), taskDetails.getBackground().getConstantState());
         taskDetails.performClick();
         verify(onClickListener).onClick(taskDetails);
 
@@ -380,12 +450,16 @@ public class TaskRegisterViewHolderTest extends BaseUnitTest {
         setFIAsCurrentPlan();
         when(taskDetails.getTaskCount()).thenReturn(2);
         when(taskDetails.getCompleteTaskCount()).thenReturn(2);
+
+        doReturn(new Pair<Drawable, String>(context.getResources().getDrawable(R.drawable.tasks_complete_bg)
+                , RuntimeEnvironment.application.getString(R.string.tasks_complete))).when(taskingLibraryConfiguration).getActionDrawable(context, taskDetails);
+
         viewHolder.setTaskAction("Record\n Status", taskDetails, cardDetails, onClickListener);
+
         TextView taskDetails = viewHolder.itemView.findViewById(R.id.task_action);
         assertEquals(View.VISIBLE, taskDetails.getVisibility());
-        assertEquals(context.getString(R.string.tasks_complete), taskDetails.getText());
-        assertEquals(context.getColor(R.color.text_black), taskDetails.getCurrentTextColor());
-        assertEquals(context.getResources().getDrawable(R.drawable.tasks_complete_bg).getConstantState(), taskDetails.getBackground().getConstantState());
+        assertEquals("Record\n Status", taskDetails.getText());
+        verify(taskingLibraryConfiguration).showTasksCompleteActionView(taskDetails);
         taskDetails.performClick();
         verify(onClickListener).onClick(taskDetails);
 
@@ -396,12 +470,16 @@ public class TaskRegisterViewHolderTest extends BaseUnitTest {
         setMDAAsCurrentPlan();
         when(taskDetails.getTaskCount()).thenReturn(2);
         when(taskDetails.getCompleteTaskCount()).thenReturn(2);
+
+        doReturn(new Pair<Drawable, String>(context.getResources().getDrawable(R.drawable.tasks_complete_bg)
+                , RuntimeEnvironment.application.getString(R.string.tasks_complete))).when(taskingLibraryConfiguration).getActionDrawable(context, taskDetails);
+
         viewHolder.setTaskAction("Record\n Status", taskDetails, cardDetails, onClickListener);
+
         TextView taskDetails = viewHolder.itemView.findViewById(R.id.task_action);
         assertEquals(View.VISIBLE, taskDetails.getVisibility());
-        assertEquals(context.getString(R.string.tasks_complete), taskDetails.getText());
-        assertEquals(context.getColor(R.color.text_black), taskDetails.getCurrentTextColor());
-        //assertEquals(context.getResources().getDrawable(R.drawable.mda_adhered_bg).getConstantState(), taskDetails.getBackground().getConstantState());
+        assertEquals("Record\n Status", taskDetails.getText());
+        verify(taskingLibraryConfiguration).showTasksCompleteActionView(taskDetails);
         taskDetails.performClick();
         verify(onClickListener).onClick(taskDetails);
 
