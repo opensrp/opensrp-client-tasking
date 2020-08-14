@@ -142,10 +142,7 @@ public class BaseInteractorTest extends BaseUnitTest {
 
 
     @Test
-    public void testSavePaotForm() throws Exception {
-        Cache<Location> cache = mock(Cache.class);
-        when(cache.get(anyString(), any())).thenReturn(mock(Location.class));
-        Whitebox.setInternalState(Utils.class, cache);
+    public void testSaveJsonForm() throws Exception {
         String form = AssetHandler.readFileFromAssetsFolder(org.smartregister.tasking.util.Constants.JsonForm.PAOT_FORM, context);
         JSONObject formObject = new JSONObject(form);
         String structureId = UUID.randomUUID().toString();
@@ -157,28 +154,11 @@ public class BaseInteractorTest extends BaseUnitTest {
         formObject.put(DETAILS, details);
         JsonFormUtils.getFieldJSONObject(JsonFormUtils.fields(formObject), PAOT_STATUS).put(VALUE, "Active");
         JsonFormUtils.getFieldJSONObject(JsonFormUtils.fields(formObject), "lastUpdatedDate").put(VALUE, "19-07-2019");
-        interactor.saveJsonForm(formObject.toString());
-        verify(eventClientRepository, timeout(ASYNC_TIMEOUT)).addEvent(eq(structureId), eventCaptor.capture());
-        verify(clientProcessor, timeout(ASYNC_TIMEOUT)).processClient(eventClientCaptor.capture(), eq(true));
-        verify(presenter, timeout(ASYNC_TIMEOUT)).onFormSaved(structureId, taskId, Task.TaskStatus.COMPLETED, null, PAOT);
-        assertEquals(org.smartregister.tasking.util.Constants.EventType.PAOT_EVENT, eventCaptor.getValue().getString("eventType"));
-        JSONArray obs = eventCaptor.getValue().getJSONArray("obs");
-        assertEquals(3, obs.length());
-        assertEquals("Active", obs.getJSONObject(0).getJSONArray(VALUES).get(0));
-        assertEquals("19-07-2019", obs.getJSONObject(1).getJSONArray(VALUES).get(0));
-        assertEquals("Complete", obs.getJSONObject(2).getJSONArray(VALUES).get(0));
-        assertEquals(details.toString(), eventCaptor.getValue().getJSONObject(DETAILS).toString());
 
-        assertEquals(1, eventClientCaptor.getValue().size());
+        String stringJson = formObject.toString();
+        interactor.saveJsonForm(stringJson);
 
-        Event event = eventClientCaptor.getValue().get(0).getEvent();
-        assertEquals(3, event.getObs().size());
-        assertEquals("Active", event.getObs().get(0).getValue());
-        assertEquals("19-07-2019", event.getObs().get(1).getValue());
-        assertEquals("Complete", event.getObs().get(2).getValue());
-        assertEquals(2, event.getDetails().size());
-        assertEquals(taskId, event.getDetails().get(TASK_IDENTIFIER));
-        assertEquals(structureId, event.getBaseEntityId());
+        verify(taskingLibraryConfiguration).saveJsonForm(interactor, stringJson);
     }
 
     @Test
