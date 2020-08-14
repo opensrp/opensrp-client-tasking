@@ -201,7 +201,7 @@ public class TestRevealApplication extends DrishtiApplication {
 
         @Override
         public Map<String, Integer> populateLabels() {
-            return null;
+            return new HashMap<>();
         }
 
         @Override
