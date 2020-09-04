@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.smartregister.gradle.jarjar'
 
 buildscript {
     repositories {
@@ -8,6 +9,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:4.0.0'
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.3'
+        classpath 'org.smartregister:gradle-jarjar-plugin:1.0.0-SNAPSHOT'
     }
 }
 
@@ -47,6 +49,7 @@ android {
     }
 
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -59,9 +62,13 @@ android {
 }
 
 dependencies {
-    implementation project(":opensrp-tasking")
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.9'
+    implementation (project(":opensrp-tasking")) {
+        transitive true
+        exclude group: 'com.ibm.fhir', module: 'fhir-model'
+    }
 
-    implementation fileTree(dir: "libs", include: ["*.jar"])
+    //implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
 
@@ -69,5 +76,14 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
+    jarJar 'com.ibm.fhir:fhir-model:4.2.3'
 
+    // Repackaged jars will be placed here, adding them to classpath
+    implementation fileTree(dir: "./build/libs", include: ['*.jar'])
+}
+
+
+jarJar {
+    // Dependencies and related JarJar rules
+    remove = ['fhir-model-4.2.3.jar': 'com.ibm.fhir.model.visitor.CopyingVisitor*']
 }

@@ -60,4 +60,14 @@ public class MainActivity extends AppCompatActivity {
         boolean result = pathEvaluatorLibrary.evaluateBooleanExpression(patient, expressionEditText.getText().toString());
         resultsTextView.setText(getString(R.string.result, result));
     }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
 }
