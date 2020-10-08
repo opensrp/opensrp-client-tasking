@@ -8,27 +8,19 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.apache.commons.lang3.StringUtils;
-import org.smartregister.domain.Task;
 import org.smartregister.tasking.R;
 import org.smartregister.tasking.TaskingLibrary;
-import org.smartregister.tasking.model.CardDetails;
 import org.smartregister.tasking.model.TaskDetails;
-import org.smartregister.tasking.util.CardDetailsUtil;
-import org.smartregister.tasking.util.Constants.Intervention;
-import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
-import org.smartregister.tasking.model.TaskDetails;
+import org.smartregister.tasking.viewholder.PrioritizedTaskRegisterViewHolder;
 import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.smartregister.tasking.util.Constants.BusinessStatus.NOT_ELIGIBLE;
-
 /**
  * Created by samuelgithengi on 3/20/19.
  */
-public class TaskRegisterAdapter extends RecyclerView.Adapter<TaskRegisterViewHolder> {
+public class TaskRegisterAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private List<TaskDetails> taskDetails = new ArrayList<>();
 
@@ -36,20 +28,28 @@ public class TaskRegisterAdapter extends RecyclerView.Adapter<TaskRegisterViewHo
 
     private View.OnClickListener registerActionHandler;
 
+    private boolean isV2Design;
+
     public TaskRegisterAdapter(Context context, View.OnClickListener registerActionHandler) {
         this.context = context;
         this.registerActionHandler = registerActionHandler;
+        this.isV2Design = TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design();
     }
 
     @NonNull
     @Override
-    public TaskRegisterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.task_register_row, parent, false);
-        return new TaskRegisterViewHolder(view);
+    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        if (viewType == 1) {
+            View view = LayoutInflater.from(context).inflate(R.layout.task_register_row, parent, false);
+            return new TaskRegisterViewHolder(view);
+        } else {
+            View view = LayoutInflater.from(context).inflate(R.layout.prioritized_task_register_row, parent, false);
+            return new PrioritizedTaskRegisterViewHolder(view);
+        }
     }
 
     @Override
-    public void onBindViewHolder(@NonNull TaskRegisterViewHolder viewHolder, int position) {
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder viewHolder, int position) {
         /*TaskDetails task = taskDetails.get(position);
         Float distance = task.getDistanceFromUser();
         String name = task.getStructureName();
@@ -123,8 +123,24 @@ public class TaskRegisterAdapter extends RecyclerView.Adapter<TaskRegisterViewHo
         return taskDetails.size();
     }
 
+    public int getOverdueTasksCount() {
+        int overdueTasksCount = 0;
+        for (TaskDetails taskDetails: taskDetails) {
+            // TODO: Check if the task is overdue here
+        }
+
+        return overdueTasksCount;
+    }
+
     public void setTaskDetails(List<TaskDetails> taskDetails) {
         this.taskDetails = taskDetails;
         notifyDataSetChanged();
     }
+
+    @Override
+    public int getItemViewType(int position) {
+        return isV2Design ? 2 : 1;
+    }
+
+
 }

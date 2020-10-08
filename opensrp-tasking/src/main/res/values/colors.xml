@@ -8,4 +8,6 @@
 
     <color name="delete_map">#EE0427</color>
     <color name="download_map">#68BB0C</color>
+
+    <color name="goldsmith_blue">#004984</color>
 </resources>

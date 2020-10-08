@@ -10,14 +10,19 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.json.JSONObject;
@@ -44,6 +49,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import io.ona.kujaku.location.clients.AndroidGpsLocationClient;
 import io.ona.kujaku.utils.Constants;
 
 import static android.app.Activity.RESULT_CANCELED;
@@ -84,6 +90,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         drawerView = TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getDrawerMenuView(this);//new DrawerMenuView(this);
         progressDialog = new ProgressDialog(getContext());
         progressDialog.setCancelable(false);
+
     }
 
     @Override
@@ -106,9 +113,12 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         }
 
         view.findViewById(R.id.txt_map_label).setOnClickListener(v -> getPresenter().onOpenMapClicked());
-        drawerView.initializeDrawerLayout();
-        view.findViewById(R.id.drawerMenu).setOnClickListener(v -> drawerView.openDrawerLayout());
-        drawerView.onResume();
+
+        if (drawerView != null) {
+            drawerView.initializeDrawerLayout();
+            view.findViewById(R.id.drawerMenu).setOnClickListener(v -> drawerView.openDrawerLayout());
+            drawerView.onResume();
+        }
 
         initializeProgressIndicatorViews(view);
 
@@ -121,7 +131,52 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         if (filterParams != null) {
             getPresenter().setTaskFilterParams(filterParams);
         }
+
+        initRegisterDesign(view);
     }
+
+
+    private void initRegisterDesign(@NonNull View view) {
+        if (TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design()) {
+            disableView(view.findViewById(R.id.search_bar_layout));
+            disableView(view.findViewById(R.id.progressIndicatorsGroupView));
+            disableView(view.findViewById(R.id.filter_display_view));
+            headerTextDisplay.setText("");
+            interventionTypeTv.setText("My Tasks");
+
+            // The menu icon OR image
+            ImageView drawerMenuLogo = (ImageView) view.findViewById(R.id.drawerMenu);
+            drawerMenuLogo.setImageResource(R.drawable.ic_action_goldsmith_gold_placeholder_back);
+            // Fix the G logo position
+
+            // 1.
+            ConstraintSet constraintSet = new ConstraintSet();
+            ConstraintLayout parent = (ConstraintLayout) view.findViewById(R.id.drawerMenu).getParent();
+            constraintSet.clone(parent);
+            constraintSet.connect(R.id.drawerMenu, ConstraintSet.BOTTOM, parent.getId(), ConstraintSet.BOTTOM);
+            constraintSet.applyTo(parent);
+
+
+            ((ImageView) view.findViewById(R.id.drawerMenuArrow)).setImageResource(R.drawable.ic_action_goldsmith_menu_arrow);
+            disableView(view.findViewById(R.id.menu_label));
+
+            // Center the overdue text
+            headerTextDisplay.setGravity(Gravity.CENTER_HORIZONTAL);
+
+        } else {
+            disableView(view.findViewById(R.id.imv_map_icon));
+        }
+    }
+
+    private boolean disableView(@Nullable View view) {
+        if (view != null) {
+            view.setVisibility(View.GONE);
+            return true;
+        }
+
+        return false;
+    }
+
 
     @Override
     public void filter(String filterString, String joinTableString, String mainConditionString, boolean qrCode) {
@@ -161,7 +216,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
     @Override
     protected void initializePresenter() {
         presenter = new TaskRegisterFragmentPresenter(this, TaskRegister.VIEW_IDENTIFIER);
-        locationUtils = new LocationUtils(getContext());
+        locationUtils = new LocationUtils(new AndroidGpsLocationClient(getContext()));
         locationUtils.requestLocationUpdates(getPresenter());
     }
 
@@ -258,10 +313,14 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
     @Override
     public void setTotalTasks(int structuresWithinBuffer) {
         if (isAdded() && headerTextDisplay != null) {
-            headerTextDisplay.setText(getResources().getQuantityString(R.plurals.structures,
-                    taskAdapter.getItemCount(), structuresWithinBuffer, Utils.getLocationBuffer(), taskAdapter.getItemCount()));
 
-            filterRelativeLayout.setVisibility(View.GONE);
+            if (!TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design()) {
+                headerTextDisplay.setText(getResources().getQuantityString(R.plurals.structures,
+                        taskAdapter.getItemCount(), structuresWithinBuffer, Utils.getLocationBuffer(), taskAdapter.getItemCount()));
+                filterRelativeLayout.setVisibility(View.GONE);
+            } else {
+                headerTextDisplay.setText(String.format(getString(R.string.overdue_tasks_count), taskAdapter.getOverdueTasksCount()));
+            }
         }
     }
 
@@ -270,6 +329,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         if (BuildConfig.BUILD_COUNTRY == Country.ZAMBIA) {
             new IndicatorsCalculatorTask(getActivity(), tasks).execute();
         }*/
+        taskAdapter.setTaskDetails(tasks);
 
         TaskingLibrary.getInstance().getTaskingLibraryConfiguration().setTaskDetails(getActivity(), taskAdapter, tasks);
     }

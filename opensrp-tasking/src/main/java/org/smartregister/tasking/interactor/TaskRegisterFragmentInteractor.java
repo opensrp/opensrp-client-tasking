@@ -4,6 +4,7 @@ import android.content.Context;
 import android.location.Location;
 import android.text.TextUtils;
 
+import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -312,7 +313,7 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
     }
 
 
-    public void calculateDistanceFromUser(List<TaskDetails> tasks, Location location) {
+    public void calculateDistanceFromUser(List<TaskDetails> tasks, @Nullable Location location) {
         if (tasks == null)
             return;
         appExecutors.diskIO().execute(() -> {

@@ -26,8 +26,8 @@ android {
     defaultConfig {
         minSdkVersion androidMinSdkVersion
         targetSdkVersion androidTargetSdkVersion
-        versionCode Integer.parseInt(project.VERSION_CODE)
-        versionName project.VERSION_NAME
+        versionCode 1//Integer.parseInt(project.VERSION_CODE)
+        versionName "1.0"//project.VERSION_NAME
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -109,7 +109,7 @@ dependencies {
 
     implementation 'org.smartregister:opensrp-client-reporting:0.0.6-RVL-SNAPSHOT@aar'
 
-    implementation ('io.ona.kujaku:library:0.8.3') {
+    implementation ('io.ona.kujaku:library:0.9.0') {
         transitive = true
         exclude group: 'com.android.volley'
         exclude group: 'stax', module: 'stax-api'
@@ -165,7 +165,7 @@ coveralls {
     jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/merged.xml"
 }
 
-apply from: '../maven.gradle'
+//apply from: '../maven.gradle'
 
 task javadoc(type: Javadoc) {
     failOnError false

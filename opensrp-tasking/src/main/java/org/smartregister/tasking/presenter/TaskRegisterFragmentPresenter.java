@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import com.mapbox.geojson.Feature;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -34,6 +35,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -60,7 +62,7 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
 
     private TaskRegisterFragmentInteractor interactor;
 
-    private List<TaskDetails> tasks;
+    private List<TaskDetails> tasks = new ArrayList<>();
     private android.location.Location lastLocation;
 
     private boolean recalculateDistance;
@@ -169,10 +171,27 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
             recalculateDistance = false;
         } else {
             this.tasks = tasks;
+
+            // TODO: Remove this static data
             if (tasks == null) {
+                TaskDetails taskDetails = new TaskDetails("3459-sdfa23-sdqasdf");
+
+                Map<String, String> map = ImmutableMap.of("first_name", "Martin", "last_name", "Bull", "dob", "1970-01-10", "phone_number", "07246738839", "gender", "Male");
+                CommonPersonObjectClient commonPersonObjectClient = new CommonPersonObjectClient("dfh45453483-34dfd893-394343cds3", map, "Marchello");
+
+                taskDetails.setClient(commonPersonObjectClient);
+                taskDetails.setTaskCode("pnc_visit");
+                tasks = new ArrayList<>();
+                tasks.add(taskDetails);
+                this.tasks = tasks;
+            }
+
+            if (tasks == null) {
+
                 getView().displayNotification(R.string.fetching_structure_title,
                         R.string.fetch_location_and_structures_failed, prefsUtil.getCurrentOperationalArea());
                 getView().setTaskDetails(new ArrayList<>());
+                this.tasks = tasks;
             } else if (tasks.isEmpty()) {
                 getView().displayNotification(R.string.fetching_structure_title, R.string.no_structures_found);
                 getView().setTaskDetails(tasks);
@@ -183,6 +202,7 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
             } else {
                 getView().setTaskDetails(tasks);
             }
+
             getView().setTotalTasks(structuresWithinBuffer);
             getView().hideProgressDialog();
             getView().hideProgressView();
