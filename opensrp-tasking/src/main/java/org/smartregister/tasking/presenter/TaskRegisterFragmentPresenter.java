@@ -173,7 +173,7 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
             this.tasks = tasks;
 
             // TODO: Remove this static data
-            if (tasks == null) {
+            if (tasks == null || tasks.isEmpty()) {
                 TaskDetails taskDetails = new TaskDetails("3459-sdfa23-sdqasdf");
 
                 Map<String, String> map = ImmutableMap.of("first_name", "Martin", "last_name", "Bull", "dob", "1970-01-10", "phone_number", "07246738839", "gender", "Male");

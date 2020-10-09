@@ -22,7 +22,7 @@
     <dimen name="task_register_launcher_horizontal_padding">12dp</dimen>
 
     <!-- PRIORITIZED TASK REGISTER ROW DIMENS -->
-    <dimen name="prioritized_task_register_task_entity_text_size">23sp</dimen>
+    <dimen name="prioritized_task_register_task_entity_text_size">19sp</dimen>
     <dimen name="prioritized_task_register_task_type_text_size">16sp</dimen>
     <dimen name="prioritized_task_register_task_time_text_size">16sp</dimen>
     <dimen name="prioritized_task_register_task_action_description_text_size">16sp</dimen>

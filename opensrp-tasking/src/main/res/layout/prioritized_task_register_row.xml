@@ -4,12 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:paddingStart="2dp"
     android:layout_marginStart="@dimen/task_register_padding">
 
     <ImageView
         android:id="@+id/prioritized_register_row_task_icon"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         android:contentDescription="@string/task_icon"
         android:visibility="visible"
         tools:src="@drawable/ic_action_goldsmith_gold_placeholder_back"

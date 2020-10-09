@@ -1,5 +1,6 @@
 package org.smartregister.tasking.fragment;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -20,6 +21,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
@@ -51,6 +53,7 @@ import java.util.Set;
 
 import io.ona.kujaku.location.clients.AndroidGpsLocationClient;
 import io.ona.kujaku.utils.Constants;
+import io.ona.kujaku.utils.Permissions;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -161,7 +164,14 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
             disableView(view.findViewById(R.id.menu_label));
 
             // Center the overdue text
-            headerTextDisplay.setGravity(Gravity.CENTER_HORIZONTAL);
+            LinearLayout.LayoutParams params = ((LinearLayout.LayoutParams) headerTextDisplay.getLayoutParams());
+            //params.gravity = Gravity.CENTER;
+            params.width = LinearLayout.LayoutParams.MATCH_PARENT;
+            headerTextDisplay.setGravity(Gravity.CENTER);
+            headerTextDisplay.setLayoutParams(params);
+            headerTextDisplay.requestLayout();
+
+            ((View) view.findViewById(R.id.register_nav_bar_container)).setBackgroundResource(R.color.goldsmith_blue);
 
         } else {
             disableView(view.findViewById(R.id.imv_map_icon));

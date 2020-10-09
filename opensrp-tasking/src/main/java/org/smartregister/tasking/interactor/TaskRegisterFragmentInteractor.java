@@ -323,6 +323,7 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
                     taskDetails.setDistanceFromUser(taskDetails.getLocation().distanceTo(location));
                     taskDetails.setDistanceFromCenter(false);
                 }
+
                 if (taskDetails.getDistanceFromUser() <= locationBuffer) {
                     structuresWithinBuffer += 1;
                 }

@@ -9,8 +9,11 @@ public class BaseTaskDetails {
 
     private String taskId;
 
+    // This holds a data item that can be used to generate
+    // the form to which the task should be attributed
     private String taskCode;
 
+    // This holds the entity id eg. the location-id or the person-id
     private String taskEntity;
 
     private String businessStatus;
