@@ -29,11 +29,13 @@ import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.tasking.util.Constants;
 import org.smartregister.tasking.util.PreferencesUtil;
 import org.smartregister.tasking.util.Utils;
+import org.smartregister.view.contract.IView;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -58,7 +60,7 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
 
     private ConfigurableViewsHelper viewsHelper;
 
-    private Set<View> visibleColumns;
+    private Set<? extends IView> visibleColumns;
 
     private TaskRegisterFragmentInteractor interactor;
 
@@ -114,6 +116,12 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
     public void initializeQueries(String mainCondition) {
 
         if (getView().getAdapter() == null) {
+            Set<IView> visibleColumns = new HashSet<>();
+
+            if (this.visibleColumns != null) {
+                visibleColumns.addAll(this.visibleColumns);
+            }
+
             getView().initializeAdapter(visibleColumns);
         }
         lastLocation = getView().getLocationUtils().getLastLocation();
@@ -123,7 +131,7 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
 
         if (!isTasksFiltered) {
             getView().showProgressView();
-            interactor.findTasks(getMainCondition(), lastLocation, getOperationalAreaCenter(), getView().getContext().getString(R.string.house));
+            interactor.findTasks(getMainConditionAndParams(), lastLocation, getOperationalAreaCenter(), getView().getContext().getString(R.string.house));
         }
 
     }
@@ -149,7 +157,8 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
      *
      * @return pair of filter clause and values for filter
      */
-    private Pair<String, String[]> getMainCondition() {
+    // TODO: Rename this to getMainConditionAndParams. The params returned are operational-area-id, plan-id, inactive-task-status
+    public Pair<String, String[]> getMainConditionAndParams() {
         Location operationalArea = Utils.getOperationalAreaLocation(prefsUtil.getCurrentOperationalArea());
         String whereClause = String.format("%s.%s = ? AND %s.%s = ? AND %s.%s NOT IN (%s)",
                 Constants.DatabaseKeys.TASK_TABLE, Constants.DatabaseKeys.GROUPID, Constants.DatabaseKeys.TASK_TABLE, Constants.DatabaseKeys.PLAN_ID,
@@ -233,7 +242,7 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
     @Override
     public void onDrawerClosed() {
         getView().showProgressDialog(R.string.fetching_structures_title, R.string.fetching_structures_message);
-        interactor.findTasks(getMainCondition(), lastLocation, getOperationalAreaCenter(), getView().getContext().getString(R.string.house));
+        interactor.findTasks(getMainConditionAndParams(), lastLocation, getOperationalAreaCenter(), getView().getContext().getString(R.string.house));
         getView().setInventionType(getInterventionLabel());
     }
 
@@ -409,7 +418,7 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
     public void onTaskInfoReset() {
         // refresh task list
         getView().showProgressView();
-        interactor.findTasks(getMainCondition(), lastLocation, getOperationalAreaCenter(), getView().getContext().getString(R.string.house));
+        interactor.findTasks(getMainConditionAndParams(), lastLocation, getOperationalAreaCenter(), getView().getContext().getString(R.string.house));
     }
 
     private boolean matchesTaskCodeFilterList(String value, Set<String> filterList, Pattern pattern) {

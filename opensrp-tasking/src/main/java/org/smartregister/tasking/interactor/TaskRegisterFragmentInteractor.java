@@ -15,6 +15,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.smartregister.CoreLibrary;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
+import org.smartregister.domain.Client;
 import org.smartregister.repository.EventClientRepository.event_column;
 import org.smartregister.repository.LocationRepository;
 import org.smartregister.tasking.TaskingLibrary;
@@ -28,6 +30,7 @@ import org.smartregister.tasking.util.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import timber.log.Timber;
@@ -86,7 +89,7 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
         interactorUtils = new InteractorUtils(TaskingLibrary.getInstance().getTaskRepository(), eventClientRepository, clientProcessor);
     }
 
-    private String mainSelect(String mainCondition) {
+    private String generateTaskRegisterSelectQuery(String mainCondition) {
         /*String tableName = TASK_TABLE;
         SmartRegisterQueryBuilder queryBuilder = new SmartRegisterQueryBuilder();
         queryBuilder.selectInitiateMainTable(tableName, mainColumns(tableName), ID);
@@ -97,7 +100,7 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
         queryBuilder.customJoin(String.format(" LEFT JOIN %s ON %s.%s = %s.%s ",
                 FAMILY, STRUCTURES_TABLE, ID, FAMILY, STRUCTURE_ID));
         return queryBuilder.mainCondition(mainCondition);*/
-        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().mainSelect(mainCondition);
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().generateTaskRegisterSelectQuery(mainCondition);
     }
 
     private String nonRegisteredStructureTasksSelect(String mainCondition) {
@@ -179,8 +182,16 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
     }
 
 
-    public void findTasks(Pair<String, String[]> mainCondition, Location lastLocation, Location operationalAreaCenter, String houseLabel) {
-        if (mainCondition == null || mainCondition.second == null || mainCondition.second.length < 3 || mainCondition.second[0] == null) {
+    /**
+     * The mainConditionAndParams param contains the mainCondition which is a conditional clause eg.
+     *
+     * @param mainConditionAndParams
+     * @param lastLocation
+     * @param operationalAreaCenter
+     * @param houseLabel
+     */
+    public void findTasks(Pair<String, String[]> mainConditionAndParams, Location lastLocation, Location operationalAreaCenter, String houseLabel) {
+        if (mainConditionAndParams == null || mainConditionAndParams.second == null || mainConditionAndParams.second.length < 3 || mainConditionAndParams.second[0] == null) {
             getPresenter().onTasksFound(null, 0);
             return;
         }
@@ -188,31 +199,32 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
         List<TaskDetails> tasks = new ArrayList<>();
         appExecutors.diskIO().execute(() -> {
             structuresWithinBuffer = 0;
-            if (Utils.isFocusInvestigationOrMDA()) { // perform task grouping
+            if (TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().showGroupedTasks()) {
 
-                tasks.addAll(queryTaskDetails(groupedRegisteredStructureTasksSelect(mainCondition.first),
-                        mainCondition.second, lastLocation, operationalAreaCenter, houseLabel, true));
+                if (Utils.isFocusInvestigationOrMDA()) { // perform task grouping
+                    tasks.addAll(queryTaskDetails(groupedRegisteredStructureTasksSelect(mainConditionAndParams.first),
+                            mainConditionAndParams.second, lastLocation, operationalAreaCenter, houseLabel, true));
+
+                    tasks.addAll(queryTaskDetails(nonRegisteredStructureTasksSelect(mainConditionAndParams.first),
+                            mainConditionAndParams.second, lastLocation, operationalAreaCenter, houseLabel, false));
+                } else {
+                    tasks.addAll(queryTaskDetails(generateTaskRegisterSelectQuery(mainConditionAndParams.first), mainConditionAndParams.second,
+                            lastLocation, operationalAreaCenter, houseLabel, false));
+                }
+
+                // Query BCC task
+                tasks.addAll(queryTaskDetails(bccSelect(), mainConditionAndParams.second, lastLocation,
+                        operationalAreaCenter, houseLabel, false));
 
 
-                tasks.addAll(queryTaskDetails(nonRegisteredStructureTasksSelect(mainCondition.first),
-                        mainCondition.second, lastLocation, operationalAreaCenter, houseLabel, false));
-
+                // Query Case Confirmation task
+                String[] params = ArrayUtils.add(mainConditionAndParams.second, CASE_CONFIRMATION);
+                tasks.addAll(queryTaskDetails(indexCaseSelect(), params, lastLocation,
+                        operationalAreaCenter, houseLabel, false));
             } else {
-
-                tasks.addAll(queryTaskDetails(mainSelect(mainCondition.first), mainCondition.second,
+                tasks.addAll(queryTaskDetails(generateTaskRegisterSelectQuery(mainConditionAndParams.first), mainConditionAndParams.second,
                         lastLocation, operationalAreaCenter, houseLabel, false));
-
             }
-
-            // Query BCC task
-            tasks.addAll(queryTaskDetails(bccSelect(), mainCondition.second, lastLocation,
-                    operationalAreaCenter, houseLabel, false));
-
-
-            // Query Case Confirmation task
-            String[] params = ArrayUtils.add(mainCondition.second, CASE_CONFIRMATION);
-            tasks.addAll(queryTaskDetails(indexCaseSelect(), params, lastLocation,
-                    operationalAreaCenter, houseLabel, false));
 
             Collections.sort(tasks);
             appExecutors.mainThread().execute(() -> {
@@ -259,6 +271,7 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
             task.setHouseNumber(cursor.getString(cursor.getColumnIndex(HOUSE_NUMBER)));
             task.setFamilyMemberNames(cursor.getString(cursor.getColumnIndex(Properties.FAMILY_MEMBER_NAMES)));
         }
+
         Location location = new Location((String) null);
 
         if (CASE_CONFIRMATION.equals(task.getTaskCode())) {
@@ -291,6 +304,12 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
             }
         }
         task.setStructureId(cursor.getString(cursor.getColumnIndex(STRUCTURE_ID)));
+
+        if (!TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().showGroupedTasks()) {
+            // Get the client related to the task
+            CommonPersonObjectClient client = CoreLibrary.getInstance().context().getEventClientRepository().fetchCommonPersonObjectClientByBaseEntityId(task.getTaskEntity());
+            task.setClient(client);
+        }
 
         calculateDistance(task, location, lastLocation, operationalAreaCenter);
 

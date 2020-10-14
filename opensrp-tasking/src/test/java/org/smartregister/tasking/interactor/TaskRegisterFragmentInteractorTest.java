@@ -154,7 +154,7 @@ public class TaskRegisterFragmentInteractorTest extends BaseUnitTest {
         when(database.rawQuery(bccSelectQuery, new String[]{groupId, planId, CANCELLED.name(), ARCHIVED.name()})).thenReturn(createCursor(bccTask, Intervention.BCC));
         when(database.rawQuery(indexSelectQuery, new String[]{groupId, planId, CANCELLED.name(), Intervention.CASE_CONFIRMATION})).thenReturn(createEmptyCursor());
 
-        doReturn(mainSelectQuery).when(taskingLibraryConfiguration).mainSelect(pair.first);
+        doReturn(mainSelectQuery).when(taskingLibraryConfiguration).generateTaskRegisterSelectQuery(pair.first);
 
         // Run the method
         interactor.findTasks(pair, null, center, "House");
@@ -200,7 +200,7 @@ public class TaskRegisterFragmentInteractorTest extends BaseUnitTest {
         when(database.rawQuery(indexSelectQuery, new String[]{groupId, planId, CANCELLED.name(), ARCHIVED.name(), Intervention.CASE_CONFIRMATION})).thenReturn(createEmptyCursor());
 
         // Mock the query generator
-        doReturn(mainSelectQuery).when(taskingLibraryConfiguration).mainSelect(pair.first);
+        doReturn(mainSelectQuery).when(taskingLibraryConfiguration).generateTaskRegisterSelectQuery(pair.first);
 
         // Call the method
         interactor.findTasks(pair, userLocation, null, "House");

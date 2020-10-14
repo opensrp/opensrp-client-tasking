@@ -53,7 +53,8 @@ public class LocationTaskIntentService extends IntentService {
             return;
         }
         if (!syncUtils.verifyAuthorization()) {
-            syncUtils.logoutUser();
+            // TODO: Fix this
+            //syncUtils.logoutUser();
             return;
 
         }

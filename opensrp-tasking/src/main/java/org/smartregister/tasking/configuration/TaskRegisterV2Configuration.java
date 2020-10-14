@@ -10,4 +10,9 @@ public class TaskRegisterV2Configuration implements TaskingLibraryConfiguration.
     public boolean isV2Design() {
         return true;
     }
+
+    @Override
+    public boolean showGroupedTasks() {
+        return false;
+    }
 }

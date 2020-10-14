@@ -45,6 +45,7 @@ import org.smartregister.tasking.util.Constants.TaskRegister;
 import org.smartregister.tasking.util.LocationUtils;
 import org.smartregister.tasking.util.RevealJsonFormUtils;
 import org.smartregister.tasking.util.Utils;
+import org.smartregister.view.contract.IView;
 import org.smartregister.view.fragment.BaseRegisterFragment;
 
 import java.util.HashMap;
@@ -93,7 +94,6 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         drawerView = TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getDrawerMenuView(this);//new DrawerMenuView(this);
         progressDialog = new ProgressDialog(getContext());
         progressDialog.setCancelable(false);
-
     }
 
     @Override
@@ -101,7 +101,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         return R.layout.fragment_task_register;
     }
 
-    public void initializeAdapter(Set<org.smartregister.configurableviews.model.View> visibleColumns) {
+    public void initializeAdapter(Set<IView> visibleColumns) {
         taskAdapter = new TaskRegisterAdapter(getActivity(), registerActionHandler);
         clientsView.setAdapter(taskAdapter);
     }
@@ -160,7 +160,8 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
             constraintSet.applyTo(parent);
 
 
-            ((ImageView) view.findViewById(R.id.drawerMenuArrow)).setImageResource(R.drawable.ic_action_goldsmith_menu_arrow);
+            ImageView backBtn = (ImageView) view.findViewById(R.id.drawerMenuArrow);
+            backBtn.setImageResource(R.drawable.ic_action_goldsmith_menu_arrow);
             disableView(view.findViewById(R.id.menu_label));
 
             // Center the overdue text
@@ -173,9 +174,22 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
 
             ((View) view.findViewById(R.id.register_nav_bar_container)).setBackgroundResource(R.color.goldsmith_blue);
 
+            setListenersForV2MenuBtn(backBtn, drawerMenuLogo);
         } else {
             disableView(view.findViewById(R.id.imv_map_icon));
         }
+    }
+
+    private void setListenersForV2MenuBtn(View backBtn, View logo) {
+        View.OnClickListener onClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().finish();
+            }
+        };
+
+        backBtn.setOnClickListener(onClickListener);
+        logo.setOnClickListener(onClickListener);
     }
 
     private boolean disableView(@Nullable View view) {

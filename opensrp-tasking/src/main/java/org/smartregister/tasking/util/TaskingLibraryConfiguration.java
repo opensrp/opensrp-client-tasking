@@ -97,7 +97,7 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract void onLocationValidated(@NonNull Context context, @NonNull BaseFormFragmentContract.View view, @NonNull BaseFormFragmentContract.Interactor interactor, @NonNull BaseTaskDetails baseTaskDetails, @NonNull Location structure);
 
-    public abstract String mainSelect(String mainCondition);
+    public abstract String generateTaskRegisterSelectQuery(String mainCondition);
 
     public abstract String nonRegisteredStructureTasksSelect(String mainCondition);
 
@@ -160,5 +160,7 @@ public abstract class TaskingLibraryConfiguration {
     public interface TaskRegisterConfiguration {
 
         boolean isV2Design();
+
+        boolean showGroupedTasks();
     }
 }
