@@ -307,8 +307,9 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
 
         if (!TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().showGroupedTasks()) {
             // Get the client related to the task
-            CommonPersonObjectClient client = CoreLibrary.getInstance().context().getEventClientRepository().fetchCommonPersonObjectClientByBaseEntityId(task.getTaskEntity());
-            task.setClient(client);
+            // CommonPersonObjectClient client = CoreLibrary.getInstance().context().getEventClientRepository().fetchCommonPersonObjectClientByBaseEntityId(task.getTaskEntity());
+            // task.setClient(client);
+            // TODO -> Uncomment above lines
         }
 
         calculateDistance(task, location, lastLocation, operationalAreaCenter);

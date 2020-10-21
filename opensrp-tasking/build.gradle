@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'maven-publish'
 
 buildscript {
     repositories {
@@ -93,7 +94,7 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.1.0'
 
-    api 'org.smartregister:opensrp-client-core:2.1.2.2-SNAPSHOT'
+    api 'org.smartregister:opensrp-client-core:2.1.2.4-SNAPSHOT'
     api ('org.smartregister:opensrp-client-native-form:1.13.2-SNAPSHOT') {
         transitive = true
         exclude group: 'org.smartregister', module: 'opensrp-client-simprints'
@@ -165,7 +166,7 @@ coveralls {
     jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/merged.xml"
 }
 
-//apply from: '../maven.gradle'
+apply from: '../maven.gradle'
 
 task javadoc(type: Javadoc) {
     failOnError false
