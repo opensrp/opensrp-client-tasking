@@ -662,4 +662,10 @@ public interface Constants {
         String INTERVENTION_UNIT = "intervention_unit";
         String FILTER_SORT_PARAMS = "filter_sort_params";
     }
+
+    interface TABLE_NAME {
+        String FAMILY = "ec_family";
+        String FAMILY_MEMBER = "ec_family_member";
+    }
+
 }
