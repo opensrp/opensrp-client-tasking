@@ -4,7 +4,6 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.VisibleForTesting;
 
 import org.smartregister.CoreLibrary;
 import org.smartregister.repository.AllSharedPreferences;

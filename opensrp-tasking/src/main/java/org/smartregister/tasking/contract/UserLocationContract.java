@@ -8,6 +8,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import org.smartregister.tasking.presenter.ValidateUserLocationPresenter;
 
+
 /**
  * Created by samuelgithengi on 2/13/19.
  */
@@ -45,5 +46,6 @@ public interface UserLocationContract {
         void requestUserPassword();
 
         ValidateUserLocationPresenter getLocationPresenter();
+
     }
 }

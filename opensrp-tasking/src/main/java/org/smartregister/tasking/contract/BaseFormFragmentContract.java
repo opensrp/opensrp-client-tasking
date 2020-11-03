@@ -8,6 +8,8 @@ import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.domain.Location;
 import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.util.RevealJsonFormUtils;
+import org.smartregister.tasking.util.TaskingJsonFormUtils;
+
 
 /**
  * Created by samuelgithengi on 4/18/19.
