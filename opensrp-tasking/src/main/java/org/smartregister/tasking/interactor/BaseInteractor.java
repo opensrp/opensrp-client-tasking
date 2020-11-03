@@ -13,6 +13,7 @@ import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.smartregister.BuildConfig;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.commonregistry.CommonRepository;
 import org.smartregister.domain.Location;
@@ -26,7 +27,6 @@ import org.smartregister.repository.EventClientRepository;
 import org.smartregister.repository.StructureRepository;
 import org.smartregister.repository.TaskRepository;
 import org.smartregister.sync.ClientProcessorForJava;
-import org.smartregister.tasking.BuildConfig;
 import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.BaseContract;
 import org.smartregister.tasking.contract.BaseContract.BasePresenter;
@@ -68,11 +68,14 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
             .registerTypeAdapter(DateTime.class, new DateTimeTypeConverter())
             .registerTypeAdapter(LocationProperty.class, new PropertiesConverter()).create();
 
+
     private TaskingLibrary taskingLibrary;
+
 
     protected TaskRepository taskRepository;
 
     protected StructureRepository structureRepository;
+
 
     protected BasePresenter presenterCallBack;
 
@@ -86,11 +89,11 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
 
     protected ClientProcessorForJava clientProcessor;
 
-    //private TaskUtils taskUtils;
 
     private SQLiteDatabase database;
 
     private CommonRepository commonRepository;
+
 
     //private PreferencesUtil prefsUtil;
 
@@ -118,7 +121,9 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
     public void saveJsonForm(String json) {
         try {
             JSONObject jsonForm = new JSONObject(json);
+
             /*
+
             String encounterType = jsonForm.getString(ENCOUNTER_TYPE);
             boolean refreshMapOnEventSaved = true;
             switch (encounterType) {
@@ -151,10 +156,12 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
     private org.smartregister.domain.Event saveEvent(JSONObject jsonForm, String encounterType, String bindType) throws JSONException {
         String entityId = getString(jsonForm, ENTITY_ID);
         JSONArray fields = JsonFormUtils.fields(jsonForm);
+
         JSONObject metadata = JsonFormUtils.getJSONObject(jsonForm, METADATA);
         Event event = JsonFormUtils.createEvent(fields, metadata, Utils.getFormTag(), entityId, encounterType, bindType);
         JSONObject eventJson = new JSONObject(gson.toJson(event));
         eventJson.put(DETAILS, JsonFormUtils.getJSONObject(jsonForm, DETAILS));
+
         eventClientRepository.addEvent(entityId, eventJson);
         return gson.fromJson(eventJson.toString(), org.smartregister.domain.Event.class);
     }
@@ -162,7 +169,9 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
     private void saveLocationInterventionForm(JSONObject jsonForm) {
         String encounterType = null;
         String interventionType = null;
+
         /*try {
+
             encounterType = jsonForm.getString(ENCOUNTER_TYPE);
             if (encounterType.equals(SPRAY_EVENT)) {
                 interventionType = IRS;
@@ -210,7 +219,9 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
             }
         };
 
+
         appExecutors.diskIO().execute(runnable); */
+
     }
 
     private void saveRegisterStructureForm(JSONObject jsonForm) {
@@ -222,7 +233,9 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
                     JSONObject eventDetails = new JSONObject();
                     eventDetails.put(Properties.APP_VERSION_NAME, BuildConfig.VERSION_NAME);
                     eventDetails.put(Properties.LOCATION_PARENT, operationalAreaId);
+
                     String planIdentifier = null;// PreferencesUtil.getInstance().getCurrentPlanId();
+
                     eventDetails.put(Properties.PLAN_IDENTIFIER, planIdentifier);
                     jsonForm.put(DETAILS, eventDetails);
                     org.smartregister.domain.Event event = saveEvent(jsonForm, REGISTER_STRUCTURE_EVENT, STRUCTURE);
@@ -259,11 +272,13 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
                     structure.setProperties(properties);
                     structure.setSyncStatus(BaseRepository.TYPE_Created);
                     structureRepository.addOrUpdate(structure);
+
                     /*taskingLibrary.setSynced(false);
                     Context applicationContext = taskingLibrary.getApplicationContext();*/
                     Task task = null;
                     clientProcessor.processClient(Collections.singletonList(new EventClient(event, null)), true);
                     //TODO add a way of fetching generated task
+
                     Task finalTask = task;
                     appExecutors.mainThread().execute(new Runnable() {
                         @Override
@@ -285,11 +300,13 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
                             Obs myLocationActiveObs = event.findObs(null, false, LOCATION_COMPONENT_ACTIVE);
 
                             boolean myLocationActive = myLocationActiveObs != null && Boolean.valueOf(myLocationActiveObs.getValue().toString());
+
                             //taskingLibrary.setMyLocationComponentEnabled(myLocationActive);
 
 
                             //Obs zoomObs = event.findObs(null, false, GeoWidgetFactory.ZOOM_LEVEL);
                             double zoomLevel = 10f;//Double.parseDouble(zoomObs.getValue().toString());
+
 
                             presenterCallBack.onStructureAdded(Feature.fromJson(gson.toJson(structure)), featureCoordinates, zoomLevel);
                         }
@@ -305,7 +322,9 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
     }
 
     private void saveMemberForm(JSONObject jsonForm, String eventType, String intervention) {
+
         /*Runnable runnable = new Runnable() {
+
             @Override
             public void run() {
                 try {
@@ -326,12 +345,15 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
             }
         };
         appExecutors.diskIO().execute(runnable);*/
+
     }
 
     private void saveCaseConfirmation(JSONObject jsonForm, String eventType) {
         appExecutors.diskIO().execute(() -> {
             try {
+
                 /*String baseEntityId = JsonFormUtils.getFieldValue(JsonFormUtils.fields(jsonForm), JsonForm.FAMILY_MEMBER);
+
                 jsonForm.put(ENTITY_ID, baseEntityId);
                 org.smartregister.domain.Event event = saveEvent(jsonForm, eventType, CASE_CONFIRMATION);
                 Client client = eventClientRepository.fetchClientByBaseEntityId(event.getBaseEntityId());
@@ -351,11 +373,13 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
                     taskRepository.addOrUpdate(bloodScreeningTask);
                     removedTasks.add(bloodScreeningTask);
                 }
+
                 taskingLibrary.setSynced(false);
                 clientProcessor.processClient(Collections.singletonList(new EventClient(event, client)), true);
                 appExecutors.mainThread().execute(() -> {
                     ((StructureTasksContract.Presenter) presenterCallBack).onIndexConfirmationFormSaved(taskID, Task.TaskStatus.COMPLETED, businessStatus, removedTasks);
                 });*/
+
             } catch (Exception e) {
                 Timber.e("Error saving case confirmation data");
             }
@@ -363,18 +387,25 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
     }
 
     protected String getMemberTasksSelect(String mainCondition, String[] memberColumns) {
+
         /*SmartRegisterQueryBuilder queryBuilder = new SmartRegisterQueryBuilder();
+
         queryBuilder.selectInitiateMainTable(STRUCTURES_TABLE, memberColumns, ID);
         queryBuilder.customJoin(String.format(" JOIN %s ON %s.%s = %s.%s ",
                 FAMILY_MEMBER, FAMILY_MEMBER, STRUCTURE_ID, STRUCTURES_TABLE, ID));
         queryBuilder.customJoin(String.format(" JOIN %s ON %s.%s = %s.%s ",
                 TASK_TABLE, TASK_TABLE, FOR, FAMILY_MEMBER, BASE_ENTITY_ID));
-        return queryBuilder.mainCondition(mainCondition);*/ return null;
+
+        return queryBuilder.mainCondition(mainCondition);*/
+        return null;
+
     }
 
     public void fetchFamilyDetails(String structureId) {
         appExecutors.diskIO().execute(() -> {
+
             /*Cursor cursor = null;
+
             CommonPersonObjectClient family = null;
             try {
                 cursor = database.rawQuery(String.format("SELECT %s FROM %S WHERE %s = ? AND %s IS NULL",
@@ -397,6 +428,7 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
             CommonPersonObjectClient finalFamily = family;
             appExecutors.mainThread().execute(() -> {
                 presenterCallBack.onFamilyFound(finalFamily);
+
             });*/
         });
     }
@@ -407,6 +439,7 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
 
     public void setCommonRepository() {
         if (commonRepository == null) {
+
             //commonRepository = CoreLibrary.getInstance().context().commonrepository(metadata().familyRegister.tableName);
 
         }

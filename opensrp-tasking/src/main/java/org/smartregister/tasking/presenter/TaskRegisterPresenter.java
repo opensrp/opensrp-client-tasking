@@ -14,6 +14,7 @@ import org.smartregister.view.contract.BaseRegisterContract;
 
 import java.util.List;
 
+
 /**
  * Created by samuelgithengi on 3/11/19.
  */
