@@ -104,10 +104,17 @@ dependencies {
     implementation 'xerces:xercesImpl:2.12.0'
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.5'
+    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-turf:5.1.0'
+
+
+    implementation 'com.google.android:flexbox:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+
+
+    // Test dependencices
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-turf:5.1.0'
 
 }
 

@@ -36,20 +36,6 @@ import org.smartregister.tasking.util.Constants.TaskRegister;
 import org.smartregister.tasking.util.LocationUtils;
 import org.smartregister.tasking.util.RevealJsonFormUtils;
 import org.smartregister.tasking.util.Utils;
-import org.smartregister.tasking.view.DrawerMenuView;
-import org.smartregister.reveal.util.Utils;
-import org.smartregister.tasking.R;
-import org.smartregister.tasking.TaskingLibrary;
-import org.smartregister.tasking.activity.TaskRegisterActivity;
-import org.smartregister.tasking.adapter.TaskRegisterAdapter;
-import org.smartregister.tasking.contract.TaskRegisterFragmentContract;
-import org.smartregister.tasking.model.BaseTaskDetails;
-import org.smartregister.tasking.model.TaskFilterParams;
-import org.smartregister.tasking.presenter.TaskRegisterFragmentPresenter;
-import org.smartregister.tasking.util.AlertDialogUtils;
-import org.smartregister.tasking.util.LocationUtils;
-import org.smartregister.tasking.util.TaskingConstants;
-import org.smartregister.tasking.util.TaskingJsonFormUtils;
 import org.smartregister.view.fragment.BaseRegisterFragment;
 
 import java.util.HashMap;
@@ -96,7 +82,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        drawerView = new DrawerMenuView(this);
+        drawerView = null;//new DrawerMenuView(this);
         progressDialog = new ProgressDialog(getContext());
         progressDialog.setCancelable(false);
 
@@ -217,7 +203,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
                 R.string.choose_action, R.string.view_details, R.string.undo, new Dialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        switch (which){
+                        switch (which) {
                             case BUTTON_POSITIVE:
                                 getPresenter().onTaskSelected(details, view.getId() == R.id.task_action);
                                 break;
@@ -230,7 +216,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
                         dialog.dismiss();
                     }
 
-         } );
+                });
     }
 
     public void displayResetTaskInfoDialog(TaskDetails details) {
