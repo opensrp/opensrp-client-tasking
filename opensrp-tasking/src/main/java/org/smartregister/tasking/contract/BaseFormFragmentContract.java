@@ -7,7 +7,9 @@ import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.domain.Location;
 import org.smartregister.tasking.model.BaseTaskDetails;
+import org.smartregister.tasking.util.RevealJsonFormUtils;
 import org.smartregister.tasking.util.TaskingJsonFormUtils;
+
 
 /**
  * Created by samuelgithengi on 4/18/19.
@@ -28,7 +30,7 @@ public interface BaseFormFragmentContract {
     interface View extends UserLocationContract.UserLocationView {
         void displayToast(String format);
 
-        TaskingJsonFormUtils getJsonFormUtils();
+        RevealJsonFormUtils getJsonFormUtils();
 
         void startForm(JSONObject formJSON);
 

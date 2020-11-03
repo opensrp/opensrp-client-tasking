@@ -14,8 +14,8 @@ import org.smartregister.tasking.fragment.CaseClassificationFragment;
 import org.smartregister.tasking.fragment.TaskRegisterFragment;
 import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.presenter.TaskRegisterPresenter;
-import org.smartregister.tasking.util.TaskingConstants;
-import org.smartregister.tasking.util.TaskingJsonFormUtils;
+import org.smartregister.tasking.util.Constants;
+import org.smartregister.tasking.util.RevealJsonFormUtils;
 import org.smartregister.view.activity.BaseRegisterActivity;
 import org.smartregister.view.contract.BaseRegisterContract;
 import org.smartregister.view.fragment.BaseRegisterFragment;
@@ -24,13 +24,14 @@ import java.util.Collections;
 import java.util.List;
 
 import timber.log.Timber;
+//import static org.smartregister.tasking.util.FamilyConstants.Intent.START_REGISTRATION;
 
 /**
  * Created by samuelgithengi on 3/11/19.
  */
 public class TaskRegisterActivity extends BaseRegisterActivity implements BaseRegisterContract.View {
 
-    private TaskingJsonFormUtils jsonFormUtils;
+    private RevealJsonFormUtils jsonFormUtils;
 
     private CaseClassificationFragment caseClassificationFragment = new CaseClassificationFragment();
 
@@ -41,7 +42,7 @@ public class TaskRegisterActivity extends BaseRegisterActivity implements BaseRe
 
     @Override
     protected BaseRegisterFragment getRegisterFragment() {
-        jsonFormUtils = new TaskingJsonFormUtils();
+        jsonFormUtils = new RevealJsonFormUtils();
         TaskRegisterFragment fragment = new TaskRegisterFragment();
         fragment.setJsonFormUtils(jsonFormUtils);
         return fragment;
@@ -63,8 +64,8 @@ public class TaskRegisterActivity extends BaseRegisterActivity implements BaseRe
 
     @Override
     protected void onActivityResultExtended(int requestCode, int resultCode, Intent data) {
-        if (requestCode == TaskingConstants.RequestCode.REQUEST_CODE_GET_JSON && resultCode == RESULT_OK && data.hasExtra(TaskingConstants.JSON_FORM_PARAM_JSON)) {
-            String json = data.getStringExtra(TaskingConstants.JSON_FORM_PARAM_JSON);
+        if (requestCode == Constants.RequestCode.REQUEST_CODE_GET_JSON && resultCode == RESULT_OK && data.hasExtra(Constants.JSON_FORM_PARAM_JSON)) {
+            String json = data.getStringExtra(Constants.JSON_FORM_PARAM_JSON);
             Timber.d(json);
             getPresenter().saveJsonForm(json);
         } else {
@@ -75,7 +76,7 @@ public class TaskRegisterActivity extends BaseRegisterActivity implements BaseRe
 
     @Override
     public List<String> getViewIdentifiers() {
-        return Collections.singletonList(TaskingConstants.TaskRegister.VIEW_IDENTIFIER);
+        return Collections.singletonList(Constants.TaskRegister.VIEW_IDENTIFIER);
     }
 
     @Override

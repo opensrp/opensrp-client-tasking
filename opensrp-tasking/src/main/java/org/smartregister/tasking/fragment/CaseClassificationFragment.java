@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment;
 import org.json.JSONObject;
 import org.smartregister.tasking.R;
 import org.smartregister.tasking.contract.CaseClassificationContract;
-import org.smartregister.tasking.util.TaskingConstants;
+import org.smartregister.tasking.util.Constants;
 import org.smartregister.util.Utils;
 
 public class CaseClassificationFragment extends Fragment implements CaseClassificationContract.View {
@@ -70,7 +70,9 @@ public class CaseClassificationFragment extends Fragment implements CaseClassifi
 
     @Override
     public void displayIndexCase(@NonNull JSONObject indexCase) {
-        JSONObject details = indexCase.optJSONObject(TaskingConstants.DETAILS);
+
+        JSONObject details = indexCase.optJSONObject(Constants.DETAILS);
+
         if (details == null) {
             details = new JSONObject();
         }

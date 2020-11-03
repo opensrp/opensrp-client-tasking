@@ -10,6 +10,7 @@ import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.tasking.adapter.TaskRegisterAdapter;
 import org.smartregister.tasking.model.BaseTaskDetails;
+import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.tasking.util.LocationUtils;
 import org.smartregister.view.contract.BaseRegisterFragmentContract;
@@ -23,13 +24,14 @@ import java.util.Set;
 public interface TaskRegisterFragmentContract {
 
     interface Presenter extends BaseRegisterFragmentContract.Presenter, BaseFormFragmentContract.Presenter, BaseContract.BasePresenter {
-        void onTasksFound(List<BaseTaskDetails> tasks, int structuresWithinBuffer);
+
+        void onTasksFound(List<TaskDetails> tasks, int structuresWithinBuffer);
 
         void onDestroy();
 
         void onDrawerClosed();
 
-        void onTaskSelected(BaseTaskDetails details, boolean isActionClicked);
+        void onTaskSelected(TaskDetails details, boolean isActionClicked);
 
         @StringRes
         int getInterventionLabel();
@@ -46,7 +48,7 @@ public interface TaskRegisterFragmentContract {
 
         void onOpenMapClicked();
 
-        void resetTaskInfo(BaseTaskDetails taskDetails);
+        void resetTaskInfo(TaskDetails taskDetails);
 
         void onTaskInfoReset();
     }
@@ -59,7 +61,8 @@ public interface TaskRegisterFragmentContract {
 
         void setTotalTasks(int structuresWithinBuffer);
 
-        void setTaskDetails(List<BaseTaskDetails> tasks);
+        void setTaskDetails(List<TaskDetails> tasks);
+
 
         void displayNotification(int title, @StringRes int message, Object... formatArgs);
 
@@ -91,7 +94,8 @@ public interface TaskRegisterFragmentContract {
     }
 
     interface Interactor {
-        void resetTaskInfo(Context context, BaseTaskDetails taskDetails);
+        void resetTaskInfo(Context context, TaskDetails taskDetails);
+
     }
 
 

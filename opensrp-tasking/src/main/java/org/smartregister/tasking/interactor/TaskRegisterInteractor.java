@@ -2,12 +2,13 @@ package org.smartregister.tasking.interactor;
 
 import org.smartregister.configurableviews.ConfigurableViewsLibrary;
 import org.smartregister.configurableviews.helper.ConfigurableViewsHelper;
-import org.smartregister.reveal.application.RevealApplication;
-import org.smartregister.reveal.contract.BaseContract;
-import org.smartregister.reveal.contract.TaskRegisterContract;
-import org.smartregister.reveal.util.AppExecutors;
+import org.smartregister.tasking.TaskingLibrary;
+import org.smartregister.tasking.contract.BaseContract;
+import org.smartregister.tasking.contract.TaskRegisterContract;
+import org.smartregister.util.AppExecutors;
 
 import java.util.List;
+
 
 /**
  * Created by samuelgithengi on 3/14/19.
@@ -21,7 +22,9 @@ public class TaskRegisterInteractor extends BaseInteractor implements TaskRegist
     public TaskRegisterInteractor(BaseContract.BasePresenter presenterCallBack) {
         super(presenterCallBack);
         viewsHelper = ConfigurableViewsLibrary.getInstance().getConfigurableViewsHelper();
-        appExecutors = RevealApplication.getInstance().getAppExecutors();
+
+        appExecutors = TaskingLibrary.getInstance().getAppExecutors();
+
     }
 
     @Override

@@ -1,21 +1,16 @@
 package org.smartregister.tasking.presenter;
 
-import android.content.Context;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.util.Pair;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.mapbox.geojson.Feature;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
@@ -25,21 +20,15 @@ import org.smartregister.configurableviews.model.View;
 import org.smartregister.configurableviews.model.ViewConfiguration;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.Task;
-import org.smartregister.repository.helper.MappingHelper;
-import org.smartregister.reveal.R;
-import org.smartregister.reveal.interactor.TaskRegisterFragmentInteractor;
-import org.smartregister.reveal.model.TaskDetails;
-import org.smartregister.reveal.util.Constants;
-import org.smartregister.reveal.util.PreferencesUtil;
-import org.smartregister.reveal.util.Utils;
-import org.smartregister.tasking.contract.BaseFormFragmentContract;
+import org.smartregister.tasking.R;
 import org.smartregister.tasking.contract.TaskRegisterFragmentContract;
-import org.smartregister.tasking.contract.UserLocationContract;
+import org.smartregister.tasking.interactor.TaskRegisterFragmentInteractor;
 import org.smartregister.tasking.model.BaseTaskDetails;
+import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
-import org.smartregister.tasking.util.TaskingConstants;
-import org.smartregister.tasking.util.TaskingJsonFormUtils;
-import org.smartregister.util.DateTimeTypeConverter;
+import org.smartregister.tasking.util.Constants;
+import org.smartregister.tasking.util.PreferencesUtil;
+import org.smartregister.tasking.util.Utils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -52,10 +41,11 @@ import java.util.regex.Pattern;
 import timber.log.Timber;
 
 import static org.smartregister.domain.Task.INACTIVE_TASK_STATUS;
-import static org.smartregister.reveal.util.Constants.Intervention.BEDNET_DISTRIBUTION;
-import static org.smartregister.reveal.util.Constants.Intervention.BLOOD_SCREENING;
-import static org.smartregister.reveal.util.Constants.Intervention.CASE_CONFIRMATION;
-import static org.smartregister.reveal.util.Constants.Intervention.REGISTER_FAMILY;
+import static org.smartregister.tasking.util.Constants.Intervention.BEDNET_DISTRIBUTION;
+import static org.smartregister.tasking.util.Constants.Intervention.BLOOD_SCREENING;
+import static org.smartregister.tasking.util.Constants.Intervention.CASE_CONFIRMATION;
+import static org.smartregister.tasking.util.Constants.Intervention.REGISTER_FAMILY;
+
 
 /**
  * Created by samuelgithengi on 3/11/19.
@@ -72,7 +62,8 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
 
     private TaskRegisterFragmentInteractor interactor;
 
-    private List<BaseTaskDetails> tasks;
+    private List<TaskDetails> tasks;
+
     private android.location.Location lastLocation;
 
     private boolean recalculateDistance;
@@ -85,44 +76,12 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
 
     private boolean isTasksFiltered;
 
-    private ArrayList<BaseTaskDetails> filteredTasks;
+    private ArrayList<TaskDetails> filteredTasks;
+
 
     private int withinBuffer;
 
     private boolean applyFilterOnTasksFound;
-
-
-    private AlertDialog passwordDialog;
-
-    private UserLocationContract.UserLocationPresenter locationPresenter;
-
-    protected MappingHelper mappingHelper;
-
-    private Location structure;
-
-    private BaseTaskDetails taskDetails;
-
-    private Context context;
-
-    private BaseFormFragmentInteractor interactor;
-
-    private PreferencesUtil prefsUtil;
-
-    protected Gson gson = new GsonBuilder().setDateFormat(TaskingConstants.DateFormat.EVENT_DATE_FORMAT_Z)
-            .registerTypeAdapter(DateTime.class, new DateTimeTypeConverter()).create();
-
-    private TaskingJsonFormUtils jsonFormUtils = new TaskingJsonFormUtils();
-
-
-    protected TaskRegisterFragmentPresenter(BaseFormFragmentContract.View view, Context context) {
-        this.context = context;
-        this.view = new WeakReference<>(view);
-        passwordDialog = PasswordDialogUtils.initPasswordDialog(context, this);
-        //locationPresenter = new ValidateUserLocationPresenter(view, this);
-        //mappingHelper = new RevealMappingHelper();
-        interactor = new BaseFormFragmentInteractor(this);
-        prefsUtil = PreferencesUtil.getInstance();
-    }
 
 
     public TaskRegisterFragmentPresenter(TaskRegisterFragmentContract.View view, String viewConfigurationIdentifier) {
@@ -474,7 +433,9 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
             getView().openFamilyProfile(family, getTaskDetails());
     }
 
-    private List<BaseTaskDetails> getActiveTasks() {
-        return isTasksFiltered && filteredTasks != null ? filteredTasks : tasks;
+
+    private List<TaskDetails> getActiveTasks() {
+
+            return isTasksFiltered && filteredTasks != null ? filteredTasks : tasks;
+        }
     }
-}
