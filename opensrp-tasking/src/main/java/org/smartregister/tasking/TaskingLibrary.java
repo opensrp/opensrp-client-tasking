@@ -24,6 +24,8 @@ public class TaskingLibrary {
     private EventClientRepository eventClientRepository;
     private AllSharedPreferences allSharedPreferences;
 
+    private float locationBuffer;
+
     public void init() {
         instance = new TaskingLibrary();
     }
@@ -86,5 +88,6 @@ public class TaskingLibrary {
     public Repository getRepository() {
         //return CoreLibrary.getInstance().context().
         return null;
+
     }
 }
