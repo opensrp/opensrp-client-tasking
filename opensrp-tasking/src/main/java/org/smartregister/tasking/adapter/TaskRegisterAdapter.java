@@ -16,8 +16,6 @@ import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.util.CardDetailsUtil;
 import org.smartregister.tasking.util.Constants.Intervention;
 import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
-import org.smartregister.tasking.model.TaskDetails;
-import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,29 +57,7 @@ public class TaskRegisterAdapter extends RecyclerView.Adapter<TaskRegisterViewHo
                 name = task.getFamilyName() != null ? task.getFamilyName() : task.getStructureName() != null ? task.getStructureName() : context.getString(R.string.unenumerated_structure);
             }
             action = context.getString(R.string.record_status);
-        } /*else if (Intervention.MOSQUITO_COLLECTION.equals(task.getTaskCode())) {
-            name = context.getString(R.string.mosquito_collection_point);
-            action = context.getString(R.string.record_mosquito_collection);
-        } else if (Intervention.LARVAL_DIPPING.equals(task.getTaskCode())) {
-            name = context.getString(R.string.larval_breeding_site);
-            action = context.getString(R.string.record_larvacide);
-        } else if (Intervention.BCC.equals(task.getTaskCode())) {
-            viewHolder.setIcon(R.drawable.ic_bcc);
-            name = context.getString(R.string.bcc);
-            action = context.getString(R.string.record_bcc);
-            hasIcon = true;
-        } else if (Intervention.CASE_CONFIRMATION.equals(task.getTaskCode()) && task.getTaskCount() == null) {
-            viewHolder.setIcon(R.drawable.ic_classification_details);
-            viewHolder.setItemViewListener(task, registerActionHandler);
-            name = context.getString(R.string.classification_details);
-            action = context.getString(R.string.view);
-            hasIcon = true;
-        } else if (Intervention.PAOT.equals(task.getTaskCode())) {
-            name = context.getString(R.string.card_view_paot);
-            if (task.getBusinessStatus() != null) {
-                action = CardDetailsUtil.getTranslatedBusinessStatus(task.getBusinessStatus()).replaceAll(" ", "\n");
-            }
-        }*/ else {
+        } else {
             name = NOT_ELIGIBLE.equals(task.getBusinessStatus()) ? context.getString(R.string.ineligible_location) : task.getFamilyName();
             if (name == null) {
                 name = task.getStructureName() != null ? task.getStructureName() : context.getString(R.string.unenumerated_structure);

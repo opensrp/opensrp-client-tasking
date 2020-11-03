@@ -23,6 +23,7 @@ import org.smartregister.domain.Task;
 import org.smartregister.tasking.R;
 import org.smartregister.tasking.contract.TaskRegisterFragmentContract;
 import org.smartregister.tasking.interactor.TaskRegisterFragmentInteractor;
+import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.tasking.util.Constants;
@@ -45,6 +46,7 @@ import static org.smartregister.tasking.util.Constants.Intervention.BLOOD_SCREEN
 import static org.smartregister.tasking.util.Constants.Intervention.CASE_CONFIRMATION;
 import static org.smartregister.tasking.util.Constants.Intervention.REGISTER_FAMILY;
 
+
 /**
  * Created by samuelgithengi on 3/11/19.
  */
@@ -61,6 +63,7 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
     private TaskRegisterFragmentInteractor interactor;
 
     private List<TaskDetails> tasks;
+
     private android.location.Location lastLocation;
 
     private boolean recalculateDistance;
@@ -75,9 +78,11 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
 
     private ArrayList<TaskDetails> filteredTasks;
 
+
     private int withinBuffer;
 
     private boolean applyFilterOnTasksFound;
+
 
     public TaskRegisterFragmentPresenter(TaskRegisterFragmentContract.View view, String viewConfigurationIdentifier) {
         this(view, viewConfigurationIdentifier, null);
@@ -428,7 +433,9 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
             getView().openFamilyProfile(family, getTaskDetails());
     }
 
+
     private List<TaskDetails> getActiveTasks() {
-        return isTasksFiltered && filteredTasks != null ? filteredTasks : tasks;
+
+            return isTasksFiltered && filteredTasks != null ? filteredTasks : tasks;
+        }
     }
-}

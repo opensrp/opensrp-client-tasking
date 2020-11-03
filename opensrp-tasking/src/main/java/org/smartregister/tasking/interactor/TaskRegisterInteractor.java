@@ -9,6 +9,7 @@ import org.smartregister.util.AppExecutors;
 
 import java.util.List;
 
+
 /**
  * Created by samuelgithengi on 3/14/19.
  */
@@ -21,7 +22,9 @@ public class TaskRegisterInteractor extends BaseInteractor implements TaskRegist
     public TaskRegisterInteractor(BaseContract.BasePresenter presenterCallBack) {
         super(presenterCallBack);
         viewsHelper = ConfigurableViewsLibrary.getInstance().getConfigurableViewsHelper();
+
         appExecutors = TaskingLibrary.getInstance().getAppExecutors();
+
     }
 
     @Override
