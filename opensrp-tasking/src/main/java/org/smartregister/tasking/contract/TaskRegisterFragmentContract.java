@@ -24,6 +24,7 @@ import java.util.Set;
 public interface TaskRegisterFragmentContract {
 
     interface Presenter extends BaseRegisterFragmentContract.Presenter, BaseFormFragmentContract.Presenter, BaseContract.BasePresenter {
+
         void onTasksFound(List<TaskDetails> tasks, int structuresWithinBuffer);
 
         void onDestroy();
@@ -62,6 +63,7 @@ public interface TaskRegisterFragmentContract {
 
         void setTaskDetails(List<TaskDetails> tasks);
 
+
         void displayNotification(int title, @StringRes int message, Object... formatArgs);
 
         void showProgressDialog(@StringRes int title, @StringRes int message);
@@ -93,6 +95,7 @@ public interface TaskRegisterFragmentContract {
 
     interface Interactor {
         void resetTaskInfo(Context context, TaskDetails taskDetails);
+
     }
 
 
