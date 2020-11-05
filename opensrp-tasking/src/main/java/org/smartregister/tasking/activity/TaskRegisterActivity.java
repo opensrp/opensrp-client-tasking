@@ -24,12 +24,11 @@ import java.util.Collections;
 import java.util.List;
 
 import timber.log.Timber;
-//import static org.smartregister.tasking.util.FamilyConstants.Intent.START_REGISTRATION;
 
 /**
  * Created by samuelgithengi on 3/11/19.
  */
-public class TaskRegisterActivity extends BaseRegisterActivity implements BaseRegisterContract.View {
+public abstract class TaskRegisterActivity extends BaseRegisterActivity implements BaseRegisterContract.View {
 
     private RevealJsonFormUtils jsonFormUtils;
 
@@ -94,7 +93,7 @@ public class TaskRegisterActivity extends BaseRegisterActivity implements BaseRe
         return (TaskRegisterContract.Presenter) presenter;
     }
 
-    public void startFamilyRegistration(BaseTaskDetails taskDetails) {
+    public abstract void startFamilyRegistration(BaseTaskDetails taskDetails);
         /*Intent intent = new Intent(this, FamilyRegisterActivity.class);
         intent.putExtra(START_REGISTRATION, true);
         intent.putExtra(Properties.LOCATION_UUID, taskDetails.getStructureId());
@@ -102,7 +101,6 @@ public class TaskRegisterActivity extends BaseRegisterActivity implements BaseRe
         intent.putExtra(Properties.TASK_BUSINESS_STATUS, taskDetails.getBusinessStatus());
         intent.putExtra(Properties.TASK_STATUS, taskDetails.getTaskStatus());
         startActivity(intent);*/
-    }
 
     public void displayIndexCaseFragment(JSONObject indexCase) {
         ((CaseClassificationContract.View) caseClassificationFragment).displayIndexCase(indexCase);

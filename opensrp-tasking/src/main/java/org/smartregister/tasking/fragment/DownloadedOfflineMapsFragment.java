@@ -18,6 +18,7 @@ import com.mapbox.mapboxsdk.offline.OfflineRegion;
 
 import org.smartregister.tasking.BuildConfig;
 import org.smartregister.tasking.R;
+import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.adapter.DownloadedOfflineMapAdapter;
 import org.smartregister.tasking.contract.DownloadedOfflineMapsContract;
 import org.smartregister.tasking.contract.OfflineMapDownloadCallback;
@@ -138,7 +139,7 @@ public class DownloadedOfflineMapsFragment extends BaseOfflineMapsFragment imple
         for (OfflineMapModel offlineMapModel: offlineMapsTodelete) {
             OfflineServiceHelper.deleteOfflineMap(getActivity(),
                     offlineMapModel.getDownloadAreaId(),
-                    BuildConfig.MAPBOX_SDK_ACCESS_TOKEN);
+                    TaskingLibrary.getInstance().getMapboxAccessToken());
         }
     }
 
@@ -188,12 +189,9 @@ public class DownloadedOfflineMapsFragment extends BaseOfflineMapsFragment imple
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.offline_map_checkbox:
-                updateOfflineMapsTodelete(view);
-                break;
-            default:
-                break;
+        int viewId = view.getId();
+        if (viewId == R.id.offline_map_checkbox) {
+            updateOfflineMapsTodelete(view);
         }
     }
 }

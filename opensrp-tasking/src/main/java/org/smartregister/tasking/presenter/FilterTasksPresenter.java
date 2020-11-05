@@ -4,10 +4,12 @@ import android.content.Intent;
 import android.view.ViewGroup;
 import android.widget.ToggleButton;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 
 import org.apache.commons.lang3.StringUtils;
 import org.smartregister.tasking.R;
+import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.FilterTasksContract;
 import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.tasking.util.Constants;
@@ -39,12 +41,11 @@ public class FilterTasksPresenter implements FilterTasksContract.Presenter {
 
     public FilterTasksPresenter(FilterTasksContract.View view) {
         this.view = view;
-        populateLabels();
+        labelsMap = populateLabels();
     }
 
 
-    private void populateLabels() {
-        labelsMap = new HashMap<>();
+    private Map<String, Integer> populateLabels() {
         //Interventions
         /*
         labelsMap.put(Intervention.IRS, R.string.irs);
@@ -77,6 +78,8 @@ public class FilterTasksPresenter implements FilterTasksContract.Presenter {
         labelsMap.put(BusinessStatus.NOT_ELIGIBLE, R.string.not_eligible);
         labelsMap.put(BusinessStatus.IN_PROGRESS, R.string.in_progress);
         */
+
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().populateLabels();
     }
 
 

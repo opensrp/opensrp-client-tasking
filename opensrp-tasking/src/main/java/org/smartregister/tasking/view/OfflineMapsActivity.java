@@ -3,6 +3,7 @@ package org.smartregister.tasking.view;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -26,7 +27,7 @@ import java.util.Map;
 
 import timber.log.Timber;
 
-public class OfflineMapsActivity extends AppCompatActivity implements OfflineMapDownloadCallback {
+public abstract class OfflineMapsActivity extends AppCompatActivity implements OfflineMapDownloadCallback {
 
     private static final String TAG = OfflineMapsActivity.class.getName();
 
@@ -81,7 +82,7 @@ public class OfflineMapsActivity extends AppCompatActivity implements OfflineMap
     protected ViewPager setupViewPager() {
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        availableOfflineMapsFragment = AvailableOfflineMapsFragment.newInstance(this.getIntent().getExtras());
+        availableOfflineMapsFragment = AvailableOfflineMapsFragment.newInstance(this.getIntent().getExtras(), getMapStyleAssetPath());
         availableOfflineMapsFragment.setOfflineMapDownloadCallback(this);
         adapter.addFragment(availableOfflineMapsFragment, this.getString(R.string.available).toUpperCase());
 
@@ -139,6 +140,14 @@ public class OfflineMapsActivity extends AppCompatActivity implements OfflineMap
         availableOfflineMapsFragment = (AvailableOfflineMapsFragment)  adapter.getItem(AVAILABLE_OFFLINE_MAPS_FRAGMENT_INDEX);
         List<String> regionNames = offlineRegionInfo != null ? offlineRegionInfo.first : null;
         availableOfflineMapsFragment.setOfflineDownloadedMapNames(regionNames);
-
     }
+
+
+    /**
+     * Provide the asset path to the mapbox style eg download_mapbox_style.json without the "asset://" prefix
+     *
+     * @return
+     */
+    @NonNull
+    public abstract String getMapStyleAssetPath();
 }

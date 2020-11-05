@@ -12,11 +12,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 import com.mapbox.mapboxsdk.offline.OfflineRegionStatus;
 
-import org.smartregister.reveal.R;
-import org.smartregister.reveal.model.OfflineMapModel;
-import org.smartregister.reveal.util.Utils;
-import org.smartregister.reveal.viewholder.DownloadedOfflineMapViewHolder;
+import org.smartregister.tasking.R;
 import org.smartregister.tasking.model.OfflineMapModel;
+import org.smartregister.tasking.util.Utils;
+import org.smartregister.tasking.viewholder.DownloadedOfflineMapViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;

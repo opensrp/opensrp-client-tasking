@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="filter_toggle_end_margin">16dp</dimen>
     <dimen name="filter_toggle_bottom_margin">8dp</dimen>
@@ -9,4 +8,20 @@
     <dimen name="detect_case_padding">40dp</dimen>
     <dimen name="status_label_vertical_padding">8dp</dimen>
 
+    <dimen name="task_register_padding">8dp</dimen>
+    <dimen name="task_action_text">18sp</dimen>
+    <dimen name="task_register_text_size">16sp</dimen>
+    <dimen name="downloading_hint_text_size">12sp</dimen>
+    <dimen name="task_register_vertical_padding">4dp</dimen>
+    <dimen name="task_toolbar_margin">20dp</dimen>
+    <dimen name="sync_badge_margin">35dp</dimen>
+    <dimen name="register_list_desc_size">17sp</dimen>
+    <dimen name="register_member_title_size">17sp</dimen>
+    <dimen name="task_register_action_width">120dp</dimen>
+    <dimen name="task_register_action_text">16sp</dimen>
+    <dimen name="task_register_launcher_horizontal_padding">12dp</dimen>
+
 </resources>
+
+
+

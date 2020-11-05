@@ -1,6 +1,9 @@
 package org.smartregister.tasking;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import org.smartregister.CoreLibrary;
 import org.smartregister.repository.AllSharedPreferences;
@@ -9,7 +12,11 @@ import org.smartregister.repository.Repository;
 import org.smartregister.repository.StructureRepository;
 import org.smartregister.repository.TaskNotesRepository;
 import org.smartregister.repository.TaskRepository;
+import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 import org.smartregister.util.AppExecutors;
+import org.smartregister.view.activity.DrishtiApplication;
+
+import io.ona.kujaku.data.realm.RealmDatabase;
 
 /**
  * Created by samuelgithengi on 6/10/20.
@@ -24,23 +31,27 @@ public class TaskingLibrary {
     private EventClientRepository eventClientRepository;
     private AllSharedPreferences allSharedPreferences;
 
-    private float locationBuffer;
+    private String digitalGlobeConnectId;
+    private String mapboxAccessToken;
 
-    public void init() {
-        instance = new TaskingLibrary();
+    private RealmDatabase realmDatabase;
+    private TaskingLibraryConfiguration taskingLibraryConfiguration;
+
+    public static void init(@NonNull TaskingLibraryConfiguration taskingLibraryConfiguration) {
+        instance = new TaskingLibrary(taskingLibraryConfiguration);
     }
 
     public static TaskingLibrary getInstance() {
         return instance;
     }
 
+    public TaskingLibrary(@NonNull TaskingLibraryConfiguration taskingLibraryConfiguration) {
+        this.taskingLibraryConfiguration = taskingLibraryConfiguration;
+    }
+
     @NonNull
     public AppExecutors getAppExecutors() {
-        if (appExecutors == null) {
-            appExecutors = new AppExecutors();
-        }
-
-        return appExecutors;
+        return taskingLibraryConfiguration.getAppExecutors();
     }
 
     @NonNull
@@ -86,8 +97,36 @@ public class TaskingLibrary {
 
     @NonNull
     public Repository getRepository() {
-        //return CoreLibrary.getInstance().context().
-        return null;
+        return DrishtiApplication.getInstance().getRepository();
+    }
 
+    @Nullable
+    public String getDigitalGlobeConnectId() {
+        return digitalGlobeConnectId;
+    }
+
+    public void setDigitalGlobeConnectId(@Nullable String digitalGlobeConnectId) {
+        this.digitalGlobeConnectId = digitalGlobeConnectId;
+    }
+
+    @Nullable
+    public String getMapboxAccessToken() {
+        return mapboxAccessToken;
+    }
+
+    public void setMapboxAccessToken(String mapboxAccessToken) {
+        this.mapboxAccessToken = mapboxAccessToken;
+    }
+
+    public RealmDatabase getRealmDatabase(@NonNull Context context) {
+        if (realmDatabase == null) {
+            realmDatabase = RealmDatabase.init(context);
+        }
+
+        return realmDatabase;
+    }
+
+    public TaskingLibraryConfiguration getTaskingLibraryConfiguration() {
+        return taskingLibraryConfiguration;
     }
 }

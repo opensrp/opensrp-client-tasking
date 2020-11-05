@@ -9,19 +9,16 @@
     <string name="filters">Filters (%1$d)</string>
 
 
-
     <plurals name="structures">
         <item quantity="one">%1d structure within %2.0f m (%3$d total)</item>
         <item quantity="other">%1d structures within %2.0f m (%3$d total)</item>
     </plurals>
-
 
     <string name="record_status">Record\nStatus</string>
     <string name="numero_sign">No.</string>
     <string name="unenumerated_structure">Unenumerated Structure</string>
     <string name="ineligible_location">Ineligible Location</string>
     <string name="return_to_register">Return</string>
-
 
     <string name="family_name_format">Family name: %1s</string>
     <string name="village_town_format">Village Town: %1s</string>
@@ -33,7 +30,6 @@
     <string name="first_name_format">First Name: %1s</string>
     <string name="middle_name_format">Middle Name: %1s</string>
     <string name="dob_format">Date of Birth(DOB) : %1s</string>
-
     <string name="case_number_format">Case Number: %1s</string>
     <string name="case_classification_format">Case Classification: %1s</string>
     <string name="focus_reason_format">Focus Reason: %1s</string>
@@ -53,7 +49,6 @@
     <string name="failed_to_find_family">Failed to get Family Details</string>
 
     <string name="house">House</string>
-
     <string-array name="task_sort_options">
         <item>Distance (nearest first)</item>
         <item>Status</item>
@@ -96,5 +91,17 @@
     <string name="delete">Delete</string>
     <string name="download_finished_successfuly">Download finished successfuly</string>
     <string name="map_download_progress">Downloading: %,.2f %%</string>
-</resources>
 
+    <string name="found_coverage">Found Coverage</string>
+    <string name="spray_coverage">Spray Coverage</string>
+    <string name="spray_success_rate">Spray Success Rate</string>
+    <string name="offline_map_size">Size %1$s Downloaded %2$s </string>
+
+    <string name="downloading">Downloading</string>
+    <string name="task_icon">Task Icon</string>
+    <string name="hamburger_menu">Hamburger menu</string>
+    <string name="menu">Menu</string>
+    <string name="map">Map</string>
+    <string name="download">Download</string>
+    <string name="clear">Clear</string>
+</resources>

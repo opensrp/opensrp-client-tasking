@@ -17,6 +17,7 @@ import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.domain.Location;
 import org.smartregister.tasking.R;
+import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.BaseFormFragmentContract;
 import org.smartregister.tasking.interactor.BaseFormFragmentInteractor;
 import org.smartregister.tasking.model.BaseTaskDetails;
@@ -101,13 +102,13 @@ public class BaseFormFragmentPresenter extends BaseLocationListener implements B
 
     @Override
     public void onLocationValidated() {
-        if (!Intervention.REGISTER_FAMILY.equals(getTaskDetails().getTaskCode())) {
+        /*if (!Intervention.REGISTER_FAMILY.equals(getTaskDetails().getTaskCode())) {
             String formName = getView().getJsonFormUtils().getFormName(null, taskDetails.getTaskCode());
             if (StringUtils.isBlank(formName)) {
                 getView().displayError(R.string.opening_form_title, R.string.form_not_found);
             } else {
                 JSONObject formJSON = getView().getJsonFormUtils().getFormJSON(context, formName, taskDetails, structure);
-                /*if (Intervention.BEDNET_DISTRIBUTION.equals(taskDetails.getTaskCode())) {
+                if (Intervention.BEDNET_DISTRIBUTION.equals(taskDetails.getTaskCode())) {
                     interactor.findNumberOfMembers(taskDetails.getTaskEntity(), formJSON);
                     return;
                 } else if (CASE_CONFIRMATION.equals(taskDetails.getTaskCode())) {
@@ -120,17 +121,20 @@ public class BaseFormFragmentPresenter extends BaseLocationListener implements B
                     getView().startForm(formJSON);
                 } else {
                     getView().startForm(formJSON);
-                }*/
+                }
             }
         }
-        getView().hideProgressDialog();
+        getView().hideProgressDialog();*/
+        TaskingLibrary.getInstance()
+                .getTaskingLibraryConfiguration()
+                .onLocationValidated(context, getView(), interactor, getTaskDetails(), structure);
     }
 
     public void showBasicForm(String formName) {
-        JSONObject formJSON = getView().getJsonFormUtils().getFormJSON(context, formName, null, null);
+        /*JSONObject formJSON = getView().getJsonFormUtils().getFormJSON(context, formName, null, null);
         switch (formName) {
 
-            /*case JsonForm.IRS_SA_DECISION_ZAMBIA:
+            case JsonForm.IRS_SA_DECISION_ZAMBIA:
             case JsonForm.CB_SPRAY_AREA_ZAMBIA:
             case JsonForm.MOBILIZATION_FORM_ZAMBIA:
                 jsonFormUtils.populateServerOptions(RevealApplication.getInstance().getServerConfigs(),
@@ -172,11 +176,14 @@ public class BaseFormFragmentPresenter extends BaseLocationListener implements B
                         formJSON, Constants.CONFIGURATION.DATA_COLLECTORS, JsonForm.DATA_COLLECTOR,
                         PreferencesUtil.getInstance().getCurrentDistrict());
 
-                break;*/
+                break;
             default:
                 break;
         }
-        getView().startForm(formJSON);
+        getView().startForm(formJSON);*/
+        TaskingLibrary.getInstance()
+                .getTaskingLibraryConfiguration()
+                .showBasicForm(getView(), context, formName);
     }
 
     @Override

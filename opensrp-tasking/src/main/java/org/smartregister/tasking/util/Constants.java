@@ -487,6 +487,7 @@ public interface Constants {
     }
 
     interface TaskRegister {
+
         String VIEW_IDENTIFIER = "task_register";
 
         String INTERVENTION_TYPE = "intervention_type";
@@ -607,6 +608,8 @@ public interface Constants {
 
         String PERSON_TESTED = "person_tested";
 
+        String HOUSE_NUMBER = "house_number";
+
     }
 
     interface UseContextCode {
@@ -666,6 +669,31 @@ public interface Constants {
     interface TABLE_NAME {
         String FAMILY = "ec_family";
         String FAMILY_MEMBER = "ec_family_member";
+    }
+
+    interface IntentKey {
+        String BASE_ENTITY_ID = "base_entity_id";
+        String FAMILY_BASE_ENTITY_ID = "family_base_entity_id";
+        String FAMILY_HEAD = "family_head";
+        String PRIMARY_CAREGIVER = "primary_caregiver";
+        String VILLAGE_TOWN = "village_town";
+        String FAMILY_NAME = "family_name";
+        String JSON = "json";
+        String TO_RESCHEDULE = "to_reschedule";
+        String IS_REMOTE_LOGIN = "is_remote_login";
+        String GO_TO_DUE_PAGE = "go_to_due_page";
+    }
+
+    interface DbKey {
+        String DATE_REMOVED = "date_removed";
+    }
+
+    interface Table {
+
+    }
+
+    interface ObsKey {
+        String ZOOM_LEVEL = "zoom_level";
     }
 
 }

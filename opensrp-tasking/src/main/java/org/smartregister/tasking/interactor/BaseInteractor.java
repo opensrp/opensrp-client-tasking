@@ -1,5 +1,7 @@
 package org.smartregister.tasking.interactor;
 
+import android.content.Context;
+
 import androidx.annotation.VisibleForTesting;
 
 import com.google.gson.Gson;
@@ -7,15 +9,20 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.mapbox.geojson.Feature;
 
+import net.sqlcipher.Cursor;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.smartregister.BuildConfig;
+import org.smartregister.CoreLibrary;
 import org.smartregister.clientandeventmodel.Event;
+import org.smartregister.commonregistry.CommonPersonObject;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.commonregistry.CommonRepository;
+import org.smartregister.cursoradapter.SmartRegisterQueryBuilder;
+import org.smartregister.domain.Client;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.LocationProperty;
 import org.smartregister.domain.Obs;
@@ -27,9 +34,11 @@ import org.smartregister.repository.EventClientRepository;
 import org.smartregister.repository.StructureRepository;
 import org.smartregister.repository.TaskRepository;
 import org.smartregister.sync.ClientProcessorForJava;
+import org.smartregister.tasking.BuildConfig;
 import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.BaseContract;
 import org.smartregister.tasking.contract.BaseContract.BasePresenter;
+import org.smartregister.tasking.util.Constants;
 import org.smartregister.tasking.util.Constants.Properties;
 import org.smartregister.tasking.util.Utils;
 import org.smartregister.util.AppExecutors;
@@ -41,13 +50,16 @@ import org.smartregister.view.activity.DrishtiApplication;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import timber.log.Timber;
 
 import static com.cocoahero.android.geojson.Geometry.JSON_COORDINATES;
 import static org.smartregister.tasking.util.Constants.DETAILS;
+import static org.smartregister.tasking.util.Constants.JsonForm.FAMILY_MEMBER;
 import static org.smartregister.tasking.util.Constants.JsonForm.LOCATION_COMPONENT_ACTIVE;
 import static org.smartregister.tasking.util.Constants.JsonForm.PHYSICAL_TYPE;
 import static org.smartregister.tasking.util.Constants.JsonForm.STRUCTURE_NAME;
@@ -68,14 +80,11 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
             .registerTypeAdapter(DateTime.class, new DateTimeTypeConverter())
             .registerTypeAdapter(LocationProperty.class, new PropertiesConverter()).create();
 
-
     private TaskingLibrary taskingLibrary;
-
 
     protected TaskRepository taskRepository;
 
     protected StructureRepository structureRepository;
-
 
     protected BasePresenter presenterCallBack;
 
@@ -89,11 +98,11 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
 
     protected ClientProcessorForJava clientProcessor;
 
+    //private TaskUtils taskUtils;
 
     private SQLiteDatabase database;
 
     private CommonRepository commonRepository;
-
 
     //private PreferencesUtil prefsUtil;
 
@@ -119,11 +128,8 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
 
     @Override
     public void saveJsonForm(String json) {
-        try {
+        /*try {
             JSONObject jsonForm = new JSONObject(json);
-
-            /*
-
             String encounterType = jsonForm.getString(ENCOUNTER_TYPE);
             boolean refreshMapOnEventSaved = true;
             switch (encounterType) {
@@ -147,31 +153,29 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
                     break;
             }
             taskingLibrary.setRefreshMapOnEventSaved(refreshMapOnEventSaved);
-            */
         } catch (Exception e) {
             Timber.e(e, "Error saving Json Form data");
-        }
+        }*/
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().saveJsonForm(this, json);
     }
 
-    private org.smartregister.domain.Event saveEvent(JSONObject jsonForm, String encounterType, String bindType) throws JSONException {
+    @Override
+    public org.smartregister.domain.Event saveEvent(JSONObject jsonForm, String encounterType, String bindType) throws JSONException {
         String entityId = getString(jsonForm, ENTITY_ID);
         JSONArray fields = JsonFormUtils.fields(jsonForm);
-
         JSONObject metadata = JsonFormUtils.getJSONObject(jsonForm, METADATA);
         Event event = JsonFormUtils.createEvent(fields, metadata, Utils.getFormTag(), entityId, encounterType, bindType);
         JSONObject eventJson = new JSONObject(gson.toJson(event));
         eventJson.put(DETAILS, JsonFormUtils.getJSONObject(jsonForm, DETAILS));
-
         eventClientRepository.addEvent(entityId, eventJson);
         return gson.fromJson(eventJson.toString(), org.smartregister.domain.Event.class);
     }
 
-    private void saveLocationInterventionForm(JSONObject jsonForm) {
-        String encounterType = null;
+    @Override
+    public void saveLocationInterventionForm(JSONObject jsonForm) {
+        /*String encounterType = null;
         String interventionType = null;
-
-        /*try {
-
+        try {
             encounterType = jsonForm.getString(ENCOUNTER_TYPE);
             if (encounterType.equals(SPRAY_EVENT)) {
                 interventionType = IRS;
@@ -219,12 +223,12 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
             }
         };
 
-
         appExecutors.diskIO().execute(runnable); */
-
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().saveLocationInterventionForm(this, presenterCallBack, jsonForm);
     }
 
-    private void saveRegisterStructureForm(JSONObject jsonForm) {
+    @Override
+    public void saveRegisterStructureForm(JSONObject jsonForm) {
         Runnable runnable = new Runnable() {
             @Override
             public void run() {
@@ -233,9 +237,7 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
                     JSONObject eventDetails = new JSONObject();
                     eventDetails.put(Properties.APP_VERSION_NAME, BuildConfig.VERSION_NAME);
                     eventDetails.put(Properties.LOCATION_PARENT, operationalAreaId);
-
-                    String planIdentifier = null;// PreferencesUtil.getInstance().getCurrentPlanId();
-
+                    String planIdentifier = TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getCurrentPlanId();// PreferencesUtil.getInstance().getCurrentPlanId();
                     eventDetails.put(Properties.PLAN_IDENTIFIER, planIdentifier);
                     jsonForm.put(DETAILS, eventDetails);
                     org.smartregister.domain.Event event = saveEvent(jsonForm, REGISTER_STRUCTURE_EVENT, STRUCTURE);
@@ -272,13 +274,29 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
                     structure.setProperties(properties);
                     structure.setSyncStatus(BaseRepository.TYPE_Created);
                     structureRepository.addOrUpdate(structure);
-
-                    /*taskingLibrary.setSynced(false);
-                    Context applicationContext = taskingLibrary.getApplicationContext();*/
-                    Task task = null;
+                    taskingLibrary.getTaskingLibraryConfiguration().setSynced(false);
+                    Context applicationContext = DrishtiApplication.getInstance().getApplicationContext();
                     clientProcessor.processClient(Collections.singletonList(new EventClient(event, null)), true);
+                    Task task = TaskingLibrary.getInstance().getTaskingLibraryConfiguration().generateTaskFromStructureType(applicationContext, structure.getId(), structureType);
+                    /*Task task = null;
+                    if (Constants.StructureType.RESIDENTIAL.equals(structureType) && Utils.isFocusInvestigationOrMDA()) {
+                        task = taskUtils.generateRegisterFamilyTask(applicationContext, structure.getId());
+                    } else {
+                        if (Constants.StructureType.RESIDENTIAL.equals(structureType)) {
+                            task = taskUtils.generateTask(applicationContext, structure.getId(), structure.getId(),
+                                    Constants.BusinessStatus.NOT_VISITED, Constants.Intervention.IRS, R.string.irs_task_description);
+                        } else if (Constants.StructureType.MOSQUITO_COLLECTION_POINT.equals(structureType)) {
+                            task = taskUtils.generateTask(applicationContext, structure.getId(), structure.getId(),
+                                    Constants.BusinessStatus.NOT_VISITED, Constants.Intervention.MOSQUITO_COLLECTION, R.string.mosquito_collection_task_description);
+                        } else if (Constants.StructureType.LARVAL_BREEDING_SITE.equals(structureType)) {
+                            task = taskUtils.generateTask(applicationContext, structure.getId(), structure.getId(),
+                                    Constants.BusinessStatus.NOT_VISITED, Constants.Intervention.LARVAL_DIPPING, R.string.larval_dipping_task_description);
+                        } else if (Constants.StructureType.POTENTIAL_AREA_OF_TRANSMISSION.equals(structureType)) {
+                            task = taskUtils.generateTask(applicationContext, structure.getId(), structure.getId(),
+                                    Constants.BusinessStatus.NOT_VISITED, Constants.Intervention.PAOT, R.string.poat_task_description);
+                        }
+                    }*/
                     //TODO add a way of fetching generated task
-
                     Task finalTask = task;
                     appExecutors.mainThread().execute(new Runnable() {
                         @Override
@@ -300,13 +318,11 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
                             Obs myLocationActiveObs = event.findObs(null, false, LOCATION_COMPONENT_ACTIVE);
 
                             boolean myLocationActive = myLocationActiveObs != null && Boolean.valueOf(myLocationActiveObs.getValue().toString());
+                            taskingLibrary.getTaskingLibraryConfiguration().setMyLocationComponentEnabled(myLocationActive);
 
-                            //taskingLibrary.setMyLocationComponentEnabled(myLocationActive);
 
-
-                            //Obs zoomObs = event.findObs(null, false, GeoWidgetFactory.ZOOM_LEVEL);
-                            double zoomLevel = 10f;//Double.parseDouble(zoomObs.getValue().toString());
-
+                            Obs zoomObs = event.findObs(null, false, Constants.ObsKey.ZOOM_LEVEL);
+                            double zoomLevel = Double.parseDouble(zoomObs.getValue().toString());
 
                             presenterCallBack.onStructureAdded(Feature.fromJson(gson.toJson(structure)), featureCoordinates, zoomLevel);
                         }
@@ -321,10 +337,9 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
         appExecutors.diskIO().execute(runnable);
     }
 
-    private void saveMemberForm(JSONObject jsonForm, String eventType, String intervention) {
-
-        /*Runnable runnable = new Runnable() {
-
+    @Override
+    public void saveMemberForm(JSONObject jsonForm, String eventType, String intervention) {
+        Runnable runnable = new Runnable() {
             @Override
             public void run() {
                 try {
@@ -334,7 +349,7 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
                     appExecutors.mainThread().execute(new Runnable() {
                         @Override
                         public void run() {
-                            String businessStatus = clientProcessor.calculateBusinessStatus(event);
+                            String businessStatus = TaskingLibrary.getInstance().getTaskingLibraryConfiguration().calculateBusinessStatus(event);
                             String taskID = event.getDetails().get(Properties.TASK_IDENTIFIER);
                             presenterCallBack.onFormSaved(event.getBaseEntityId(), taskID, Task.TaskStatus.COMPLETED, businessStatus, intervention);
                         }
@@ -344,16 +359,14 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
                 }
             }
         };
-        appExecutors.diskIO().execute(runnable);*/
-
+        appExecutors.diskIO().execute(runnable);
     }
 
-    private void saveCaseConfirmation(JSONObject jsonForm, String eventType) {
-        appExecutors.diskIO().execute(() -> {
+    @Override
+    public void saveCaseConfirmation(JSONObject jsonForm, String eventType) {
+        /*appExecutors.diskIO().execute(() -> {
             try {
-
-                /*String baseEntityId = JsonFormUtils.getFieldValue(JsonFormUtils.fields(jsonForm), JsonForm.FAMILY_MEMBER);
-
+                String baseEntityId = JsonFormUtils.getFieldValue(JsonFormUtils.fields(jsonForm), Constants.JsonForm.FAMILY_MEMBER);
                 jsonForm.put(ENTITY_ID, baseEntityId);
                 org.smartregister.domain.Event event = saveEvent(jsonForm, eventType, CASE_CONFIRMATION);
                 Client client = eventClientRepository.fetchClientByBaseEntityId(event.getBaseEntityId());
@@ -373,43 +386,35 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
                     taskRepository.addOrUpdate(bloodScreeningTask);
                     removedTasks.add(bloodScreeningTask);
                 }
-
                 taskingLibrary.setSynced(false);
                 clientProcessor.processClient(Collections.singletonList(new EventClient(event, client)), true);
                 appExecutors.mainThread().execute(() -> {
                     ((StructureTasksContract.Presenter) presenterCallBack).onIndexConfirmationFormSaved(taskID, Task.TaskStatus.COMPLETED, businessStatus, removedTasks);
-                });*/
-
+                });
             } catch (Exception e) {
                 Timber.e("Error saving case confirmation data");
             }
-        });
+        });*/
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().saveCaseConfirmation(this, presenterCallBack, jsonForm, eventType);
     }
 
     protected String getMemberTasksSelect(String mainCondition, String[] memberColumns) {
-
-        /*SmartRegisterQueryBuilder queryBuilder = new SmartRegisterQueryBuilder();
-
-        queryBuilder.selectInitiateMainTable(STRUCTURES_TABLE, memberColumns, ID);
+        SmartRegisterQueryBuilder queryBuilder = new SmartRegisterQueryBuilder();
+        queryBuilder.selectInitiateMainTable(Constants.DatabaseKeys.STRUCTURES_TABLE, memberColumns, Constants.DatabaseKeys.ID);
         queryBuilder.customJoin(String.format(" JOIN %s ON %s.%s = %s.%s ",
-                FAMILY_MEMBER, FAMILY_MEMBER, STRUCTURE_ID, STRUCTURES_TABLE, ID));
+                Constants.TABLE_NAME.FAMILY_MEMBER, Constants.TABLE_NAME.FAMILY_MEMBER, Constants.DatabaseKeys.STRUCTURE_ID, Constants.DatabaseKeys.STRUCTURES_TABLE, Constants.DatabaseKeys.ID));
         queryBuilder.customJoin(String.format(" JOIN %s ON %s.%s = %s.%s ",
-                TASK_TABLE, TASK_TABLE, FOR, FAMILY_MEMBER, BASE_ENTITY_ID));
-
-        return queryBuilder.mainCondition(mainCondition);*/
-        return null;
-
+                Constants.Tables.TASK_TABLE, Constants.Tables.TASK_TABLE, Constants.DatabaseKeys.FOR, Constants.TABLE_NAME.FAMILY_MEMBER, Constants.DatabaseKeys.BASE_ENTITY_ID));
+        return queryBuilder.mainCondition(mainCondition);
     }
 
     public void fetchFamilyDetails(String structureId) {
         appExecutors.diskIO().execute(() -> {
-
-            /*Cursor cursor = null;
-
+            Cursor cursor = null;
             CommonPersonObjectClient family = null;
             try {
                 cursor = database.rawQuery(String.format("SELECT %s FROM %S WHERE %s = ? AND %s IS NULL",
-                        INTENT_KEY.BASE_ENTITY_ID, TABLE_NAME.FAMILY, STRUCTURE_ID, DATE_REMOVED), new String[]{structureId});
+                        Constants.IntentKey.BASE_ENTITY_ID, Constants.TABLE_NAME.FAMILY, Constants.DatabaseKeys.STRUCTURE_ID, Constants.DbKey.DATE_REMOVED), new String[]{structureId});
                 if (cursor.moveToNext()) {
                     String baseEntityId = cursor.getString(0);
                     setCommonRepository();
@@ -428,8 +433,7 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
             CommonPersonObjectClient finalFamily = family;
             appExecutors.mainThread().execute(() -> {
                 presenterCallBack.onFamilyFound(finalFamily);
-
-            });*/
+            });
         });
     }
 
@@ -439,9 +443,7 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
 
     public void setCommonRepository() {
         if (commonRepository == null) {
-
-            //commonRepository = CoreLibrary.getInstance().context().commonrepository(metadata().familyRegister.tableName);
-
+            commonRepository = CoreLibrary.getInstance().context().commonrepository(TaskingLibrary.getInstance().getTaskingLibraryConfiguration().familyRegisterTableName());
         }
     }
 }

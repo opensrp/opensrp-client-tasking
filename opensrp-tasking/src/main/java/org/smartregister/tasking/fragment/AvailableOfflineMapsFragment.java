@@ -49,18 +49,21 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
 
     private Button btnDownloadMap;
 
+    private String mapStyleAssetPath;
+
     private static Gson gson = new GsonBuilder().setDateFormat(Constants.DateFormat.EVENT_DATE_FORMAT_Z)
                 .registerTypeAdapter(DateTime.class, new DateTimeTypeConverter())
             .registerTypeAdapter(LocationProperty.class, new PropertiesConverter()).create();
 
-
-    public static AvailableOfflineMapsFragment newInstance(Bundle bundle) {
+    public static AvailableOfflineMapsFragment newInstance(Bundle bundle, @NonNull String mapStyleAssetPath) {
 
         AvailableOfflineMapsFragment fragment = new AvailableOfflineMapsFragment();
         if (bundle != null) {
             fragment.setArguments(bundle);
         }
+
         fragment.setPresenter(new AvailableOfflineMapsPresenter(fragment));
+        fragment.setMapStyleAssetPath(mapStyleAssetPath);
 
         return fragment;
     }
@@ -73,9 +76,7 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
         }
         btnDownloadMap = null;
 
-        new FileHttpServerTask(getContext()).execute();
-
-
+        new FileHttpServerTask(getContext(), getMapStyleAssetPath()).execute();
     }
 
     @Nullable
@@ -247,15 +248,20 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.offline_map_checkbox:
-                updateOperationalAreasToDownload(view);
-                break;
-            case R.id.download_map:
-                initiateMapDownload();
-                break;
-            default:
-                break;
+        int viewId = view.getId();
+        if (viewId == R.id.offline_map_checkbox) {
+            updateOperationalAreasToDownload(view);
+        } else if (viewId == R.id.download_map) {
+            initiateMapDownload();
         }
+    }
+
+    @NonNull
+    public String getMapStyleAssetPath() {
+        return mapStyleAssetPath;
+    }
+
+    public void setMapStyleAssetPath(String mapStyleAssetPath) {
+        this.mapStyleAssetPath = mapStyleAssetPath;
     }
 }

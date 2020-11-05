@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.cardview.widget.CardView;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -23,6 +24,7 @@ import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.Task;
 import org.smartregister.tasking.R;
+import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.activity.TaskRegisterActivity;
 import org.smartregister.tasking.adapter.TaskRegisterAdapter;
 import org.smartregister.tasking.contract.BaseDrawerContract;
@@ -53,11 +55,9 @@ import static org.smartregister.tasking.util.Constants.Filter.FILTER_SORT_PARAMS
 import static org.smartregister.tasking.util.Constants.Intervention.TASK_RESET_INTERVENTIONS;
 import static org.smartregister.tasking.util.Constants.RequestCode.REQUEST_CODE_FILTER_TASKS;
 
-
 /**
  * Created by samuelgithengi on 3/11/19.
  */
-
 public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRegisterFragmentContract.View, BaseDrawerContract.DrawerActivity {
 
     private TaskRegisterAdapter taskAdapter;
@@ -65,7 +65,6 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
     private BaseDrawerContract.View drawerView;
 
     private RevealJsonFormUtils jsonFormUtils;
-
     private ProgressDialog progressDialog;
     private TextView interventionTypeTv;
 
@@ -82,10 +81,9 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        drawerView = null;//new DrawerMenuView(this);
+        drawerView = TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getDrawerMenuView(this);//new DrawerMenuView(this);
         progressDialog = new ProgressDialog(getContext());
         progressDialog.setCancelable(false);
-
     }
 
     @Override
@@ -123,7 +121,6 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         if (filterParams != null) {
             getPresenter().setTaskFilterParams(filterParams);
         }
-
     }
 
     @Override
@@ -137,14 +134,25 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
 
     @Override
     public void startMapActivity(TaskFilterParams taskFilterParams) {
+        /*
+        Intent intent = new Intent(getContext(), ListTasksActivity.class);
+        if (taskFilterParams != null) {
+            taskFilterParams.setSearchPhrase(getSearchView().getText().toString());
+            intent.putExtra(FILTER_SORT_PARAMS, taskFilterParams);
+        } else if (StringUtils.isNotBlank(getSearchView().getText())) {
+            intent.putExtra(FILTER_SORT_PARAMS, new TaskFilterParams(getSearchView().getText().toString()));
+        }
+        getActivity().setResult(RESULT_OK, intent);
+        getActivity().finish();
+        */
 
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().startMapActivity(getActivity(), getSearchView().getText().toString(), taskFilterParams);
     }
 
     @Override
     public Location getLastLocation() {
         if (getActivity() != null && getActivity().getIntent().getExtras() != null) {
             return getActivity().getIntent().getExtras().getParcelable(TaskRegister.LAST_USER_LOCATION);
-
         } else {
             return null;
         }
@@ -153,7 +161,6 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
     @Override
     protected void initializePresenter() {
         presenter = new TaskRegisterFragmentPresenter(this, TaskRegister.VIEW_IDENTIFIER);
-
         locationUtils = new LocationUtils(getContext());
         locationUtils.requestLocationUpdates(getPresenter());
     }
@@ -196,14 +203,12 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
 
     }
 
-
     public void displayTaskActionDialog(TaskDetails details, View view) {
-
         AlertDialogUtils.displayNotificationWithCallback(getContext(), R.string.select_task_action,
                 R.string.choose_action, R.string.view_details, R.string.undo, new Dialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        switch (which) {
+                        switch (which){
                             case BUTTON_POSITIVE:
                                 getPresenter().onTaskSelected(details, view.getId() == R.id.task_action);
                                 break;
@@ -216,11 +221,10 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
                         dialog.dismiss();
                     }
 
-                });
+         } );
     }
 
     public void displayResetTaskInfoDialog(TaskDetails details) {
-
         AlertDialogUtils.displayNotificationWithCallback(getContext(), R.string.undo_task_title,
                 R.string.undo_task_msg, R.string.confirm, R.string.cancel, new DialogInterface.OnClickListener() {
                     @Override
@@ -237,6 +241,8 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         /*if (this.getActivity() != null) {
             NoMatchDialogFragment.launchDialog((BaseRegisterActivity) this.getActivity(), "dialog", opensrpId);
         }*/
+
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().showNotFoundPopup(getActivity(), opensrpId);
     }
 
     private TaskRegisterFragmentPresenter getPresenter() {
@@ -253,28 +259,25 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
     public void setTotalTasks(int structuresWithinBuffer) {
         if (isAdded() && headerTextDisplay != null) {
             headerTextDisplay.setText(getResources().getQuantityString(R.plurals.structures,
-
                     taskAdapter.getItemCount(), structuresWithinBuffer, Utils.getLocationBuffer(), taskAdapter.getItemCount()));
-
 
             filterRelativeLayout.setVisibility(View.GONE);
         }
     }
-
 
     public void setTaskDetails(List<TaskDetails> tasks) {
         /*taskAdapter.setTaskDetails(tasks);
         if (BuildConfig.BUILD_COUNTRY == Country.ZAMBIA) {
             new IndicatorsCalculatorTask(getActivity(), tasks).execute();
         }*/
+
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().setTaskDetails(getActivity(), taskAdapter, tasks);
     }
 
     @Override
     public void displayNotification(int title, int message, Object... formatArgs) {
         setRefreshList(false);
-
         AlertDialogUtils.displayNotification(getContext(), title, message, formatArgs);
-
     }
 
     @Override
@@ -289,7 +292,6 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
 
     @Override
     public void onDestroy() {
-
         getPresenter().onDestroy();
         super.onDestroy();
     }
@@ -300,10 +302,8 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
 
     }
 
-
     @Override
     public RevealJsonFormUtils getJsonFormUtils() {
-
         return jsonFormUtils;
     }
 
@@ -356,11 +356,9 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
 
     @Override
     public void openFamilyProfile(CommonPersonObjectClient family, BaseTaskDetails taskDetails) {
-
         /*
 
         Intent intent = new Intent(getContext(), org.smartregister.family.util.Utils.metadata().profileActivity);
-
         intent.putExtra(org.smartregister.family.util.Constants.INTENT_KEY.FAMILY_BASE_ENTITY_ID, family.getCaseId());
         intent.putExtra(org.smartregister.family.util.Constants.INTENT_KEY.FAMILY_HEAD, org.smartregister.family.util.Utils.getValue(family.getColumnmaps(), DBConstants.KEY.FAMILY_HEAD, false));
         intent.putExtra(org.smartregister.family.util.Constants.INTENT_KEY.PRIMARY_CAREGIVER, org.smartregister.family.util.Utils.getValue(family.getColumnmaps(), DBConstants.KEY.PRIMARY_CAREGIVER, false));
@@ -374,9 +372,9 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         intent.putExtra(Properties.TASK_STATUS, taskDetails.getTaskStatus());
 
         startActivity(intent);
+        */
 
-*/
-
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().openFamilyProfile(getActivity(), family, taskDetails);
     }
 
     @Override
@@ -405,13 +403,10 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
 
     @Override
     public void openFilterActivity(TaskFilterParams filterParams) {
-
-        /*
-        Intent intent = new Intent(getContext(), FilterTasksActivity.class);
+        /*Intent intent = new Intent(getContext(), FilterTasksActivity.class);
         intent.putExtra(FILTER_SORT_PARAMS, filterParams);
-        getActivity().startActivityForResult(intent, REQUEST_CODE_FILTER_TASKS);
-        */
-
+        getActivity().startActivityForResult(intent, REQUEST_CODE_FILTER_TASKS);*/
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().openFilterActivity(getActivity(), filterParams);
     }
 
     @Override
@@ -419,9 +414,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         getSearchView().setText(searchPhrase);
     }
 
-
     public void setJsonFormUtils(RevealJsonFormUtils jsonFormUtils) {
-
         this.jsonFormUtils = jsonFormUtils;
     }
 
@@ -435,7 +428,6 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
                 getPresenter().getLocationPresenter().onGetUserLocationFailed();
             }
             hasRequestedLocation = false;
-
         } else if (requestCode == REQUEST_CODE_FILTER_TASKS && resultCode == RESULT_OK && data.hasExtra(FILTER_SORT_PARAMS)) {
             TaskFilterParams filterParams = (TaskFilterParams) data.getSerializableExtra(FILTER_SORT_PARAMS);
             getPresenter().filterTasks(filterParams);
@@ -454,9 +446,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
     public void onResume() {
         super.onResume();
         if (getContext() != null) {
-
             IntentFilter filter = new IntentFilter(Action.STRUCTURE_TASK_SYNCED);
-
             LocalBroadcastManager.getInstance(getContext()).registerReceiver(refreshRegisterReceiver, filter);
         }
     }

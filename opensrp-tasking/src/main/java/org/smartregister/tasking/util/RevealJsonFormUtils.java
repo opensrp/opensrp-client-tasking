@@ -20,6 +20,7 @@ import org.smartregister.domain.Event;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.Obs;
 import org.smartregister.tasking.BuildConfig;
+import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.util.Constants.CONFIGURATION;
@@ -187,7 +188,7 @@ public class RevealJsonFormUtils {
         formData.put(Properties.LOCATION_VERSION, structureVersion);
         formData.put(Properties.APP_VERSION_NAME, BuildConfig.VERSION_NAME);
         formData.put(Properties.FORM_VERSION, formJson.optString("form_version"));
-        String planIdentifier = "";//PreferencesUtil.getInstance().getCurrentPlanId();
+        String planIdentifier = TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getCurrentPlanId();//PreferencesUtil.getInstance().getCurrentPlanId();
         formData.put(Properties.PLAN_IDENTIFIER, planIdentifier);
         formJson.put(DETAILS, formData);
         return formJson;
@@ -324,7 +325,7 @@ public class RevealJsonFormUtils {
         } else if (IRS_VERIFICATION.equals(encounterType) || Intervention.IRS_VERIFICATION.equals(taskCode)) {
             formName = JsonForm.ZAMBIA_IRS_VERIFICATION_FORM;
         }*/
-        return formName;
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getFormName(encounterType, taskCode);
     }
 
     public String getFormName(String encounterType) {

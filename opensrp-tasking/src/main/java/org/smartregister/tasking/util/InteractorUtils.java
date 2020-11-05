@@ -16,6 +16,7 @@ import org.smartregister.repository.BaseRepository;
 import org.smartregister.repository.EventClientRepository;
 import org.smartregister.repository.TaskRepository;
 import org.smartregister.sync.ClientProcessorForJava;
+import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.model.BaseTaskDetails;
 
 import java.util.ArrayList;
@@ -80,7 +81,7 @@ public class InteractorUtils {
 
 
     public boolean archiveClient(String baseEntityId, boolean isFamily) {
-        taskRepository.cancelTasksForEntity(baseEntityId);
+        /*taskRepository.cancelTasksForEntity(baseEntityId);
         taskRepository.archiveTasksForEntity(baseEntityId);
         JSONObject eventsByBaseEntityId = eventClientRepository.getEventsByBaseEntityId(baseEntityId);
         JSONArray events = eventsByBaseEntityId.optJSONArray("events");
@@ -105,8 +106,8 @@ public class InteractorUtils {
             clientJsonObject.put(EventClientRepository.client_column.syncStatus.name(), BaseRepository.TYPE_Unsynced);
             clientJsonObject.getJSONObject("attributes").put("dateRemoved", now);
             eventClientRepository.addorUpdateClient(baseEntityId, clientJsonObject);
-            //RevealApplication.getInstance().setSynced(false);
-            /*Event archiveEvent = FamilyJsonFormUtils.createFamilyEvent(baseEntityId, Utils.getCurrentLocationId(),
+            RevealApplication.getInstance().setSynced(false);
+            Event archiveEvent = FamilyJsonFormUtils.createFamilyEvent(baseEntityId, Utils.getCurrentLocationId(),
                     null, isFamily ? EventType.ARCHIVE_FAMILY : EventType.ARCHIVE_FAMILY_MEMBER);
             archiveEvent.addObs(new Obs().withValue(now).withFieldCode("dateArchived").withFieldType("formsubmissionField"));
 
@@ -116,14 +117,16 @@ public class InteractorUtils {
 
             clientProcessor.processClient(Collections.singletonList(new EventClient(
                     gson.fromJson(eventJson.toString(), org.smartregister.domain.Event.class),
-                    gson.fromJson(clientJsonObject.toString(), Client.class))), true);*/
+                    gson.fromJson(clientJsonObject.toString(), Client.class))), true);
             saved = true;
 
         } catch (JSONException e) {
             Timber.e(e);
             saved = false;
         }
-        return saved;
+        return saved;*/
+
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().archiveClient(baseEntityId, isFamily);
     }
 
     public boolean archiveEventsForTask(SQLiteDatabase db, BaseTaskDetails taskDetails) {
@@ -211,7 +214,8 @@ public class InteractorUtils {
     }
 
     public boolean resetTaskInfo(SQLiteDatabase db, BaseTaskDetails taskDetails) {
-        return true; //return archiveEventsForTask(db, taskDetails) && TaskUtils.getInstance().resetTask(taskDetails);
+        //return archiveEventsForTask(db, taskDetails) && TaskUtils.getInstance().resetTask(taskDetails);
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().resetTaskInfo(db, taskDetails);
     }
 
 }
