@@ -3,11 +3,11 @@ buildscript {
     repositories {
         google()
         jcenter()
+        maven{  url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.11.0"
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        classpath 'gradle.plugin.org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.10.2'
     }
 }
 
@@ -21,7 +21,9 @@ configure(allprojects) { project ->
             jcenter()
             mavenCentral()
             maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
+            maven{  url "https://plugins.gradle.org/m2/" }
             mavenLocal()
+
         }
     }
 }
