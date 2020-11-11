@@ -113,7 +113,7 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
         taskRepository = taskingLibrary.getTaskRepository();
         structureRepository = taskingLibrary.getStructureRepository();
         eventClientRepository = taskingLibrary.getEventClientRepository();
-        clientProcessor = ClientProcessorForJava.getInstance(DrishtiApplication.getInstance());
+        clientProcessor = DrishtiApplication.getInstance().getClientProcessor();
         sharedPreferences = taskingLibrary.getAllSharedPreferences();
         //taskUtils = TaskUtils.getInstance();
         database = taskingLibrary.getRepository().getReadableDatabase();

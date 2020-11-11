@@ -24,6 +24,8 @@ public class BaseTaskDetails {
 
     private String familyMemberNames;
 
+    private long authoredOn;
+
     public BaseTaskDetails(@NonNull String taskId) {
         this.taskId = taskId;
     }
@@ -82,6 +84,14 @@ public class BaseTaskDetails {
 
     public void setFamilyMemberNames(String familyMemberNames) {
         this.familyMemberNames = familyMemberNames;
+    }
+
+    public long getAuthoredOn() {
+        return authoredOn;
+    }
+
+    public void setAuthoredOn(long authoredOn) {
+        this.authoredOn = authoredOn;
     }
 
     @Override

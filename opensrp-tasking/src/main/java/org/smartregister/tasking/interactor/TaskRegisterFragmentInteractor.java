@@ -37,6 +37,7 @@ import timber.log.Timber;
 
 import static org.smartregister.domain.Task.INACTIVE_TASK_STATUS;
 import static org.smartregister.repository.EventClientRepository.Table.event;
+import static org.smartregister.tasking.util.Constants.DatabaseKeys.AUTHORED_ON;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.BUSINESS_STATUS;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.CODE;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.COMPLETED_TASK_COUNT;
@@ -249,6 +250,8 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
                 }
                 tasks.add(taskDetails);
             }
+        } catch (Exception ex) {
+            Timber.e(ex);
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -264,6 +267,7 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
         task.setTaskEntity(cursor.getString(cursor.getColumnIndex(FOR)));
         task.setBusinessStatus(cursor.getString(cursor.getColumnIndex(BUSINESS_STATUS)));
         task.setTaskStatus(cursor.getString(cursor.getColumnIndex(STATUS)));
+        task.setAuthoredOn(cursor.getLong(cursor.getColumnIndex(AUTHORED_ON)));
         if (isGroupedTasks) {
             task.setTaskCount(cursor.getInt(cursor.getColumnIndex(TASK_COUNT)));
             task.setCompleteTaskCount(cursor.getInt(cursor.getColumnIndex(COMPLETED_TASK_COUNT)));
@@ -277,38 +281,43 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
         if (CASE_CONFIRMATION.equals(task.getTaskCode())) {
             task.setReasonReference(cursor.getString(cursor.getColumnIndex(REFERENCE_REASON)));
         } else if (!BCC.equals(task.getTaskCode())) {
-            location.setLatitude(cursor.getDouble(cursor.getColumnIndex(LATITUDE)));
-            location.setLongitude(cursor.getDouble(cursor.getColumnIndex(LONGITUDE)));
-            task.setLocation(location);
-            task.setStructureName(cursor.getString(cursor.getColumnIndex(NAME)));
-            if (StringUtils.isBlank(task.getStructureName())) {
-                task.setStructureName(cursor.getString(cursor.getColumnIndex(STRUCTURE_NAME)));
-            }
 
-            task.setFamilyName(cursor.getString(cursor.getColumnIndex(FIRST_NAME)));
-            if (task.getFamilyName() == null) {
-                task.setFamilyName(cursor.getString(cursor.getColumnIndex(FAMILY_NAME)));
-            }
+            if (cursor.getColumnIndex(LATITUDE) > -1) {
+                location.setLatitude(cursor.getDouble(cursor.getColumnIndex(LATITUDE)));
+                location.setLongitude(cursor.getDouble(cursor.getColumnIndex(LONGITUDE)));
+                task.setLocation(location);
 
-            if (task.getFamilyName() != null)
-                task.setFamilyName(task.getFamilyName() + " " + houseLabel);
-
-            task.setSprayStatus(cursor.getString(cursor.getColumnIndex(SPRAY_STATUS)));
-
-            if (Constants.BusinessStatus.NOT_SPRAYED.equals(task.getBusinessStatus())) {
-                String reason = cursor.getString(cursor.getColumnIndex(NOT_SRAYED_REASON));
-                if (OTHER.equals(reason)) {
-                    reason = cursor.getString(cursor.getColumnIndex(NOT_SRAYED_OTHER_REASON));
+                task.setStructureName(cursor.getString(cursor.getColumnIndex(NAME)));
+                if (StringUtils.isBlank(task.getStructureName())) {
+                    task.setStructureName(cursor.getString(cursor.getColumnIndex(STRUCTURE_NAME)));
                 }
-                task.setTaskDetails(reason);
+
+                task.setFamilyName(cursor.getString(cursor.getColumnIndex(FIRST_NAME)));
+                if (task.getFamilyName() == null) {
+                    task.setFamilyName(cursor.getString(cursor.getColumnIndex(FAMILY_NAME)));
+                }
+
+                if (task.getFamilyName() != null)
+                    task.setFamilyName(task.getFamilyName() + " " + houseLabel);
+
+                task.setSprayStatus(cursor.getString(cursor.getColumnIndex(SPRAY_STATUS)));
+
+                if (Constants.BusinessStatus.NOT_SPRAYED.equals(task.getBusinessStatus())) {
+                    String reason = cursor.getString(cursor.getColumnIndex(NOT_SRAYED_REASON));
+                    if (OTHER.equals(reason)) {
+                        reason = cursor.getString(cursor.getColumnIndex(NOT_SRAYED_OTHER_REASON));
+                    }
+                    task.setTaskDetails(reason);
+                }
             }
         }
+
         task.setStructureId(cursor.getString(cursor.getColumnIndex(STRUCTURE_ID)));
 
         if (!TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().showGroupedTasks()) {
             // Get the client related to the task
-            // CommonPersonObjectClient client = CoreLibrary.getInstance().context().getEventClientRepository().fetchCommonPersonObjectClientByBaseEntityId(task.getTaskEntity());
-            // task.setClient(client);
+            CommonPersonObjectClient client = CoreLibrary.getInstance().context().getEventClientRepository().fetchCommonPersonObjectClientByBaseEntityId(task.getTaskEntity());
+            task.setClient(client);
             // TODO -> Uncomment above lines
         }
 

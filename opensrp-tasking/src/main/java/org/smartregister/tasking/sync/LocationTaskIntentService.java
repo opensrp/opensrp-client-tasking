@@ -195,7 +195,7 @@ public class LocationTaskIntentService extends IntentService {
         if (!eventClients.isEmpty()) {
 
             try {
-                DrishtiApplication.getInstance().getClientProcessor().getInstance(getApplicationContext()).processClient(eventClients);
+                DrishtiApplication.getInstance().getClientProcessor().processClient(eventClients);
             } catch (Exception ex) {
                 Timber.e(ex);
             }

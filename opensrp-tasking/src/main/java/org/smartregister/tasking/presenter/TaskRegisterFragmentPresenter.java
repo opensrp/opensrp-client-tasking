@@ -21,6 +21,8 @@ import org.smartregister.configurableviews.model.View;
 import org.smartregister.configurableviews.model.ViewConfiguration;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.Task;
+import org.smartregister.location.helper.LocationHelper;
+import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.tasking.R;
 import org.smartregister.tasking.contract.TaskRegisterFragmentContract;
 import org.smartregister.tasking.interactor.TaskRegisterFragmentInteractor;
@@ -30,6 +32,7 @@ import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.tasking.util.Constants;
 import org.smartregister.tasking.util.PreferencesUtil;
 import org.smartregister.tasking.util.Utils;
+import org.smartregister.view.activity.DrishtiApplication;
 import org.smartregister.view.contract.IView;
 
 import java.lang.ref.WeakReference;
@@ -143,7 +146,7 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
 
     private android.location.Location getOperationalAreaCenter() {
         Location operationalAreaLocation = Utils.getOperationalAreaLocation(prefsUtil.getCurrentOperationalArea());
-        if (operationalAreaLocation == null)
+        if (operationalAreaLocation == null || operationalAreaLocation.getGeometry() == null)
             return null;
         return mappingHelper.getCenter(gson.toJson(operationalAreaLocation.getGeometry()));
     }

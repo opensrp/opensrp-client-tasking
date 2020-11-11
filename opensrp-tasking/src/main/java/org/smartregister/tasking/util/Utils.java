@@ -22,6 +22,8 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,6 +50,7 @@ import org.smartregister.view.activity.DrishtiApplication;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -393,4 +396,32 @@ public class Utils {
         return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().displayDistanceScale();
     }
 
+    public static String getRelativeDateTimeString(Calendar fromTime) {
+
+        SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MMM dd, yyyy");
+        SimpleDateFormat TIME_FORMAT = new SimpleDateFormat(" 'at' h:mm aa");
+        if (fromTime == null) return null;
+
+        DateTime startDate = new DateTime(fromTime.getTimeInMillis());
+        DateTime today = new DateTime();
+        int days = Days.daysBetween(today.withTimeAtStartOfDay(), startDate.withTimeAtStartOfDay()).getDays();
+
+        String date;
+        switch (days) {
+            case -1:
+                date = "yesterday";
+                break;
+            case 0:
+                date = "today";
+                break;
+            case 1:
+                date = "tomorrow";
+                break;
+            default:
+                date = DATE_FORMAT.format(fromTime.getTime());
+                break;
+        }
+        String time = TIME_FORMAT.format(fromTime.getTime());
+        return date + time;
+    }
 }
