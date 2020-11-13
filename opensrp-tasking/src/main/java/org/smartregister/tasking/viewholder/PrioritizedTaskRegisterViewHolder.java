@@ -60,6 +60,16 @@ public class PrioritizedTaskRegisterViewHolder extends RecyclerView.ViewHolder {
         taskActionDescriptionTv.setOnClickListener(onClickListener);
     }
 
+    public void setTaskDetails(@NonNull TaskDetails taskDetails) {
+        itemView.setTag(R.id.task_details, taskDetails);
+        taskIconImageView.setTag(R.id.task_details, taskDetails);
+        taskActionImageView.setTag(R.id.task_details, taskDetails);
+        taskEntityNameTv.setTag(R.id.task_details, taskDetails);
+        taskTitleTv.setTag(R.id.task_details, taskDetails);
+        taskActionDescriptionTv.setTag(R.id.task_details, taskDetails);
+        taskRelativeTimeAssignedTv.setTag(R.id.task_details, taskDetails);
+    }
+
 
     public void setTaskIcon(@DrawableRes int iconResource) {
         taskIconImageView.setImageDrawable(context.getResources().getDrawable(iconResource));

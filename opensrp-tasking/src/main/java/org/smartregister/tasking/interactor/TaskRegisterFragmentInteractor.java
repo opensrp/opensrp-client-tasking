@@ -315,6 +315,7 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
         task.setStructureId(cursor.getString(cursor.getColumnIndex(STRUCTURE_ID)));
 
         if (!TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().showGroupedTasks()) {
+            // TODO: Check if the client details from below query can be outdated/stale due to client edit registrations
             // Get the client related to the task
             CommonPersonObjectClient client = CoreLibrary.getInstance().context().getEventClientRepository().fetchCommonPersonObjectClientByBaseEntityId(task.getTaskEntity());
             task.setClient(client);
