@@ -55,6 +55,7 @@ import java.util.Set;
 import io.ona.kujaku.location.clients.AndroidGpsLocationClient;
 import io.ona.kujaku.utils.Constants;
 import io.ona.kujaku.utils.Permissions;
+import timber.log.Timber;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -273,9 +274,15 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
     protected void onViewClicked(View view) {
         TaskDetails details = (TaskDetails) view.getTag(R.id.task_details);
 
-        if (TASK_RESET_INTERVENTIONS.contains(details.getTaskCode())
+        if (details != null && TASK_RESET_INTERVENTIONS.contains(details.getTaskCode())
                 && Task.TaskStatus.COMPLETED.name().equals(details.getTaskStatus())) {
             displayTaskActionDialog(details, view);
+        } else if (TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design()) {
+            if (details != null) {
+                TaskingLibrary.getInstance().getTaskingLibraryConfiguration().onTaskRegisterItemClicked(getActivity(), details);
+            } else {
+                Timber.e("View does not have the task details attached");
+            }
         } else {
             getPresenter().onTaskSelected(details, view.getId() == R.id.task_action);
         }

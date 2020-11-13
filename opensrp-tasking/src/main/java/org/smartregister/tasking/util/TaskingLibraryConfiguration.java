@@ -139,6 +139,8 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract void onTaskRegisterBindViewHolder(@NonNull Context context, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull View.OnClickListener registerActionHandler, @NonNull TaskDetails taskDetails, int position);
 
+    public abstract void onTaskRegisterItemClicked(@NonNull Activity activity, @NonNull TaskDetails taskDetails);
+
     @NonNull
     public abstract AppExecutors getAppExecutors();
 
