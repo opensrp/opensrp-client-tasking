@@ -9,20 +9,17 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.domain.Location;
-import org.smartregister.tasking.R;
 import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.BaseFormFragmentContract;
 import org.smartregister.tasking.interactor.BaseFormFragmentInteractor;
 import org.smartregister.tasking.model.BaseTaskDetails;
-import org.smartregister.tasking.repository.RevealMappingHelper;
-import org.smartregister.tasking.util.Constants.Intervention;
+import org.smartregister.tasking.repository.TaskingMappingHelper;
 import org.smartregister.tasking.util.Constants.JsonForm;
 import org.smartregister.tasking.util.PasswordDialogUtils;
 import org.smartregister.tasking.util.PreferencesUtil;
@@ -55,7 +52,7 @@ public class BaseFormFragmentPresenter extends BaseLocationListener implements B
 
     private ValidateUserLocationPresenter locationPresenter;
 
-    protected RevealMappingHelper mappingHelper;
+    protected TaskingMappingHelper mappingHelper;
 
     private Location structure;
 
@@ -77,7 +74,7 @@ public class BaseFormFragmentPresenter extends BaseLocationListener implements B
         this.view = new WeakReference<>(view);
         passwordDialog = PasswordDialogUtils.initPasswordDialog(context, this);
         locationPresenter = new ValidateUserLocationPresenter(view, this);
-        mappingHelper = new RevealMappingHelper();
+        mappingHelper = new TaskingMappingHelper();
         interactor = new BaseFormFragmentInteractor(this);
         prefsUtil = PreferencesUtil.getInstance();
     }

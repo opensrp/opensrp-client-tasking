@@ -104,4 +104,97 @@
     <string name="map">Map</string>
     <string name="download">Download</string>
     <string name="clear">Clear</string>
+    <string name="list">List</string>
+    <string name="powered_by">Powered by</string>
+
+    <string name="select_campaign_operational_area_title">Plan and Operational area not set</string>
+    <string name="select_campaign_operational_area">Plan and Operational area not set. Select from the hamburger menu</string>
+    <string name="revoked_plan_operational_area">Previously selected Plan and/or Operational area revoked. Select from the hamburger menu</string>
+
+    <string name="reveal_datasource_name" translatable="false">reveal-data-set</string>
+    <string name="reveal_layer_polygons" translatable="false">reveal-data-polygons</string>
+    <string name="reveal_layer_points" translatable="false">reveal-data-points</string>
+    <string name="base_map_feature_json" translatable="false">base_map_feature.json</string>
+    <string name="reveal_satellite_style" translatable="false">asset://reveal-streets-satellite.json</string>
+    <string name="reveal_offline_map_download_style" translatable="false">map-download-style.json</string>
+
+    <string name="saving_title">Saving</string>
+    <string name="saving_message">Saving form in Progress. Please wait</string>
+
+    <string name="location_services_disabled">Location Services Disabled</string>
+    <string name="location_services_disabled_spray">You have declined enabling location services to get your current location. You shall have to enter admin password to spray the structure</string>
+    <string name="location_services_disabled_add">You have declined enabling location services to get your current location. You shall have to enter admin password to add the structure</string>
+
+
+    <string name="mark_location_inactive">Mark Location Inactive</string>
+    <string name="confirm_mark_location_inactive">Please confirm that this location should be marked inactive</string>
+
+    <string name="progressBarLabel">Syncing %s : %d%% </string>
+    <string name="device_data_synced">Device data synced</string>
+    <string name="device_data_not_synced">Device data not synced</string>
+    <string name="manifest_version_parenthesis_placeholder">(%1$s)</string>
+
+    <string name="selected_datasource_name" translatable="false">select-data</string>
+
+
+    <string name="structure_not_found_or_visited_during_campaign">Structure not found or visited during campaign</string>
+    <string name="other">Other</string>
+
+    <string name="synced_events">Synced events:</string>
+    <string name="unsynced_events">Unsynced events:</string>
+    <string name="synced_clients">Synced clients:</string>
+    <string name="unsynced_clients">Unsynced clients:</string>
+    <string name="validated_events">Validated events:</string>
+    <string name="validated_clients">Validated clients:</string>
+    <string name="task_unprocessed_events">Task unprocessed events:</string>
+
+    <string name="operational_area_not_selected">Operational Area not selected</string>
+    <string name="sync">Sync</string>
+    <string name="campaign">Plan</string>
+    <string name="operational_area">Operational Area</string>
+    <string name="language_s">Language: %s</string>
+
+    <string name="cannot_make_structure_inactive">You can not make this structure inactive because tasks are completed against it</string>
+    <string name="mark_location_ineligible">Mark Location Ineligible</string>
+    <string name="is_structure_eligible_for_fam_reg">Is this location eligible to register a family?</string>
+
+    <string name="eligible">Eligible</string>
+    <string name="not_eligible_unoccupied">Not Eligible: Currently Unoccupied</string>
+    <string name="not_eligible_other">Not Eligible: Other</string>
+
+    <string name="add_structure">Register Structure</string>
+    <string name="filter">Filter</string>
+
+    <string name="events">Events</string>
+    <string name="locations">Locations</string>
+    <string name="plans">Plans</string>
+    <string name="structures">Structures</string>
+    <string name="tasks_text">Tasks</string>
+
+    <string name="register_family">Register Family</string>
+
+    <string name="district">District:</string>
+    <string name="facility">Location:</string>
+    <string name="canton">Canton:</string>
+    <string name="operator">User:</string>
+
+    <string name="last_edited">Edited %1s</string>
+    <string name="device_to_device_sync">P2P Sync</string>
+    <string name="summary_forms">Other Forms</string>
+    <string name="filled_forms">Filled Forms</string>
+    <string name="tasking_app_version">Version %1$s</string>
+
+    <string name="error_fetching_location_hierarchy_title">Error Processing Locations Hierarchy</string>
+    <string name="error_fetching_location_hierarchy">Error Processing Location Hierarchy. Log off to download location hierarchy again</string>
+
+    <string name="resetting_task_title">Resetting Task Information</string>
+    <string name="resetting_task_msg">Resetting Task Information. Please wait</string>
+    <string name="form_save_failure_title">Error Saving Form</string>
+    <string name="spray_form_save_failure">Error saving spray form</string>
+    <string name="add_structure_form_save_failure">Error saving add structure form</string>
+    <string name="error_occurred_saving_form">Error Occurred Saving form</string>
+
+    <string name="plans_download_on_progress_title">Download in Progress</string>
+    <string name="plans_download_on_progress">Downloading of Plans In Progress. Please wait</string>
+
 </resources>

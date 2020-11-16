@@ -8,6 +8,7 @@ import androidx.annotation.Nullable;
 import org.smartregister.CoreLibrary;
 import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.EventClientRepository;
+import org.smartregister.repository.PlanDefinitionSearchRepository;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.StructureRepository;
 import org.smartregister.repository.TaskNotesRepository;
@@ -29,6 +30,7 @@ public class TaskingLibrary {
     private TaskNotesRepository taskNotesRepository;
     private StructureRepository structureRepository;
     private EventClientRepository eventClientRepository;
+    private PlanDefinitionSearchRepository planDefinitionSearchRepository;
     private AllSharedPreferences allSharedPreferences;
 
     private String digitalGlobeConnectId;
@@ -88,6 +90,14 @@ public class TaskingLibrary {
         }
 
         return structureRepository;
+    }
+
+    @NonNull
+    public PlanDefinitionSearchRepository getPlanDefinitionSearchRepository() {
+        if (planDefinitionSearchRepository == null) {
+            planDefinitionSearchRepository = new PlanDefinitionSearchRepository();
+        }
+        return planDefinitionSearchRepository;
     }
 
     @NonNull

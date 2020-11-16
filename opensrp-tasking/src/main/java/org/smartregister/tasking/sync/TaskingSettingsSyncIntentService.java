@@ -15,7 +15,7 @@ import static org.smartregister.tasking.util.Constants.CONFIGURATION.UPDATE_LOCA
 /**
  * @author Vincent Karuri
  */
-public class RevealSettingsSyncIntentService extends SettingsSyncIntentService {
+public class TaskingSettingsSyncIntentService extends SettingsSyncIntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         super.onHandleIntent(intent);

@@ -1,5 +1,7 @@
 package org.smartregister.tasking.sync;
 
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.IntentService;
 import android.content.Intent;
 
@@ -19,13 +21,14 @@ import org.smartregister.sync.helper.LocationServiceHelper;
 import org.smartregister.sync.helper.PlanIntentServiceHelper;
 import org.smartregister.sync.helper.TaskServiceHelper;
 import org.smartregister.tasking.TaskingLibrary;
-import org.smartregister.tasking.job.RevealSyncSettingsServiceJob;
+import org.smartregister.tasking.job.TaskingSyncSettingsServiceJob;
 import org.smartregister.tasking.util.PreferencesUtil;
 import org.smartregister.tasking.util.Utils;
 import org.smartregister.util.NetworkUtils;
 import org.smartregister.util.SyncUtils;
 import org.smartregister.view.activity.DrishtiApplication;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -53,7 +56,15 @@ public class LocationTaskIntentService extends IntentService {
             return;
         }
         if (!syncUtils.verifyAuthorization()) {
-            syncUtils.logoutUser();
+            try {
+                syncUtils.logoutUser();
+            } catch (AuthenticatorException e) {
+                Timber.e(e);
+            } catch (OperationCanceledException e) {
+                Timber.e(e);
+            } catch (IOException e) {
+                Timber.e(e);
+            }
             return;
 
         }
@@ -64,7 +75,7 @@ public class LocationTaskIntentService extends IntentService {
         (TaskingLibrary.getInstance().getAppExecutors()).mainThread().execute(new Runnable() {
             @Override
             public void run() {
-                RevealSyncSettingsServiceJob.scheduleJobImmediately(RevealSyncSettingsServiceJob.TAG);
+                TaskingSyncSettingsServiceJob.scheduleJobImmediately(TaskingSyncSettingsServiceJob.TAG);
             }
         });
     }

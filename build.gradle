@@ -8,6 +8,7 @@ buildscript {
     dependencies {
         classpath "io.codearte.gradle.nexus:gradle-nexus-staging-plugin:0.11.0"
         classpath 'gradle.plugin.org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.10.2'
+        classpath 'com.android.tools.build:gradle:4.0.2'
     }
 }
 
@@ -55,6 +56,58 @@ subprojects {
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
         maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
         maven { url "https://dl.bintray.com/ibm-watson-health/ibm-fhir-server-releases"}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         maven { url "http://dl.bintray.com/ona/kujaku" }
     }
 

@@ -12,9 +12,7 @@ import timber.log.Timber;
 /**
  * Created by Ephraim Kigamba - nek.eam@gmail.com on 27-07-2020.
  */
-public class TaskingJsonFormUtils {
-
-
+public class TaskingJsonFormUtils extends RevealJsonFormUtils{
 
     public void startJsonForm(JSONObject form, Activity context) {
         startJsonForm(form, context, TaskingConstants.RequestCode.REQUEST_CODE_GET_JSON);

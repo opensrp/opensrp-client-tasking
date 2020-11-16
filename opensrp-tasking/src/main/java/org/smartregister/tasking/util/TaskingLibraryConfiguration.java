@@ -10,6 +10,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.json.JSONObject;
@@ -17,14 +20,17 @@ import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.Task;
+import org.smartregister.tasking.activity.TaskingHomeActivity;
 import org.smartregister.tasking.adapter.TaskRegisterAdapter;
 import org.smartregister.tasking.contract.BaseContract;
 import org.smartregister.tasking.contract.BaseDrawerContract;
 import org.smartregister.tasking.contract.BaseFormFragmentContract;
+import org.smartregister.tasking.layer.DigitalGlobeLayer;
 import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.model.CardDetails;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
+import org.smartregister.tasking.repository.TaskingMappingHelper;
 import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
 import org.smartregister.util.AppExecutors;
 
@@ -51,7 +57,6 @@ public abstract class TaskingLibraryConfiguration {
     public abstract int getResolveLocationTimeoutInSeconds();
 
     public abstract String getAdminPasswordNotNearStructures();
-
 
     public abstract boolean isFocusInvestigation();
 
@@ -143,4 +148,34 @@ public abstract class TaskingLibraryConfiguration {
     public abstract void showTasksCompleteActionView(TextView actionView);
 
     public abstract Map<String, Object> getServerConfigs();
+
+    public abstract TaskingJsonFormUtils getJsonFormUtils();
+
+    public abstract TaskingMappingHelper getMappingHelper();
+
+    public abstract TaskingMapHelper getMapHelper();
+
+    public abstract boolean isRefreshMapOnEventSaved();
+
+    public abstract void setRefreshMapOnEventSaved(boolean isRefreshMapOnEventSaved);
+
+    public abstract void setFeatureCollection(FeatureCollection featureCollection);
+
+    public abstract DigitalGlobeLayer getDigitalGlobeLayer();
+
+    public abstract List<String> getFacilityLevels();
+
+    public abstract List<String> getLocationLevels();
+
+    public abstract ActivityConfiguration getActivityConfiguration();
+
+    public abstract void registerFamily(Feature selectedFeature);
+
+    public abstract void setGeoJsonSource(FeatureCollection featureCollection, Feature operationalArea, boolean isChangeMapPosition);
+
+    public abstract void openTaskRegister(TaskFilterParams filterParams, TaskingHomeActivity taskingHomeActivity);
+
+    public abstract boolean isCompassEnabled();
+
+    public abstract boolean showCurrentLocationButton();
 }

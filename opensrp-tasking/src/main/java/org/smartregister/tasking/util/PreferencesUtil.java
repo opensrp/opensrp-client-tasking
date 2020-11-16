@@ -1,6 +1,7 @@
 package org.smartregister.tasking.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.smartregister.account.AccountHelper;
 import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.view.activity.DrishtiApplication;
 
@@ -110,4 +111,7 @@ public class PreferencesUtil {
         return allSharedPreferences.getPreference(planId);
     }
 
+    public boolean isKeycloakConfigured() {
+        return allSharedPreferences.getPreferences().getBoolean(AccountHelper.CONFIGURATION_CONSTANTS.IS_KEYCLOAK_CONFIGURED, false);
+    }
 }

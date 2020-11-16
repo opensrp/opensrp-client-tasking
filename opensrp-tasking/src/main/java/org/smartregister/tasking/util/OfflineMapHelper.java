@@ -10,6 +10,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 import com.mapbox.turf.TurfMeasurement;
 
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.tasking.R;
@@ -39,11 +40,11 @@ import static org.smartregister.tasking.util.Constants.Map.DOWNLOAD_MIN_ZOOM;
 public class OfflineMapHelper {
 
     @NonNull
-    public static Pair<List<String>, Map<String, OfflineRegion>> getOfflineRegionInfo (final OfflineRegion[] offlineRegions) {
+    public static Pair<List<String>, Map<String, OfflineRegion>> getOfflineRegionInfo(final OfflineRegion[] offlineRegions) {
         List<String> offlineRegionNames = new ArrayList<>();
         Map<String, OfflineRegion> modelMap = new HashMap<>();
 
-        for(int position = 0; position < offlineRegions.length; position++) {
+        for (int position = 0; position < offlineRegions.length; position++) {
 
             byte[] metadataBytes = offlineRegions[position].getMetadata();
             try {
@@ -68,11 +69,11 @@ public class OfflineMapHelper {
 
         List<MapBoxOfflineQueueTask> offlineQueueTasks = realmDatabase.getTasks();
 
-        if (offlineQueueTasks == null){
+        if (offlineQueueTasks == null) {
             return offlineQueueTaskMap;
         }
 
-        for (MapBoxOfflineQueueTask offlineQueueTask: offlineQueueTasks) {
+        for (MapBoxOfflineQueueTask offlineQueueTask : offlineQueueTasks) {
 
             try {
                 if (MapBoxOfflineQueueTask.TASK_TYPE_DOWNLOAD.equals(offlineQueueTask.getTaskType())
@@ -136,8 +137,10 @@ public class OfflineMapHelper {
 
     public static void initializeFileHTTPServer(Context context, String digitalGlobeIdPlaceholder, String mapStyleAssetPath) {
         try {
-            FileHTTPServer httpServer = new FileHTTPServer(context, mapStyleAssetPath, digitalGlobeIdPlaceholder);
-            httpServer.start();
+            if (StringUtils.isNotBlank(mapStyleAssetPath)) {
+                FileHTTPServer httpServer = new FileHTTPServer(context, mapStyleAssetPath, digitalGlobeIdPlaceholder);
+                httpServer.start();
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

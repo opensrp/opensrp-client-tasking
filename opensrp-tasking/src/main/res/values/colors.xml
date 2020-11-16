@@ -8,4 +8,14 @@
 
     <color name="delete_map">#EE0427</color>
     <color name="download_map">#68BB0C</color>
+
+    <color name="text_gray">#A4A4A4</color>
+    <color name="button_blue">#2D75DE</color>
+
+    <color name="transluscent_white">#80FFFFFF</color>
+    <color name="distance_scale_text">@color/white</color>
+
+    <color name="search_textfield_background_grey">@color/white</color>
+    <color name="background_alert_red">#FFBDBD</color>
+    <color name="background_alert_green">#B3EDC3</color>
 </resources>
