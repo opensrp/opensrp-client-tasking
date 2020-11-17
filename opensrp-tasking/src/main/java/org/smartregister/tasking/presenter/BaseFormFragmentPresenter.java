@@ -23,7 +23,8 @@ import org.smartregister.tasking.repository.TaskingMappingHelper;
 import org.smartregister.tasking.util.Constants.JsonForm;
 import org.smartregister.tasking.util.PasswordDialogUtils;
 import org.smartregister.tasking.util.PreferencesUtil;
-import org.smartregister.tasking.util.RevealJsonFormUtils;
+import org.smartregister.tasking.util.TaskingJsonFormUtils;
+import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 import org.smartregister.tasking.util.Utils;
 import org.smartregister.util.DateTimeTypeConverter;
 import org.smartregister.util.JsonFormUtils;
@@ -48,6 +49,7 @@ import static org.smartregister.tasking.util.Constants.Intervention.REGISTER_FAM
 public class BaseFormFragmentPresenter extends BaseLocationListener implements BaseFormFragmentContract.Presenter {
 
     private final WeakReference<BaseFormFragmentContract.View> view;
+
     private AlertDialog passwordDialog;
 
     private ValidateUserLocationPresenter locationPresenter;
@@ -64,19 +66,23 @@ public class BaseFormFragmentPresenter extends BaseLocationListener implements B
 
     private PreferencesUtil prefsUtil;
 
+    private TaskingLibraryConfiguration libraryConfiguration;
+
     protected Gson gson = new GsonBuilder().setDateFormat(EVENT_DATE_FORMAT_Z)
             .registerTypeAdapter(DateTime.class, new DateTimeTypeConverter()).create();
 
-    private RevealJsonFormUtils jsonFormUtils = new RevealJsonFormUtils();
+    private TaskingJsonFormUtils jsonFormUtils;
 
     protected BaseFormFragmentPresenter(BaseFormFragmentContract.View view, Context context) {
         this.context = context;
         this.view = new WeakReference<>(view);
+        libraryConfiguration = TaskingLibrary.getInstance().getTaskingLibraryConfiguration();
         passwordDialog = PasswordDialogUtils.initPasswordDialog(context, this);
         locationPresenter = new ValidateUserLocationPresenter(view, this);
-        mappingHelper = new TaskingMappingHelper();
+        mappingHelper = libraryConfiguration.getMappingHelper();
         interactor = new BaseFormFragmentInteractor(this);
         prefsUtil = PreferencesUtil.getInstance();
+        jsonFormUtils = libraryConfiguration.getJsonFormUtils();
     }
 
     protected boolean validateFarStructures() {
