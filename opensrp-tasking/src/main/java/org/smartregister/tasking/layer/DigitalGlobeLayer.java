@@ -34,7 +34,7 @@ public class DigitalGlobeLayer extends BaseLayer {
     }
 
     protected void createLayersAndSources() {
-        String dgTileUrl = getDigitalGlobeLayerUrl() + getConnectId();
+        String dgTileUrl = getDigitalGlobeLayerUrl();
         TileSet tileSet = new TileSet("1.0.0", dgTileUrl);
         tileSet.setScheme("tms");
         RasterSource rasterSource = new RasterSource(getSatelliteSourceId(), tileSet, 256);
@@ -54,7 +54,7 @@ public class DigitalGlobeLayer extends BaseLayer {
     }
 
     public String getDigitalGlobeLayerUrl() {
-        return "https://access.maxar.com/earthservice/tmsaccess/tms/1.0.0/DigitalGlobe:ImageryTileService@EPSG:3857@png/{z}/{x}/{y}.png?connectId=";
+        return "https://access.maxar.com/earthservice/tmsaccess/tms/1.0.0/DigitalGlobe:ImageryTileService@EPSG:3857@png/{z}/{x}/{y}.png?connectId=" + getConnectId();
     }
 
     public String getConnectId() {
