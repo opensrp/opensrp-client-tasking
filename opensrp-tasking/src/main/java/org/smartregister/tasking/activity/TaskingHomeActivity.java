@@ -45,7 +45,6 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.pluginscalebar.ScaleBarOptions;
 import com.mapbox.pluginscalebar.ScaleBarPlugin;
 
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.AllConstants;
@@ -82,8 +81,6 @@ import static android.content.DialogInterface.BUTTON_POSITIVE;
 import static org.smartregister.tasking.util.TaskingConstants.ANIMATE_TO_LOCATION_DURATION;
 import static org.smartregister.tasking.util.TaskingConstants.CONFIGURATION.LOCAL_SYNC_DONE;
 import static org.smartregister.tasking.util.TaskingConstants.CONFIGURATION.UPDATE_LOCATION_BUFFER_RADIUS;
-import static org.smartregister.tasking.util.TaskingConstants.Filter.FILTER_SORT_PARAMS;
-import static org.smartregister.tasking.util.TaskingConstants.RequestCode.REQUEST_CODE_TASK_LISTS;
 import static org.smartregister.tasking.util.TaskingConstants.VERTICAL_OFFSET;
 import static org.smartregister.tasking.util.Utils.displayDistanceScale;
 import static org.smartregister.tasking.util.Utils.getLocationBuffer;
@@ -250,7 +247,7 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
 
         kujakuMapView.showCurrentLocationBtn(taskingLibraryConfiguration.showCurrentLocationButton());
 
-        kujakuMapView.setDisableMyLocationOnMapMove(true);
+        kujakuMapView.setDisableMyLocationOnMapMove(taskingLibraryConfiguration.disableMyLocationOnMapMove());
 
         Float locationBufferRadius = getLocationBuffer();
 
@@ -644,23 +641,14 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
         mMapboxMap = mapboxMap;
 
-        Style.Builder builder = new Style.Builder()
-                .fromUri(getString(org.smartregister.tasking.R.string.reveal_satellite_style));
-
-        mapboxMap.setStyle(builder, this);
-
-        mapboxMap.setMinZoomPreference(10);
-
-        mapboxMap.setMaxZoomPreference(21);
-
-        CameraPosition cameraPosition = new CameraPosition.Builder()
-                .zoom(16)
-                .build();
-        mapboxMap.setCameraPosition(cameraPosition);
-
         mapboxMap.addOnMapClickListener(this);
 
         mapboxMap.addOnMapLongClickListener(this);
+
+        Style.Builder builder = new Style.Builder()
+                .fromUri(getString(R.string.reveal_satellite_style));
+
+        mapboxMap.setStyle(builder, this);
 
         taskingHomePresenter.onMapReady();
 
@@ -676,9 +664,9 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
 
         selectedGeoJsonSource = style.getSourceAs(getString(R.string.selected_datasource_name));
 
-        mapHelper.addCustomLayers(style, getActivity());
+        mapHelper.addCustomLayers(style, TaskingHomeActivity.this);
 
-        mapHelper.addBaseLayers(kujakuMapView, style, getActivity());
+        mapHelper.addBaseLayers(kujakuMapView, style, TaskingHomeActivity.this);
 
         initializeScaleBarPlugin(mMapboxMap);
     }

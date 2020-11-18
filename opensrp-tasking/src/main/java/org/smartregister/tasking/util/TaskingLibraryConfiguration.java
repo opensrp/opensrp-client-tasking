@@ -178,4 +178,6 @@ public abstract class TaskingLibraryConfiguration {
     public abstract boolean isCompassEnabled();
 
     public abstract boolean showCurrentLocationButton();
+
+    public abstract boolean disableMyLocationOnMapMove();
 }

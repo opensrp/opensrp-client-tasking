@@ -70,7 +70,7 @@ import static org.smartregister.tasking.util.Constants.Intervention.MDA;
 import static org.smartregister.tasking.util.Constants.Intervention.MOSQUITO_COLLECTION;
 import static org.smartregister.tasking.util.Constants.Intervention.PAOT;
 
-public class Utils {
+public class Utils extends org.smartregister.util.Utils {
 
     public static final ArrayList<String> ALLOWED_LEVELS;
     public static final String DEFAULT_LOCATION_LEVEL = Tags.HEALTH_CENTER;

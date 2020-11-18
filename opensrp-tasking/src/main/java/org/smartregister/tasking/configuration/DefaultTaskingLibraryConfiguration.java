@@ -371,4 +371,9 @@ public class DefaultTaskingLibraryConfiguration extends TaskingLibraryConfigurat
     public boolean showCurrentLocationButton() {
         return false;
     }
+
+    @Override
+    public boolean disableMyLocationOnMapMove() {
+        return false;
+    }
 }

@@ -229,6 +229,8 @@ public interface TaskingConstants {
         String EVENT_TABLE = "event";
         String TASK_TABLE = "task";
         String STRUCTURE_TABLE = "structure";
+        String LOCATION_TABLE = "location";
+        String EC_EVENT = "ec_events";
     }
 
     interface BusinessStatus {
@@ -661,5 +663,11 @@ public interface TaskingConstants {
         String STATUS = "task_status";
         String INTERVENTION_UNIT = "intervention_unit";
         String FILTER_SORT_PARAMS = "filter_sort_params";
+    }
+
+    interface Columns {
+        interface Location {
+            String SYNC_STATUS = "sync_status";
+        }
     }
 }
