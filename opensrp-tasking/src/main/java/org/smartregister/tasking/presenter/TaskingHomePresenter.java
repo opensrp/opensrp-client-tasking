@@ -54,6 +54,7 @@ import static android.content.DialogInterface.BUTTON_NEUTRAL;
 import static org.smartregister.domain.LocationProperty.PropertyStatus.INACTIVE;
 import static org.smartregister.tasking.util.Constants.JsonForm.STRUCTURE_NAME;
 import static org.smartregister.tasking.util.TaskingConstants.BusinessStatus.NOT_ELIGIBLE;
+import static org.smartregister.tasking.util.TaskingConstants.GeoJSON.FEATURES;
 import static org.smartregister.tasking.util.TaskingConstants.Properties.FEATURE_SELECT_TASK_BUSINESS_STATUS;
 import static org.smartregister.tasking.util.TaskingConstants.Properties.LOCATION_STATUS;
 import static org.smartregister.tasking.util.TaskingConstants.Properties.TASK_BUSINESS_STATUS;
@@ -162,11 +163,48 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
 
     @Override
     public void onStructuresFetched(JSONObject structuresGeoJson, Feature operationalArea, List<TaskDetails> taskDetailsList, String point, Boolean locationComponentActive) {
-
+        onStructuresFetched(structuresGeoJson, operationalArea, taskDetailsList);
     }
 
     @Override
     public void onStructuresFetched(JSONObject structuresGeoJson, Feature operationalArea, List<TaskDetails> taskDetailsList) {
+        if (getView() != null) {
+            setChangeMapPosition(drawerPresenter.isChangedCurrentSelection() || (drawerPresenter.isChangedCurrentSelection() && changeMapPosition));
+            drawerPresenter.setChangedCurrentSelection(false);
+            if (structuresGeoJson.has(FEATURES)) {
+                featureCollection = FeatureCollection.fromJson(structuresGeoJson.toString());
+                isTasksFiltered = false;
+                if (filterParams != null && !filterParams.getCheckedFilters().isEmpty() && StringUtils.isBlank(searchPhrase)) {
+                    filterFeatureCollection = null;
+                    filterTasks(filterParams);
+                } else if (filterParams != null && !filterParams.getCheckedFilters().isEmpty()) {
+                    searchFeatureCollection = null;
+                    searchTasks(searchPhrase);
+                } else {
+                    getView().setGeoJsonSource(getFeatureCollection(), operationalArea, isChangeMapPosition());
+                }
+                this.operationalArea = operationalArea;
+                if (org.smartregister.util.Utils.isEmptyCollection(getFeatureCollection().features())) {
+                    getView().displayNotification(R.string.fetching_structures_title, R.string.no_structures_found);
+                }
+            } else {
+                getView().displayNotification(R.string.fetching_structures_title,
+                        R.string.fetch_location_and_structures_failed, prefsUtil.getCurrentOperationalArea());
+                try {
+                    structuresGeoJson.put(FEATURES, new JSONArray());
+                    getView().setGeoJsonSource(FeatureCollection.fromJson(structuresGeoJson.toString()), operationalArea, isChangeMapPosition());
+                    getView().clearSelectedFeature();
+                    getView().closeCardView(R.id.btn_collapse_spray_card_view);
+                } catch (JSONException e) {
+                    Timber.e("error resetting structures");
+                }
+            }
+
+//            if (taskDetailsList != null && (BuildConfig.BUILD_COUNTRY == Country.ZAMBIA
+//                    || BuildConfig.BUILD_COUNTRY == Country.NAMIBIA)) {
+//                new IndicatorsCalculatorTask(listTaskView.getActivity(), taskDetailsList).execute();
+//            }
+        }
     }
 
 

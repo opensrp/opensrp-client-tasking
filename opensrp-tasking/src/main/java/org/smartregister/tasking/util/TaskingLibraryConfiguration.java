@@ -16,8 +16,8 @@ import com.mapbox.geojson.FeatureCollection;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.json.JSONObject;
-import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.clientandeventmodel.Event;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.Task;
 import org.smartregister.tasking.activity.TaskingHomeActivity;
@@ -128,7 +128,7 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract void saveJsonForm(BaseContract.BaseInteractor baseInteractor, String json);
 
-    public abstract  void openFilterActivity(Activity activity, TaskFilterParams filterParams);
+    public abstract void openFilterActivity(Activity activity, TaskFilterParams filterParams);
 
     public abstract void openFamilyProfile(Activity activity, CommonPersonObjectClient family, BaseTaskDetails taskDetails);
 
@@ -171,8 +171,6 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract void registerFamily(Feature selectedFeature);
 
-    public abstract void setGeoJsonSource(FeatureCollection featureCollection, Feature operationalArea, boolean isChangeMapPosition);
-
     public abstract void openTaskRegister(TaskFilterParams filterParams, TaskingHomeActivity taskingHomeActivity);
 
     public abstract boolean isCompassEnabled();
@@ -180,4 +178,8 @@ public abstract class TaskingLibraryConfiguration {
     public abstract boolean showCurrentLocationButton();
 
     public abstract boolean disableMyLocationOnMapMove();
+
+    public abstract Boolean getDrawOperationalAreaBoundaryAndLabel();
+
+    public abstract GeoJsonUtils getGeoJsonUtils();
 }

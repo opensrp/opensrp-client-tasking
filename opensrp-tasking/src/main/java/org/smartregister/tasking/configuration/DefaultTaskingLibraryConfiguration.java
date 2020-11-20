@@ -34,6 +34,7 @@ import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.tasking.repository.TaskingMappingHelper;
 import org.smartregister.tasking.util.ActivityConfiguration;
 import org.smartregister.tasking.util.DefaultLocationHierarchyUtils;
+import org.smartregister.tasking.util.GeoJsonUtils;
 import org.smartregister.tasking.util.TaskingConstants;
 import org.smartregister.tasking.util.TaskingJsonFormUtils;
 import org.smartregister.tasking.util.TaskingLibraryConfiguration;
@@ -353,11 +354,6 @@ public class DefaultTaskingLibraryConfiguration extends TaskingLibraryConfigurat
     }
 
     @Override
-    public void setGeoJsonSource(FeatureCollection featureCollection, Feature operationalArea, boolean isChangeMapPosition) {
-
-    }
-
-    @Override
     public void openTaskRegister(TaskFilterParams filterParams, TaskingHomeActivity taskingHomeActivity) {
 
     }
@@ -375,5 +371,15 @@ public class DefaultTaskingLibraryConfiguration extends TaskingLibraryConfigurat
     @Override
     public boolean disableMyLocationOnMapMove() {
         return false;
+    }
+
+    @Override
+    public Boolean getDrawOperationalAreaBoundaryAndLabel() {
+        return null;
+    }
+
+    @Override
+    public GeoJsonUtils getGeoJsonUtils() {
+        return new GeoJsonUtils();
     }
 }

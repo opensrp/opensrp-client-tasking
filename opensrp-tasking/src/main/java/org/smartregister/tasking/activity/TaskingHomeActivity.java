@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.text.Editable;
@@ -41,6 +42,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.UiSettings;
+import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.pluginscalebar.ScaleBarOptions;
 import com.mapbox.pluginscalebar.ScaleBarPlugin;
@@ -73,8 +75,11 @@ import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 import org.smartregister.tasking.util.TaskingMapHelper;
 import org.smartregister.tasking.util.Utils;
 
+import java.util.List;
+
 import io.ona.kujaku.callbacks.OnLocationComponentInitializedCallback;
 import io.ona.kujaku.layers.BoundaryLayer;
+import io.ona.kujaku.listeners.OnFeatureLongClickListener;
 import timber.log.Timber;
 
 import static android.content.DialogInterface.BUTTON_POSITIVE;
@@ -149,6 +154,8 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
     private TaskingLibraryConfiguration taskingLibraryConfiguration;
 
     private TaskingLibrary taskingLibrary;
+
+    private LineLayer indexCaseLineLayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -372,8 +379,65 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
 
     @Override
     public void setGeoJsonSource(@NonNull FeatureCollection featureCollection, Feature operationalArea, boolean isChangeMapPosition) {
-        taskingLibraryConfiguration.setGeoJsonSource(featureCollection, operationalArea, isChangeMapPosition);
+        if (geoJsonSource != null) {
+            geoJsonSource.setGeoJson(featureCollection);
+            if (operationalArea != null) {
+                CameraPosition cameraPosition = mMapboxMap.getCameraForGeometry(operationalArea.geometry());
+                if (taskingHomePresenter.getInterventionLabel() == R.string.focus_investigation) {
+                    Feature indexCase = mapHelper.getIndexCase(featureCollection);
+                    if (indexCase != null) {
+                        Location center = mappingHelper.getCenter(indexCase.geometry().toJson());
+                        double currentZoom = mMapboxMap.getCameraPosition().zoom;
+                        cameraPosition = new CameraPosition.Builder()
+                                .target(new LatLng(center.getLatitude(), center.getLongitude())).zoom(currentZoom).build();
+                    }
+                }
+
+                if (cameraPosition != null && (boundaryLayer == null || isChangeMapPosition)) {
+                    mMapboxMap.setCameraPosition(cameraPosition);
+                }
+
+                Boolean drawOperationalAreaBoundaryAndLabel = getDrawOperationalAreaBoundaryAndLabel();
+                if (drawOperationalAreaBoundaryAndLabel) {
+                    if (boundaryLayer == null) {
+                        boundaryLayer = createBoundaryLayer(operationalArea);
+                        kujakuMapView.addLayer(boundaryLayer);
+
+                        kujakuMapView.setOnFeatureLongClickListener(new OnFeatureLongClickListener() {
+                            @Override
+                            public void onFeatureLongClick(List<Feature> features) {
+                                taskingHomePresenter.onFociBoundaryLongClicked();
+                            }
+                        }, boundaryLayer.getLayerIds());
+
+                    } else {
+                        boundaryLayer.updateFeatures(FeatureCollection.fromFeature(operationalArea));
+                    }
+                }
+
+                if (taskingHomePresenter.getInterventionLabel() == R.string.focus_investigation && mapHelper.getIndexCaseLineLayer() == null) {
+                    mapHelper.addIndexCaseLayers(mMapboxMap, getContext(), featureCollection);
+                } else {
+                    mapHelper.updateIndexCaseLayers(mMapboxMap, featureCollection, this);
+                }
+            }
+        }
     }
+
+
+    private Boolean getDrawOperationalAreaBoundaryAndLabel() {
+        return taskingLibraryConfiguration.getDrawOperationalAreaBoundaryAndLabel();
+    }
+
+    protected BoundaryLayer createBoundaryLayer(Feature operationalArea) {
+        return new BoundaryLayer.Builder(FeatureCollection.fromFeature(operationalArea))
+                .setLabelProperty(TaskingConstants.Map.NAME_PROPERTY)
+                .setLabelTextSize(getResources().getDimension(R.dimen.operational_area_boundary_text_size))
+                .setLabelColorInt(Color.WHITE)
+                .setBoundaryColor(Color.WHITE)
+                .setBoundaryWidth(getResources().getDimension(R.dimen.operational_area_boundary_width)).build();
+    }
+
 
     @Override
     public void displayNotification(int title, int message, Object... formatArgs) {

@@ -13,6 +13,7 @@ import org.smartregister.repository.Repository;
 import org.smartregister.repository.StructureRepository;
 import org.smartregister.repository.TaskNotesRepository;
 import org.smartregister.repository.TaskRepository;
+import org.smartregister.tasking.repository.TaskingRepository;
 import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 import org.smartregister.util.AppExecutors;
 import org.smartregister.view.activity.DrishtiApplication;
@@ -38,6 +39,7 @@ public class TaskingLibrary {
 
     private RealmDatabase realmDatabase;
     private TaskingLibraryConfiguration taskingLibraryConfiguration;
+    private TaskingRepository taskingRepository;
 
     public static void init(@NonNull TaskingLibraryConfiguration taskingLibraryConfiguration) {
         instance = new TaskingLibrary(taskingLibraryConfiguration);
@@ -98,6 +100,14 @@ public class TaskingLibrary {
             planDefinitionSearchRepository = new PlanDefinitionSearchRepository();
         }
         return planDefinitionSearchRepository;
+    }
+
+    @NonNull
+    public TaskingRepository getTaskingRepository() {
+        if (taskingRepository == null) {
+            taskingRepository = new TaskingRepository();
+        }
+        return taskingRepository;
     }
 
     @NonNull

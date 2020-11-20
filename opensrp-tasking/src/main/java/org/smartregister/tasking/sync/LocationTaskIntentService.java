@@ -71,7 +71,7 @@ public class LocationTaskIntentService extends IntentService {
         }
         sendSyncStatusBroadcastMessage(FetchStatus.fetchStarted);
 
-        doSync();
+       // doSync();
 
         (TaskingLibrary.getInstance().getAppExecutors()).mainThread().execute(new Runnable() {
             @Override

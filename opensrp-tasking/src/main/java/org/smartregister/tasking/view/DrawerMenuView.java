@@ -277,7 +277,7 @@ public class DrawerMenuView implements View.OnClickListener, BaseDrawerContract.
             presenter.onShowFilledForms();
         else if (v.getId() == R.id.sync_button) {
             toggleProgressBarView(true);
-            //Utils.startImmediateSync();
+            Utils.startImmediateSync();
             closeDrawerLayout();
         }
     }
