@@ -6,6 +6,7 @@ import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -34,6 +35,7 @@ import org.smartregister.domain.Location;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.job.DocumentConfigurationServiceJob;
 import org.smartregister.job.PullUniqueIdsServiceJob;
+import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.tasking.BuildConfig;
 import org.smartregister.tasking.R;
@@ -423,5 +425,21 @@ public class Utils {
         }
         String time = TIME_FORMAT.format(fromTime.getTime());
         return date + time;
+    }
+
+    public static void setCurrentOperationalAreaAndLocality() {
+        PreferencesUtil prefsUtil = PreferencesUtil.getInstance();
+        String operationalAreaName = prefsUtil.getCurrentOperationalArea();
+
+        if (!TextUtils.isEmpty(CoreLibrary.getInstance().context().allSharedPreferences().fetchRegisteredANM())
+                && TextUtils.isEmpty(operationalAreaName)) {
+            AllSharedPreferences allSharedPreferences = DrishtiApplication.getInstance().getContext().allSharedPreferences();
+            operationalAreaName = LocationHelper.getInstance().getDefaultLocation();
+
+            if (!TextUtils.isEmpty(operationalAreaName)) {
+                allSharedPreferences.saveCurrentLocality(operationalAreaName);
+                prefsUtil.setCurrentOperationalArea(operationalAreaName);
+            }
+        }
     }
 }
