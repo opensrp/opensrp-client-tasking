@@ -24,6 +24,7 @@ import org.smartregister.domain.Task;
 import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.tasking.R;
+import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.TaskRegisterFragmentContract;
 import org.smartregister.tasking.interactor.TaskRegisterFragmentInteractor;
 import org.smartregister.tasking.model.BaseTaskDetails;
@@ -168,12 +169,22 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
     // TODO: Rename this to getMainConditionAndParams. The params returned are operational-area-id, plan-id, inactive-task-status
     public Pair<String, String[]> getMainConditionAndParams() {
         Location operationalArea = Utils.getOperationalAreaLocation(prefsUtil.getCurrentOperationalArea());
-        String whereClause = String.format("%s.%s = ? AND %s.%s = ? AND %s.%s NOT IN (%s)",
-                Constants.DatabaseKeys.TASK_TABLE, Constants.DatabaseKeys.GROUPID, Constants.DatabaseKeys.TASK_TABLE, Constants.DatabaseKeys.PLAN_ID,
-                Constants.DatabaseKeys.TASK_TABLE, Constants.DatabaseKeys.STATUS,
-                TextUtils.join(",", Collections.nCopies(INACTIVE_TASK_STATUS.length, "?")));
-        return new Pair<>(whereClause, ArrayUtils.addAll(new String[]{operationalArea == null ?
-                null : operationalArea.getId(), prefsUtil.getCurrentPlanId()}, INACTIVE_TASK_STATUS));
+        if (TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design()) {
+            String whereClause = String.format("%s.%s = ? AND %s.%s = ? AND %s.%s NOT IN (%s)",
+                    Constants.DatabaseKeys.TASK_TABLE, Constants.DatabaseKeys.GROUPID, Constants.DatabaseKeys.TASK_TABLE, Constants.DatabaseKeys.PLAN_ID,
+                    Constants.DatabaseKeys.TASK_TABLE, Constants.DatabaseKeys.STATUS,
+                    TextUtils.join(",", Collections.nCopies(INACTIVE_TASK_STATUS.length + 1, "?")));
+            return new Pair<>(whereClause, ArrayUtils.addAll(new String[]{operationalArea == null ?
+                    null : operationalArea.getId(), prefsUtil.getCurrentPlanId()}, ArrayUtils.addAll(INACTIVE_TASK_STATUS, Task.TaskStatus.COMPLETED.name())));
+        } else {
+            String whereClause = String.format("%s.%s = ? AND %s.%s = ? AND %s.%s NOT IN (%s)",
+                    Constants.DatabaseKeys.TASK_TABLE, Constants.DatabaseKeys.GROUPID, Constants.DatabaseKeys.TASK_TABLE, Constants.DatabaseKeys.PLAN_ID,
+                    Constants.DatabaseKeys.TASK_TABLE, Constants.DatabaseKeys.STATUS,
+                    TextUtils.join(",", Collections.nCopies(INACTIVE_TASK_STATUS.length, "?")));
+            return new Pair<>(whereClause, ArrayUtils.addAll(new String[]{operationalArea == null ?
+                    null : operationalArea.getId(), prefsUtil.getCurrentPlanId()}, INACTIVE_TASK_STATUS));
+
+        }
     }
 
     @Override
