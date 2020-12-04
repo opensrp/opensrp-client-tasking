@@ -1,5 +1,7 @@
 package org.smartregister.tasking.util;
 
+import android.icu.util.ULocale;
+
 import androidx.annotation.NonNull;
 
 import org.smartregister.domain.Location;
@@ -85,8 +87,8 @@ public class GeoJsonUtils {
     }
 
     public void calculateState(Task task, StateWrapper state, @NonNull Map<String, Integer> mdaStatusMap) {
-        if (Utils.isResidentialStructure(task.getCode())) {
-            switch (task.getCode()) {
+//        if (Utils.isResidentialStructure(task.getCode())) {
+//            switch (task.getCode()) {
 //                case TaskingConstants.Intervention.REGISTER_FAMILY:
 //                    state.familyRegTaskExists = true;
 //                    state.familyRegistered = COMPLETE.equals(task.getBusinessStatus());
@@ -112,9 +114,8 @@ public class GeoJsonUtils {
 //                    break;
 //                default:
 //                    break;
-            }
-
-        }
+//            }
+//        }
     }
 
 

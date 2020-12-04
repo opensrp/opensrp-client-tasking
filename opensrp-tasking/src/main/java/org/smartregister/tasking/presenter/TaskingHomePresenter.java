@@ -212,6 +212,7 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
     public void onMapReady() {
         String planId = PreferencesUtil.getInstance().getCurrentPlanId();
         String operationalArea = PreferencesUtil.getInstance().getCurrentOperationalArea();
+
         if (StringUtils.isNotBlank(planId) &&
                 StringUtils.isNotBlank(operationalArea)) {
             taskingHomeInteractor.fetchLocations(planId, operationalArea);
@@ -219,7 +220,7 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
             if (getView() != null) {
                 getView().displayNotification(R.string.select_campaign_operational_area_title, R.string.select_campaign_operational_area);
             }
-            //drawerPresenter.getView().lockNavigationDrawerForSelection();
+            drawerPresenter.getView().lockNavigationDrawerForSelection();
         }
     }
 

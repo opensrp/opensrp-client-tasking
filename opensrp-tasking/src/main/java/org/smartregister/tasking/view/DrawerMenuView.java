@@ -25,7 +25,6 @@ import org.smartregister.CoreLibrary;
 import org.smartregister.p2p.activity.P2pModeSelectActivity;
 import org.smartregister.tasking.R;
 import org.smartregister.tasking.TaskingLibrary;
-import org.smartregister.tasking.activity.OfflineMapsActivity;
 import org.smartregister.tasking.contract.BaseDrawerContract;
 import org.smartregister.tasking.interactor.BaseDrawerInteractor;
 import org.smartregister.tasking.presenter.BaseDrawerPresenter;
@@ -46,23 +45,22 @@ import timber.log.Timber;
  */
 public class DrawerMenuView implements View.OnClickListener, BaseDrawerContract.View, View.OnLongClickListener, DrawerLayout.DrawerListener {
 
+    protected TextView planTextView;
+    protected TextView operationalAreaTextView;
+    protected TextView districtTextView;
+    protected TextView facilityTextView;
+    protected TextView operatorTextView;
+    protected TextView p2pSyncTextView;
 
-    private TextView planTextView;
-    private TextView operationalAreaTextView;
-    private TextView districtTextView;
-    private TextView facilityTextView;
-    private TextView operatorTextView;
-    private TextView p2pSyncTextView;
+    protected DrawerLayout mDrawerLayout;
 
-    private DrawerLayout mDrawerLayout;
+    protected BaseDrawerContract.Presenter presenter;
 
-    private BaseDrawerContract.Presenter presenter;
+    protected BaseDrawerContract.DrawerActivity activity;
 
-    private BaseDrawerContract.DrawerActivity activity;
+    protected BaseDrawerContract.Interactor interactor;
 
-    private BaseDrawerContract.Interactor interactor;
-
-    TaskingLibraryConfiguration taskingLibraryConfiguration;
+    protected TaskingLibraryConfiguration taskingLibraryConfiguration;
 
     public DrawerMenuView(BaseDrawerContract.DrawerActivity activity) {
         this.activity = activity;
@@ -176,7 +174,7 @@ public class DrawerMenuView implements View.OnClickListener, BaseDrawerContract.
     }
 
     @Override
-    public void lockNavigationDrawerForSelection(@StringRes int title,@StringRes int message) {
+    public void lockNavigationDrawerForSelection(@StringRes int title, @StringRes int message) {
         AlertDialogUtils.displayNotification(getContext(), title, message);
         lockNavigationDrawerForSelection();
     }
@@ -363,4 +361,5 @@ public class DrawerMenuView implements View.OnClickListener, BaseDrawerContract.
     public BaseDrawerContract.DrawerActivity getActivity() {
         return activity;
     }
+
 }

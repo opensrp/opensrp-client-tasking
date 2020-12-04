@@ -1,5 +1,7 @@
 package org.smartregister.tasking.interactor;
 
+import androidx.annotation.Nullable;
+
 import com.mapbox.geojson.Feature;
 
 import org.json.JSONArray;
@@ -46,6 +48,7 @@ public class TaskingHomeInteractor extends BaseInteractor {
 
     public TaskingHomeInteractor(TaskingHomeActivityContract.Presenter presenter) {
         super(presenter);
+        this.presenter = presenter;
         commonRepository = getCommonRepository();
         taskingLibrary = taskingLibrary.getInstance();
         geoJsonUtils = taskingLibrary.getTaskingLibraryConfiguration().getGeoJsonUtils();
@@ -58,7 +61,7 @@ public class TaskingHomeInteractor extends BaseInteractor {
     public void fetchInterventionDetails(String interventionType, String featureId, boolean isForForm) {
     }
 
-    public void fetchLocations(String plan, String operationalArea) {
+    public void fetchLocations(@Nullable String plan, @Nullable String operationalArea) {
         fetchLocations(plan, operationalArea, null, null);
     }
 
@@ -84,7 +87,6 @@ public class TaskingHomeInteractor extends BaseInteractor {
                             indexCase = taskingRepository.getIndexCaseStructure(plan);
                         String features = geoJsonUtils.getGeoJsonFromStructuresAndTasks(structures, tasks, indexCase, structureNames);
                         featureCollection.put(TaskingConstants.GeoJSON.FEATURES, new JSONArray(features));
-
                     }
                 } catch (Exception e) {
                     Timber.e(e);
@@ -107,12 +109,8 @@ public class TaskingHomeInteractor extends BaseInteractor {
                         }
                     }
                 });
-
             }
-
         };
-
-
         appExecutors.diskIO().execute(runnable);
     }
 

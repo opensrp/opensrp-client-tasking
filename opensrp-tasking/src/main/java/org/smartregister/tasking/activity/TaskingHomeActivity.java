@@ -382,20 +382,22 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
         if (geoJsonSource != null) {
             geoJsonSource.setGeoJson(featureCollection);
             if (operationalArea != null) {
-                CameraPosition cameraPosition = mMapboxMap.getCameraForGeometry(operationalArea.geometry());
-                if (taskingHomePresenter.getInterventionLabel() == R.string.focus_investigation) {
-                    Feature indexCase = mapHelper.getIndexCase(featureCollection);
-                    if (indexCase != null) {
-                        Location center = mappingHelper.getCenter(indexCase.geometry().toJson());
-                        double currentZoom = mMapboxMap.getCameraPosition().zoom;
-                        cameraPosition = new CameraPosition.Builder()
-                                .target(new LatLng(center.getLatitude(), center.getLongitude())).zoom(currentZoom).build();
+                if(operationalArea.geometry() !=null) {
+                    CameraPosition cameraPosition = mMapboxMap.getCameraForGeometry(operationalArea.geometry());
+                    if (taskingHomePresenter.getInterventionLabel() == R.string.focus_investigation) {
+                        Feature indexCase = mapHelper.getIndexCase(featureCollection);
+                        if (indexCase != null) {
+                            Location center = mappingHelper.getCenter(indexCase.geometry().toJson());
+                            double currentZoom = mMapboxMap.getCameraPosition().zoom;
+                            cameraPosition = new CameraPosition.Builder()
+                                    .target(new LatLng(center.getLatitude(), center.getLongitude())).zoom(currentZoom).build();
+                        }
                     }
                 }
 
-                if (cameraPosition != null && (boundaryLayer == null || isChangeMapPosition)) {
-                    mMapboxMap.setCameraPosition(cameraPosition);
-                }
+//                if (cameraPosition != null && (boundaryLayer == null || isChangeMapPosition)) {
+//                    mMapboxMap.setCameraPosition(cameraPosition);
+//                }
 
                 Boolean drawOperationalAreaBoundaryAndLabel = getDrawOperationalAreaBoundaryAndLabel();
                 if (drawOperationalAreaBoundaryAndLabel) {

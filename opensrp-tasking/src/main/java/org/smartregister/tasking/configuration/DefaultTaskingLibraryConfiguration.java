@@ -50,6 +50,8 @@ import static org.smartregister.tasking.util.Utils.getGlobalConfig;
 
 public class DefaultTaskingLibraryConfiguration extends TaskingLibraryConfiguration {
 
+    private boolean isSynced;
+
     @NonNull
     @Override
     public Pair<Drawable, String> getActionDrawable(Context context, TaskDetails task) {
@@ -214,12 +216,12 @@ public class DefaultTaskingLibraryConfiguration extends TaskingLibraryConfigurat
 
     @Override
     public boolean getSynced() {
-        return false;
+        return isSynced;
     }
 
     @Override
     public void setSynced(boolean synced) {
-
+        isSynced = synced;
     }
 
     @Override

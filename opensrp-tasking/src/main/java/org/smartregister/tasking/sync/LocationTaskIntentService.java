@@ -71,7 +71,7 @@ public class LocationTaskIntentService extends IntentService {
         }
         sendSyncStatusBroadcastMessage(FetchStatus.fetchStarted);
 
-       // doSync();
+        doSync();
 
         (TaskingLibrary.getInstance().getAppExecutors()).mainThread().execute(new Runnable() {
             @Override
@@ -101,7 +101,7 @@ public class LocationTaskIntentService extends IntentService {
         LocationServiceHelper locationServiceHelper = new LocationServiceHelper(
                 DrishtiApplication.getInstance().getContext().getLocationRepository(),
                 DrishtiApplication.getInstance().getContext().getLocationTagRepository(),
-                DrishtiApplication.getInstance().getContext().getStructureRepository());
+                TaskingLibrary.getInstance().getStructureRepository());
 
 
         List<Location> syncedStructures = syncStructures(locationServiceHelper);
@@ -163,8 +163,8 @@ public class LocationTaskIntentService extends IntentService {
      * Checks if there a synced structure or task on the currently opened operational area
      *
      * @param syncedStructures the list of synced structures
-     * @param syncedTasks     the list of synced tasks
-     * @return true if there is a synched structure or task on the currently opened operational area; otherwise returns false
+     * @param syncedTasks      the list of synced tasks
+     * @return true if there is a synced structure or task on the currently opened operational area; otherwise returns false
      */
     protected boolean hasChangesInCurrentOperationalArea(List<Location> syncedStructures, List<Task> syncedTasks) {
         Location operationalAreaLocation = Utils.getOperationalAreaLocation(PreferencesUtil.getInstance().getCurrentOperationalArea());
@@ -195,7 +195,7 @@ public class LocationTaskIntentService extends IntentService {
      * Extracts a set of Structures ids from synced structures and tasks
      *
      * @param syncedStructures the list of synced structures
-     * @param syncedTasks     the list of synced tasks
+     * @param syncedTasks      the list of synced tasks
      * @return a set of baseEntityIds
      */
     protected Set<String> extractStructureIds(List<Location> syncedStructures, List<Task> syncedTasks) {

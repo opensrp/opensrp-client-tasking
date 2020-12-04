@@ -42,15 +42,23 @@ public class TaskingLibrary {
     private TaskingRepository taskingRepository;
 
     public static void init(@NonNull TaskingLibraryConfiguration taskingLibraryConfiguration) {
-        instance = new TaskingLibrary(taskingLibraryConfiguration);
+        instance = new TaskingLibrary(taskingLibraryConfiguration, null, null);
+    }
+
+    public static void init(@NonNull TaskingLibraryConfiguration taskingLibraryConfiguration,
+                            @Nullable TaskingRepository taskingRepository, @Nullable StructureRepository structureRepository) {
+        instance = new TaskingLibrary(taskingLibraryConfiguration, taskingRepository, structureRepository);
     }
 
     public static TaskingLibrary getInstance() {
         return instance;
     }
 
-    public TaskingLibrary(@NonNull TaskingLibraryConfiguration taskingLibraryConfiguration) {
+    public TaskingLibrary(@NonNull TaskingLibraryConfiguration taskingLibraryConfiguration,
+                          @Nullable TaskingRepository taskingRepository, @Nullable StructureRepository structureRepository) {
         this.taskingLibraryConfiguration = taskingLibraryConfiguration;
+        this.taskingRepository = taskingRepository;
+        this.structureRepository = structureRepository;
     }
 
     @NonNull
@@ -90,7 +98,6 @@ public class TaskingLibrary {
         if (structureRepository == null) {
             structureRepository = new StructureRepository();
         }
-
         return structureRepository;
     }
 
