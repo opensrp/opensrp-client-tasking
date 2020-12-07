@@ -205,7 +205,7 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
                 TaskDetails taskDetails = new TaskDetails("3459-sdfa23-sdqasdf");
 
                 //Map<String, String> map = ImmutableMap.of("first_name", "Martin", "last_name", "Bull", "birthdate", "1970-01-10", "phone_number", "07246738839", "gender", "Male");
-                Map<String, String> map = ImmutableMap.of("firstName", "John", "last_name", "Doe", "birthdate", "1970-01-10", "phone_number", "07246738839", "gender", "Male");
+                Map<String, String> map = ImmutableMap.of("firstName", "John", "lastName", "Doe", "birthdate", "1970-01-10", "phone_number", "07246738839", "gender", "Male");
                 CommonPersonObjectClient commonPersonObjectClient = new CommonPersonObjectClient("dfh45453483-34dfd893-394343cds3", map, "Marchello");
 
                 taskDetails.setClient(commonPersonObjectClient);
