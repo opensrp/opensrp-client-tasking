@@ -222,7 +222,10 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
                 getView().setTaskDetails(new ArrayList<>());
                 this.tasks = tasks;
             } else if (tasks.isEmpty()) {
-                getView().displayNotification(R.string.fetching_structure_title, R.string.no_structures_found);
+                if (getView().getContext().getApplicationContext().getPackageName().contains("reveal")) {
+                    getView().displayNotification(R.string.fetching_structure_title, R.string.no_structures_found);
+                }
+
                 getView().setTaskDetails(tasks);
             } else if (applyFilterOnTasksFound) {
                 filterTasks(filterParams);
