@@ -105,6 +105,8 @@ public interface TaskingConstants {
         String MDA_ADHERENCE_OFFICERS = "mda_adherence_officers";
         String MDA_CATCHMENT_AREAS = "mda_catchment_areas";
         String DISPLAY_DISTANCE_SCALE = "display_distance_scale";
+
+        String SELECT_PLAN_THEN_AREA = "select_plan_then_area";
     }
 
     interface Preferences {

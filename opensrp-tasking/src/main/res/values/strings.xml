@@ -149,6 +149,7 @@
     <string name="task_unprocessed_events">Task unprocessed events:</string>
 
     <string name="operational_area_not_selected">Operational Area not selected</string>
+    <string name="plan_not_selected">Plan not selected</string>
     <string name="sync">Sync</string>
     <string name="campaign">Plan</string>
     <string name="operational_area">Operational Area</string>
@@ -196,5 +197,6 @@
 
     <string name="plans_download_on_progress_title">Download in Progress</string>
     <string name="plans_download_on_progress">Downloading of Plans In Progress. Please wait</string>
+    <string name="zoom_in_to_select">Zoom in to select a structure</string>
 
 </resources>

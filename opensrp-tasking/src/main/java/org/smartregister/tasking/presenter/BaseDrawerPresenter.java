@@ -21,6 +21,7 @@ import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.BaseDrawerContract;
 import org.smartregister.tasking.interactor.BaseDrawerInteractor;
 import org.smartregister.tasking.util.PreferencesUtil;
+import org.smartregister.tasking.util.TaskingConstants;
 import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 import org.smartregister.util.AssetHandler;
 import org.smartregister.util.Utils;
@@ -35,6 +36,7 @@ import java.util.Set;
 import timber.log.Timber;
 
 import static org.smartregister.AllConstants.OPERATIONAL_AREAS;
+import static org.smartregister.tasking.util.TaskingConstants.TaskRegister.INTERVENTION_TYPE;
 
 /**
  * Created by samuelgithengi on 3/21/19.
@@ -107,7 +109,39 @@ public class BaseDrawerPresenter implements BaseDrawerContract.Presenter {
 
     @Override
     public void onPlansFetched(Set<PlanDefinition> planDefinitions) {
+        List<String> ids = new ArrayList<>();
+        List<FormLocation> formLocations = new ArrayList<>();
+        for (PlanDefinition planDefinition : planDefinitions) {
+            if (!planDefinition.getStatus().equals(PlanDefinition.PlanStatus.ACTIVE)) {
+                continue;
+            }
+            ids.add(planDefinition.getIdentifier());
+            FormLocation formLocation = new FormLocation();
+            formLocation.name = planDefinition.getTitle();
+            formLocation.key = planDefinition.getIdentifier();
+            formLocation.level = "";
+            formLocations.add(formLocation);
 
+            // get intervention type for plan
+            for (PlanDefinition.UseContext useContext : planDefinition.getUseContext()) {
+                if (useContext.getCode().equals(INTERVENTION_TYPE)) {
+                    prefsUtil.setInterventionTypeForPlan(planDefinition.getTitle(), useContext.getValueCodableConcept());
+                    break;
+                }
+            }
+
+        }
+
+        String entireTreeString = "";
+        if (formLocations != null && !formLocations.isEmpty()) {
+            entireTreeString = AssetHandler.javaToJsonString(formLocations,
+                    new TypeToken<List<FormLocation>>() {
+                    }.getType());
+        }
+
+        if (getView() != null) {
+            getView().showPlanSelector(ids, entireTreeString);
+        }
     }
 
     private void populateLocationsFromPreferences() {
@@ -120,13 +154,19 @@ public class BaseDrawerPresenter implements BaseDrawerContract.Presenter {
 
     @Override
     public void onShowOperationalAreaSelector() {
-        Pair<String, ArrayList<String>> locationHierarchy = extractLocationHierarchy();
         if (getView() != null) {
-            if (locationHierarchy != null) {
-                getView().showOperationalAreaSelector(locationHierarchy);
+            if (!Utils.getBooleanProperty(TaskingConstants.CONFIGURATION.SELECT_PLAN_THEN_AREA) || StringUtils.isNotBlank(prefsUtil.getCurrentPlanId())) {
+                Pair<String, ArrayList<String>> locationHierarchy = extractLocationHierarchy();
+
+                if (locationHierarchy != null) {
+                    getView().showOperationalAreaSelector(locationHierarchy);
+                } else {
+                    getView().displayNotification(R.string.error_fetching_location_hierarchy_title, R.string.error_fetching_location_hierarchy);
+                    drishtiApplication.getContext().userService().forceRemoteLogin(drishtiApplication.getContext().allSharedPreferences().fetchRegisteredANM());
+                }
+
             } else {
-                getView().displayNotification(R.string.error_fetching_location_hierarchy_title, R.string.error_fetching_location_hierarchy);
-                drishtiApplication.getContext().userService().forceRemoteLogin(drishtiApplication.getContext().allSharedPreferences().fetchRegisteredANM());
+                getView().displayNotification(R.string.campaign, R.string.plan_not_selected);
             }
         }
     }
@@ -181,11 +221,11 @@ public class BaseDrawerPresenter implements BaseDrawerContract.Presenter {
     }
 
     protected String getDistrictFromTreeDialogValue(ArrayList<String> name) {
-        return "";
+        return taskingLibraryConfiguration.getDistrictFromTreeDialogValue(name);
     }
 
     protected String getProvinceFromTreeDialogValue(ArrayList<String> name) {
-        return "";
+        return taskingLibraryConfiguration.getProvinceFromTreeDialogValue(name);
     }
 
     private void removeUnauthorizedOperationalAreas(List<String> operationalAreas, List<FormLocation> entireTree) {
@@ -232,7 +272,8 @@ public class BaseDrawerPresenter implements BaseDrawerContract.Presenter {
 
     @Override
     public void onShowPlanSelector() {
-        if (StringUtils.isBlank(prefsUtil.getCurrentOperationalArea()) && getView() != null) {
+        if ((StringUtils.isBlank(prefsUtil.getCurrentOperationalArea()) && !Utils.getBooleanProperty(TaskingConstants.CONFIGURATION.SELECT_PLAN_THEN_AREA))
+                && getView() != null) {
             getView().displayNotification(R.string.operational_area, R.string.operational_area_not_selected);
         } else {
             interactor.fetchPlans(prefsUtil.getCurrentOperationalArea());
@@ -384,5 +425,11 @@ public class BaseDrawerPresenter implements BaseDrawerContract.Presenter {
 
     @Override
     public void onShowFilledForms() {
+        taskingLibraryConfiguration.onShowFilledForms();
+    }
+
+    @Override
+    public void checkSynced() {
+        interactor.checkSynced();
     }
 }

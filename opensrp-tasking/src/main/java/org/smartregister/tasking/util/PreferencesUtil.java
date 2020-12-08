@@ -45,8 +45,9 @@ public class PreferencesUtil {
 
     public void setCurrentOperationalArea(String operationalArea) {
         allSharedPreferences.savePreference(CURRENT_OPERATIONAL_AREA, operationalArea);
-        if (StringUtils.isNotBlank(operationalArea)) {
-            allSharedPreferences.savePreference(CURRENT_OPERATIONAL_AREA_ID, Utils.getCurrentLocationId());
+        String currentLocationId = Utils.getCurrentLocationId();
+        if (StringUtils.isNotBlank(operationalArea) && StringUtils.isNotBlank(currentLocationId)) {
+            allSharedPreferences.savePreference(CURRENT_OPERATIONAL_AREA_ID, currentLocationId);
         }
     }
 

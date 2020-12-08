@@ -12,17 +12,17 @@ import org.smartregister.util.AppExecutors;
  */
 public class BaseDrawerInteractor implements BaseDrawerContract.Interactor {
 
-    private AppExecutors appExecutors;
+    protected AppExecutors appExecutors;
 
-    private BaseDrawerContract.Presenter presenter;
+    protected BaseDrawerContract.Presenter presenter;
 
-    private PlanDefinitionSearchRepository planDefinitionSearchRepository;
+    protected PlanDefinitionSearchRepository planDefinitionSearchRepository;
 
-    private TaskingLibrary taskingLibrary;
+    protected TaskingLibrary taskingLibrary;
 
-    private TaskingRepository taskingRepository;
+    protected TaskingRepository taskingRepository;
 
-    private TaskingLibraryConfiguration taskingLibraryConfiguration;
+    protected TaskingLibraryConfiguration taskingLibraryConfiguration;
 
     public BaseDrawerInteractor(BaseDrawerContract.Presenter presenter) {
         this.presenter = presenter;
@@ -35,12 +35,12 @@ public class BaseDrawerInteractor implements BaseDrawerContract.Interactor {
 
     @Override
     public void fetchPlans(String jurisdictionName) {
-
+        taskingLibraryConfiguration.fetchPlans(jurisdictionName, presenter);
     }
 
     @Override
     public void validateCurrentPlan(String selectedOperationalArea, String currentPlanId) {
-
+        taskingLibraryConfiguration.validateCurrentPlan(selectedOperationalArea, currentPlanId, presenter);
     }
 
     @Override
@@ -55,4 +55,6 @@ public class BaseDrawerInteractor implements BaseDrawerContract.Interactor {
         };
         appExecutors.diskIO().execute(runnable);
     }
+
+
 }

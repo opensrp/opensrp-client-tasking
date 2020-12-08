@@ -1,6 +1,9 @@
 package org.smartregister.tasking.presenter;
 
+import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.PointF;
+import android.graphics.RectF;
 import android.location.Location;
 
 import androidx.annotation.NonNull;
@@ -55,6 +58,8 @@ import static org.smartregister.domain.LocationProperty.PropertyStatus.INACTIVE;
 import static org.smartregister.tasking.util.Constants.JsonForm.STRUCTURE_NAME;
 import static org.smartregister.tasking.util.TaskingConstants.BusinessStatus.NOT_ELIGIBLE;
 import static org.smartregister.tasking.util.TaskingConstants.GeoJSON.FEATURES;
+import static org.smartregister.tasking.util.TaskingConstants.Map.CLICK_SELECT_RADIUS;
+import static org.smartregister.tasking.util.TaskingConstants.Properties.FAMILY_MEMBER_NAMES;
 import static org.smartregister.tasking.util.TaskingConstants.Properties.FEATURE_SELECT_TASK_BUSINESS_STATUS;
 import static org.smartregister.tasking.util.TaskingConstants.Properties.LOCATION_STATUS;
 import static org.smartregister.tasking.util.TaskingConstants.Properties.TASK_BUSINESS_STATUS;
@@ -146,6 +151,12 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
     @Override
     public void onDrawerClosed() {
         if (drawerPresenter.isChangedCurrentSelection()) {
+            String currentPlanId = prefsUtil.getCurrentPlanId();
+            String currentOperationalArea = prefsUtil.getCurrentOperationalArea();
+
+            if (StringUtils.isBlank(currentPlanId) || StringUtils.isBlank(currentOperationalArea))
+                return;
+
             if (getView() != null) {
                 getView().showProgressDialog(R.string.fetching_structures_title, R.string.fetching_structures_message);
             }
@@ -155,10 +166,16 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
 
     public void refreshStructures(boolean localSyncDone) {
         setChangeMapPosition(!localSyncDone);
+
+        String currentPlanId = prefsUtil.getCurrentPlanId();
+        String currentOperationalArea = prefsUtil.getCurrentOperationalArea();
+        if (StringUtils.isBlank(currentPlanId) || StringUtils.isBlank(currentOperationalArea))
+            return;
+
         if (getView() != null) {
             getView().showProgressDialog(R.string.fetching_structures_title, R.string.fetching_structures_message);
         }
-        taskingHomeInteractor.fetchLocations(prefsUtil.getCurrentPlanId(), prefsUtil.getCurrentOperationalArea());
+        taskingHomeInteractor.fetchLocations(currentPlanId, currentOperationalArea);
     }
 
     @Override
@@ -171,7 +188,7 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
         if (getView() != null) {
             setChangeMapPosition(drawerPresenter.isChangedCurrentSelection() || (drawerPresenter.isChangedCurrentSelection() && changeMapPosition));
             drawerPresenter.setChangedCurrentSelection(false);
-            if (structuresGeoJson.has(FEATURES)) {
+            if (structuresGeoJson != null && structuresGeoJson.has(FEATURES)) {
                 featureCollection = FeatureCollection.fromJson(structuresGeoJson.toString());
                 isTasksFiltered = false;
                 if (filterParams != null && !filterParams.getCheckedFilters().isEmpty() && StringUtils.isBlank(searchPhrase)) {
@@ -191,14 +208,17 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
                 getView().displayNotification(R.string.fetching_structures_title,
                         R.string.fetch_location_and_structures_failed, prefsUtil.getCurrentOperationalArea());
                 try {
-                    structuresGeoJson.put(FEATURES, new JSONArray());
-                    getView().setGeoJsonSource(FeatureCollection.fromJson(structuresGeoJson.toString()), operationalArea, isChangeMapPosition());
+                    if (structuresGeoJson != null) {
+                        structuresGeoJson.put(FEATURES, new JSONArray());
+                        getView().setGeoJsonSource(FeatureCollection.fromJson(structuresGeoJson.toString()), operationalArea, isChangeMapPosition());
+                    }
                     getView().clearSelectedFeature();
                     getView().closeCardView(R.id.btn_collapse_spray_card_view);
                 } catch (JSONException e) {
                     Timber.e("error resetting structures");
                 }
             }
+            getView().hideProgressDialog();
 
 //            if (taskDetailsList != null && (BuildConfig.BUILD_COUNTRY == Country.ZAMBIA
 //                    || BuildConfig.BUILD_COUNTRY == Country.NAMIBIA)) {
@@ -226,6 +246,35 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
 
     @Override
     public void onMapClicked(MapboxMap mapboxMap, LatLng point, boolean isLongClick) {
+        double currentZoom = mapboxMap.getCameraPosition().zoom;
+        if (currentZoom < libraryConfiguration.getOnClickMaxZoomLevel()) {
+            Timber.w("onMapClicked Current Zoom level" + currentZoom);
+            getView().displayToast(R.string.zoom_in_to_select);
+            return;
+        }
+        clickedPoint = point;
+        final PointF pixel = mapboxMap.getProjection().toScreenLocation(point);
+        Context context = getView().getContext();
+        List<Feature> features = mapboxMap.queryRenderedFeatures(pixel,
+                context.getString(R.string.reveal_layer_polygons), context.getString(R.string.reveal_layer_points));
+        if (features.isEmpty()) {//try to increase the click area
+            RectF clickArea = new RectF(pixel.x - CLICK_SELECT_RADIUS,
+                    pixel.y + CLICK_SELECT_RADIUS, pixel.x + CLICK_SELECT_RADIUS,
+                    pixel.y - CLICK_SELECT_RADIUS);
+            features = mapboxMap.queryRenderedFeatures(clickArea,
+                    context.getString(R.string.reveal_layer_polygons), context.getString(R.string.reveal_layer_points));
+            Timber.d("Selected structure after increasing click area: " + features.size());
+            if (features.size() == 1) {
+                onFeatureSelected(features.get(0), isLongClick);
+            } else {
+                Timber.d("Not Selected structure after increasing click area: " + features.size());
+            }
+        } else {
+            onFeatureSelected(features.get(0), isLongClick);
+            if (features.size() > 1) {
+                Timber.w("Selected more than 1 structure: " + features.size());
+            }
+        }
     }
 
     @Override
@@ -246,10 +295,12 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
 
     @Override
     public void onFeatureSelectedByClick(Feature feature) {
+        libraryConfiguration.onFeatureSelectedByClick(feature, this);
     }
 
     @Override
     public void onFeatureSelectedByLongClick(Feature feature) {
+        libraryConfiguration.onFeatureSelectedByLongClick(feature, this);
     }
 
     @Override
@@ -684,24 +735,23 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
 
     @Override
     public void searchTasks(String searchPhrase) {
-//        if (searchPhrase.isEmpty()) {
-//            searchFeatureCollection = null;
-//            if (getView() != null) {
-//                getView().setGeoJsonSource(filterFeatureCollection == null ? getFeatureCollection() : FeatureCollection.fromFeatures(filterFeatureCollection), operationalArea, false);
-//            }
-//        }
-//        else {
-//            List<Feature> features = new ArrayList<>();
-//            for (Feature feature : !Utils.isEmptyCollection(searchFeatureCollection) && searchPhrase.length() > this.searchPhrase.length() ? searchFeatureCollection : Utils.isEmptyCollection(filterFeatureCollection) ? getFeatureCollection().features() : filterFeatureCollection) {
-//                String structureName = feature.getStringProperty(STRUCTURE_NAME);
-//                String familyMemberNames = feature.getStringProperty(FAMILY_MEMBER_NAMES);
-//                if (Utils.matchesSearchPhrase(structureName, searchPhrase) ||
-//                        Utils.matchesSearchPhrase(familyMemberNames, searchPhrase))
-//                    features.add(feature);
-//            }
-//            searchFeatureCollection = features;
-//            listTaskView.setGeoJsonSource(FeatureCollection.fromFeatures(searchFeatureCollection), operationalArea, false);
-//        }
+        if (searchPhrase.isEmpty()) {
+            searchFeatureCollection = null;
+            if (getView() != null) {
+                getView().setGeoJsonSource(filterFeatureCollection == null ? getFeatureCollection() : FeatureCollection.fromFeatures(filterFeatureCollection), operationalArea, false);
+            }
+        } else {
+            List<Feature> features = new ArrayList<>();
+            for (Feature feature : !Utils.isEmptyCollection(searchFeatureCollection) && searchPhrase.length() > this.searchPhrase.length() ? searchFeatureCollection : Utils.isEmptyCollection(filterFeatureCollection) ? getFeatureCollection().features() : filterFeatureCollection) {
+                String structureName = feature.getStringProperty(STRUCTURE_NAME);
+                String familyMemberNames = feature.getStringProperty(FAMILY_MEMBER_NAMES);
+                if (Utils.matchesSearchPhrase(structureName, searchPhrase) ||
+                        Utils.matchesSearchPhrase(familyMemberNames, searchPhrase))
+                    features.add(feature);
+            }
+            searchFeatureCollection = features;
+            getView().setGeoJsonSource(FeatureCollection.fromFeatures(searchFeatureCollection), operationalArea, false);
+        }
         this.searchPhrase = searchPhrase;
     }
 

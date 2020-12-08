@@ -114,6 +114,8 @@ public interface BaseDrawerContract {
         void startOtherFormsActivity();
 
         void onShowFilledForms();
+
+        void checkSynced();
     }
 
     interface Interactor {

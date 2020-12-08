@@ -25,6 +25,7 @@ import org.smartregister.tasking.adapter.TaskRegisterAdapter;
 import org.smartregister.tasking.contract.BaseContract;
 import org.smartregister.tasking.contract.BaseDrawerContract;
 import org.smartregister.tasking.contract.BaseFormFragmentContract;
+import org.smartregister.tasking.contract.TaskingHomeActivityContract;
 import org.smartregister.tasking.layer.DigitalGlobeLayer;
 import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.model.CardDetails;
@@ -34,6 +35,7 @@ import org.smartregister.tasking.repository.TaskingMappingHelper;
 import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
 import org.smartregister.util.AppExecutors;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -182,4 +184,20 @@ public abstract class TaskingLibraryConfiguration {
     public abstract Boolean getDrawOperationalAreaBoundaryAndLabel();
 
     public abstract GeoJsonUtils getGeoJsonUtils();
+
+    public abstract String getProvinceFromTreeDialogValue(ArrayList<String> name);
+
+    public abstract String getDistrictFromTreeDialogValue(ArrayList<String> name);
+
+    public abstract void onShowFilledForms();
+
+    public abstract void onFeatureSelectedByLongClick(Feature feature, TaskingHomeActivityContract.Presenter taskingHomePresenter);
+
+    public abstract void onFeatureSelectedByClick(Feature feature, TaskingHomeActivityContract.Presenter taskingHomePresenter);
+
+    public abstract double getOnClickMaxZoomLevel();
+
+    public abstract void fetchPlans(String jurisdictionName, BaseDrawerContract.Presenter presenter);
+
+    public abstract void validateCurrentPlan(String selectedOperationalArea, String currentPlanId, BaseDrawerContract.Presenter presenter);
 }

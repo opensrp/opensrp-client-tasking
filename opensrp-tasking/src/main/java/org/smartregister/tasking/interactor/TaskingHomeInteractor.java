@@ -22,6 +22,7 @@ import org.smartregister.tasking.util.GeoJsonUtils;
 import org.smartregister.tasking.util.IndicatorUtils;
 import org.smartregister.tasking.util.InteractorUtils;
 import org.smartregister.tasking.util.TaskingConstants;
+import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 import org.smartregister.tasking.util.Utils;
 
 import java.util.List;
@@ -45,6 +46,7 @@ public class TaskingHomeInteractor extends BaseInteractor {
     private TaskingHomeActivityContract.Presenter presenter;
     private TaskingRepository taskingRepository;
     private GeoJsonUtils geoJsonUtils;
+    private TaskingLibraryConfiguration taskingLibraryConfiguration;
 
     public TaskingHomeInteractor(TaskingHomeActivityContract.Presenter presenter) {
         super(presenter);
@@ -56,6 +58,7 @@ public class TaskingHomeInteractor extends BaseInteractor {
         taskRepository = taskingLibrary.getTaskRepository();
         taskingRepository = taskingLibrary.getTaskingRepository();
         interactorUtils = new InteractorUtils(taskRepository, eventClientRepository, clientProcessor);
+        taskingLibraryConfiguration = taskingLibrary.getTaskingLibraryConfiguration();
     }
 
     public void fetchInterventionDetails(String interventionType, String featureId, boolean isForForm) {
@@ -74,7 +77,6 @@ public class TaskingHomeInteractor extends BaseInteractor {
 
                 Location operationalAreaLocation = Utils.getOperationalAreaLocation(operationalArea);
                 List<TaskDetails> taskDetailsList = null;
-
                 try {
                     featureCollection = createFeatureCollection();
                     if (operationalAreaLocation != null) {
@@ -114,7 +116,7 @@ public class TaskingHomeInteractor extends BaseInteractor {
         appExecutors.diskIO().execute(runnable);
     }
 
-    private JSONObject createFeatureCollection() throws JSONException {
+    protected JSONObject createFeatureCollection() throws JSONException {
         JSONObject featureCollection = new JSONObject();
         featureCollection.put(TaskingConstants.GeoJSON.TYPE, TaskingConstants.GeoJSON.FEATURE_COLLECTION);
         return featureCollection;
@@ -151,5 +153,13 @@ public class TaskingHomeInteractor extends BaseInteractor {
 
     public TaskingLibrary getTaskingLibrary() {
         return taskingLibrary;
+    }
+
+    public TaskingLibraryConfiguration getTaskingLibraryConfiguration() {
+        return taskingLibraryConfiguration;
+    }
+
+    public GeoJsonUtils getGeoJsonUtils() {
+        return geoJsonUtils;
     }
 }

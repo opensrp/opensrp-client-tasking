@@ -26,6 +26,7 @@ import org.smartregister.tasking.adapter.TaskRegisterAdapter;
 import org.smartregister.tasking.contract.BaseContract;
 import org.smartregister.tasking.contract.BaseDrawerContract;
 import org.smartregister.tasking.contract.BaseFormFragmentContract;
+import org.smartregister.tasking.contract.TaskingHomeActivityContract;
 import org.smartregister.tasking.layer.DigitalGlobeLayer;
 import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.model.CardDetails;
@@ -43,6 +44,7 @@ import org.smartregister.tasking.view.DrawerMenuView;
 import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
 import org.smartregister.util.AppExecutors;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -383,5 +385,45 @@ public class DefaultTaskingLibraryConfiguration extends TaskingLibraryConfigurat
     @Override
     public GeoJsonUtils getGeoJsonUtils() {
         return new GeoJsonUtils();
+    }
+
+    @Override
+    public String getProvinceFromTreeDialogValue(ArrayList<String> name) {
+        return "";
+    }
+
+    @Override
+    public String getDistrictFromTreeDialogValue(ArrayList<String> name) {
+        return "";
+    }
+
+    @Override
+    public void onShowFilledForms() {
+
+    }
+
+    @Override
+    public void onFeatureSelectedByLongClick(Feature feature, TaskingHomeActivityContract.Presenter taskingHomePresenter) {
+
+    }
+
+    @Override
+    public void onFeatureSelectedByClick(Feature feature, TaskingHomeActivityContract.Presenter taskingHomePresenter) {
+
+    }
+
+    @Override
+    public double getOnClickMaxZoomLevel() {
+        return TaskingConstants.Map.MAX_SELECT_ZOOM_LEVEL;
+    }
+
+    @Override
+    public void fetchPlans(String jurisdictionName, BaseDrawerContract.Presenter presenter) {
+
+    }
+
+    @Override
+    public void validateCurrentPlan(String selectedOperationalArea, String currentPlanId, BaseDrawerContract.Presenter presenter) {
+
     }
 }

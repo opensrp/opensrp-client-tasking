@@ -26,7 +26,6 @@ import org.smartregister.p2p.activity.P2pModeSelectActivity;
 import org.smartregister.tasking.R;
 import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.BaseDrawerContract;
-import org.smartregister.tasking.interactor.BaseDrawerInteractor;
 import org.smartregister.tasking.presenter.BaseDrawerPresenter;
 import org.smartregister.tasking.util.AlertDialogUtils;
 import org.smartregister.tasking.util.TaskingConstants;
@@ -58,14 +57,11 @@ public class DrawerMenuView implements View.OnClickListener, BaseDrawerContract.
 
     protected BaseDrawerContract.DrawerActivity activity;
 
-    protected BaseDrawerContract.Interactor interactor;
-
     protected TaskingLibraryConfiguration taskingLibraryConfiguration;
 
     public DrawerMenuView(BaseDrawerContract.DrawerActivity activity) {
         this.activity = activity;
-        presenter = new BaseDrawerPresenter(this, activity);
-        interactor = new BaseDrawerInteractor(presenter);
+        presenter = getPresenter();
         taskingLibraryConfiguration = TaskingLibrary.getInstance().getTaskingLibraryConfiguration();
     }
 
@@ -199,7 +195,7 @@ public class DrawerMenuView implements View.OnClickListener, BaseDrawerContract.
             treeViewDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
-                    presenter.onOperationalAreaSelectorClicked(treeViewDialog.getName());
+                    getPresenter().onOperationalAreaSelectorClicked(treeViewDialog.getName());
                 }
             });
             treeViewDialog.show();
@@ -223,7 +219,7 @@ public class DrawerMenuView implements View.OnClickListener, BaseDrawerContract.
             treeViewDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
                 @Override
                 public void onDismiss(DialogInterface dialog) {
-                    presenter.onPlanSelectorClicked(treeViewDialog.getValue(), treeViewDialog.getName());
+                    getPresenter().onPlanSelectorClicked(treeViewDialog.getValue(), treeViewDialog.getName());
                 }
             });
             treeViewDialog.show();
@@ -258,21 +254,21 @@ public class DrawerMenuView implements View.OnClickListener, BaseDrawerContract.
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.operational_area_selector)
-            presenter.onShowOperationalAreaSelector();
+            getPresenter().onShowOperationalAreaSelector();
         else if (v.getId() == R.id.plan_selector)
-            presenter.onShowPlanSelector();
+            getPresenter().onShowPlanSelector();
         else if (v.getId() == R.id.logout_button)
             DrishtiApplication.getInstance().logoutCurrentUser();
         else if (v.getId() == R.id.btn_navMenu_offline_maps)
-            presenter.onShowOfflineMaps();
+            getPresenter().onShowOfflineMaps();
         else if (v.getId() == R.id.btn_navMenu_p2pSyncBtn)
             startP2PActivity();
         else if (v.getId() == R.id.btn_navMenu_summaryForms)
-            presenter.startOtherFormsActivity();
+            getPresenter().startOtherFormsActivity();
         else if (v.getId() == R.id.btn_navMenu_offline_maps)
-            presenter.onShowOfflineMaps();
+            getPresenter().onShowOfflineMaps();
         else if (v.getId() == R.id.btn_navMenu_filled_forms)
-            presenter.onShowFilledForms();
+            getPresenter().onShowFilledForms();
         else if (v.getId() == R.id.sync_button) {
             toggleProgressBarView(true);
             Utils.startImmediateSync();
@@ -282,12 +278,15 @@ public class DrawerMenuView implements View.OnClickListener, BaseDrawerContract.
 
     @Override
     public BaseDrawerContract.Presenter getPresenter() {
+        if (presenter == null) {
+            presenter = new BaseDrawerPresenter(this, activity);
+        }
         return presenter;
     }
 
     @Override
     public void onResume() {
-        presenter.onViewResumed();
+        getPresenter().onViewResumed();
     }
 
     private void startP2PActivity() {
@@ -302,7 +301,7 @@ public class DrawerMenuView implements View.OnClickListener, BaseDrawerContract.
 
     @Override
     public void checkSynced() {
-        interactor.checkSynced();
+        getPresenter().checkSynced();
     }
 
     @Override
@@ -333,22 +332,22 @@ public class DrawerMenuView implements View.OnClickListener, BaseDrawerContract.
 
     @Override
     public void onDrawerSlide(@NonNull View drawerView, float slideOffset) {
-
+        //Do nothing
     }
 
     @Override
     public void onDrawerOpened(@NonNull View drawerView) {
-
+        //Do nothing
     }
 
     @Override
     public void onDrawerClosed(@NonNull View drawerView) {
-        presenter.onDrawerClosed();
+        getPresenter().onDrawerClosed();
     }
 
     @Override
     public void onDrawerStateChanged(int newState) {
-
+        //Do nothing
     }
 
     @Nullable

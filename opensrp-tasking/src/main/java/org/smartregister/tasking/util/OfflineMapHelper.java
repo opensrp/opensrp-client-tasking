@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
 
 import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 import com.mapbox.turf.TurfMeasurement;
@@ -81,7 +82,7 @@ public class OfflineMapHelper {
                     offlineQueueTaskMap.put(offlineQueueTask.getTask().get(MAP_NAME).toString(), offlineQueueTask);
                 }
             } catch (JSONException e) {
-                e.printStackTrace();
+                Timber.e(e);
             }
         }
 
@@ -89,50 +90,53 @@ public class OfflineMapHelper {
     }
 
     public static void downloadMap(final Feature operationalAreaFeature, final String mapName, final Context context) {
-        Runnable runnable = new Runnable() {
-            public void run() {
-                double[] bbox = TurfMeasurement.bbox(operationalAreaFeature.geometry());
+        Geometry geometry = operationalAreaFeature.geometry();
+        if (geometry != null) {
+            Runnable runnable = new Runnable() {
+                public void run() {
+                    double[] bbox = TurfMeasurement.bbox(geometry);
 
-                double minX = bbox[0];
-                double minY = bbox[1];
-                double maxX = bbox[2];
-                double maxY = bbox[3];
+                    double minX = bbox[0];
+                    double minY = bbox[1];
+                    double maxX = bbox[2];
+                    double maxY = bbox[3];
 
-                double topLeftLat = maxY;
-                double topLeftLng = minX;
-                double bottomRightLat = minY;
-                double bottomRightLng = maxX;
-                double topRightLat = maxY;
-                double topRightLng = maxX;
-                double bottomLeftLat = minY;
-                double bottomLeftLng = minX;
+                    double topLeftLat = maxY;
+                    double topLeftLng = minX;
+                    double bottomRightLat = minY;
+                    double bottomRightLng = maxX;
+                    double topRightLat = maxY;
+                    double topRightLng = maxX;
+                    double bottomLeftLat = minY;
+                    double bottomLeftLng = minX;
 
-                String mapboxStyle = context.getString(R.string.localhost_url, FileHTTPServer.PORT);
+                    String mapboxStyle = context.getString(R.string.localhost_url, FileHTTPServer.PORT);
 
-                LatLng topLeftBound = new LatLng(topLeftLat, topLeftLng);
-                LatLng topRightBound = new LatLng(topRightLat, topRightLng);
-                LatLng bottomRightBound = new LatLng(bottomRightLat, bottomRightLng);
-                LatLng bottomLeftBound = new LatLng(bottomLeftLat, bottomLeftLng);
+                    LatLng topLeftBound = new LatLng(topLeftLat, topLeftLng);
+                    LatLng topRightBound = new LatLng(topRightLat, topRightLng);
+                    LatLng bottomRightBound = new LatLng(bottomRightLat, bottomRightLng);
+                    LatLng bottomLeftBound = new LatLng(bottomLeftLat, bottomLeftLng);
 
-                double maxZoom = DOWNLOAD_MAX_ZOOM;
-                double minZoom = DOWNLOAD_MIN_ZOOM;
+                    double maxZoom = DOWNLOAD_MAX_ZOOM;
+                    double minZoom = DOWNLOAD_MIN_ZOOM;
 
-                OfflineServiceHelper.ZoomRange zoomRange = new OfflineServiceHelper.ZoomRange(minZoom, maxZoom);
+                    OfflineServiceHelper.ZoomRange zoomRange = new OfflineServiceHelper.ZoomRange(minZoom, maxZoom);
 
-                OfflineServiceHelper.requestOfflineMapDownload(context
-                        , mapName
-                        , mapboxStyle
-                        , TaskingLibrary.getInstance().getMapboxAccessToken()
-                        , topLeftBound
-                        , topRightBound
-                        , bottomRightBound
-                        , bottomLeftBound
-                        , zoomRange
-                );
-            }
-        };
+                    OfflineServiceHelper.requestOfflineMapDownload(context
+                            , mapName
+                            , mapboxStyle
+                            , TaskingLibrary.getInstance().getMapboxAccessToken()
+                            , topLeftBound
+                            , topRightBound
+                            , bottomRightBound
+                            , bottomLeftBound
+                            , zoomRange
+                    );
+                }
+            };
 
-        TaskingLibrary.getInstance().getAppExecutors().diskIO().execute(runnable);
+            TaskingLibrary.getInstance().getAppExecutors().diskIO().execute(runnable);
+        }
     }
 
     public static void initializeFileHTTPServer(Context context, String digitalGlobeIdPlaceholder, String mapStyleAssetPath) {

@@ -1,7 +1,5 @@
 package org.smartregister.tasking.util;
 
-import android.icu.util.ULocale;
-
 import androidx.annotation.NonNull;
 
 import org.smartregister.domain.Location;
