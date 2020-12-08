@@ -31,6 +31,7 @@ import org.smartregister.tasking.adapter.TaskRegisterAdapter;
 import org.smartregister.tasking.contract.BaseContract;
 import org.smartregister.tasking.contract.BaseDrawerContract;
 import org.smartregister.tasking.contract.BaseFormFragmentContract;
+import org.smartregister.tasking.contract.TaskingHomeActivityContract;
 import org.smartregister.tasking.layer.DigitalGlobeLayer;
 import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.model.CardDetails;
@@ -38,13 +39,14 @@ import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.tasking.repository.TaskingMappingHelper;
 import org.smartregister.tasking.util.ActivityConfiguration;
+import org.smartregister.tasking.util.GeoJsonUtils;
 import org.smartregister.tasking.util.TaskingJsonFormUtils;
-import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 import org.smartregister.tasking.util.TaskingMapHelper;
 import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
 import org.smartregister.util.AppExecutors;
 import org.smartregister.view.activity.DrishtiApplication;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -350,17 +352,17 @@ public class TestRevealApplication extends DrishtiApplication {
 
         @Override
         public TaskingJsonFormUtils getJsonFormUtils() {
-            return null;
+            return new TaskingJsonFormUtils();
         }
 
         @Override
         public TaskingMappingHelper getMappingHelper() {
-            return null;
+            return new TaskingMappingHelper();
         }
 
         @Override
         public TaskingMapHelper getMapHelper() {
-            return null;
+            return new TaskingMapHelper();
         }
 
         @Override
@@ -404,11 +406,6 @@ public class TestRevealApplication extends DrishtiApplication {
         }
 
         @Override
-        public void setGeoJsonSource(FeatureCollection featureCollection, Feature operationalArea, boolean isChangeMapPosition) {
-
-        }
-
-        @Override
         public void openTaskRegister(TaskFilterParams filterParams, TaskingHomeActivity taskingHomeActivity) {
 
         }
@@ -421,6 +418,61 @@ public class TestRevealApplication extends DrishtiApplication {
         @Override
         public boolean showCurrentLocationButton() {
             return false;
+        }
+
+        @Override
+        public boolean disableMyLocationOnMapMove() {
+            return false;
+        }
+
+        @Override
+        public Boolean getDrawOperationalAreaBoundaryAndLabel() {
+            return null;
+        }
+
+        @Override
+        public GeoJsonUtils getGeoJsonUtils() {
+            return null;
+        }
+
+        @Override
+        public String getProvinceFromTreeDialogValue(ArrayList<String> name) {
+            return null;
+        }
+
+        @Override
+        public String getDistrictFromTreeDialogValue(ArrayList<String> name) {
+            return null;
+        }
+
+        @Override
+        public void onShowFilledForms() {
+
+        }
+
+        @Override
+        public void onFeatureSelectedByLongClick(Feature feature, TaskingHomeActivityContract.Presenter taskingHomePresenter) {
+
+        }
+
+        @Override
+        public void onFeatureSelectedByClick(Feature feature, TaskingHomeActivityContract.Presenter taskingHomePresenter) {
+
+        }
+
+        @Override
+        public double getOnClickMaxZoomLevel() {
+            return 0;
+        }
+
+        @Override
+        public void fetchPlans(String jurisdictionName, BaseDrawerContract.Presenter presenter) {
+
+        }
+
+        @Override
+        public void validateCurrentPlan(String selectedOperationalArea, String currentPlanId, BaseDrawerContract.Presenter presenter) {
+
         }
     }
 }

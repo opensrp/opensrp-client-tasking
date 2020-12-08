@@ -25,4 +25,9 @@ public class SampleTaskingLibraryConfiguration extends DefaultTaskingLibraryConf
     public AppExecutors getAppExecutors() {
         return new AppExecutors();
     }
+
+    @Override
+    public double getOnClickMaxZoomLevel() {
+        return 6.0;
+    }
 }
