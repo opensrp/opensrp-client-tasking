@@ -198,5 +198,7 @@
     <string name="plans_download_on_progress_title">Download in Progress</string>
     <string name="plans_download_on_progress">Downloading of Plans In Progress. Please wait</string>
     <string name="zoom_in_to_select">Zoom in to select a structure</string>
-
+    <string name="add_structure_form_redirecting">Redirecting you to operational area (%1$s) so you can collect information against this point.</string>
+    <string name="reseting_task_title">Resetting Task Information</string>
+    <string name="reseting_task_msg">Resetting Task Information. Please wait</string>
 </resources>

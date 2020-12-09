@@ -18,4 +18,7 @@
     <color name="search_textfield_background_grey">@color/white</color>
     <color name="background_alert_red">#FFBDBD</color>
     <color name="background_alert_green">#B3EDC3</color>
+
+    <color name="outside_area_mask">#313131</color>
+
 </resources>

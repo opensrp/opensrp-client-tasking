@@ -455,6 +455,9 @@ public interface TaskingConstants {
         String CATCHMENT_AREA = "catchment_area";
 
 
+        String VALID_OPERATIONAL_AREA = "valid_operational_area";
+
+        String STRUCTURE = "structure";
     }
 
     interface DateFormat {

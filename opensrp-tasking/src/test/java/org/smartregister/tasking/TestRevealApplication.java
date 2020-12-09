@@ -47,7 +47,6 @@ import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
 import org.smartregister.util.AppExecutors;
 import org.smartregister.view.activity.DrishtiApplication;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -467,7 +466,7 @@ public class TestRevealApplication extends DrishtiApplication {
 
         @Override
         public double getOnClickMaxZoomLevel() {
-            return 0;
+            return 11;
         }
 
         @Override

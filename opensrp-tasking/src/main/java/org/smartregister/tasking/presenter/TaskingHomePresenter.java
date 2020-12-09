@@ -36,17 +36,20 @@ import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.tasking.repository.TaskingMappingHelper;
 import org.smartregister.tasking.util.AlertDialogUtils;
+import org.smartregister.tasking.util.Constants;
 import org.smartregister.tasking.util.PasswordDialogUtils;
 import org.smartregister.tasking.util.PreferencesUtil;
 import org.smartregister.tasking.util.TaskingConstants;
 import org.smartregister.tasking.util.TaskingJsonFormUtils;
 import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 import org.smartregister.tasking.util.Utils;
+import org.smartregister.util.JsonFormUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -54,10 +57,18 @@ import timber.log.Timber;
 
 import static android.content.DialogInterface.BUTTON_NEGATIVE;
 import static android.content.DialogInterface.BUTTON_NEUTRAL;
+import static com.vijay.jsonwizard.constants.JsonFormConstants.TEXT;
+import static com.vijay.jsonwizard.constants.JsonFormConstants.VALUE;
 import static org.smartregister.domain.LocationProperty.PropertyStatus.INACTIVE;
 import static org.smartregister.tasking.util.Constants.JsonForm.STRUCTURE_NAME;
 import static org.smartregister.tasking.util.TaskingConstants.BusinessStatus.NOT_ELIGIBLE;
 import static org.smartregister.tasking.util.TaskingConstants.GeoJSON.FEATURES;
+import static org.smartregister.tasking.util.TaskingConstants.Intervention.IRS;
+import static org.smartregister.tasking.util.TaskingConstants.Intervention.REGISTER_FAMILY;
+import static org.smartregister.tasking.util.TaskingConstants.JsonForm.ENCOUNTER_TYPE;
+import static org.smartregister.tasking.util.TaskingConstants.JsonForm.LOCATION_COMPONENT_ACTIVE;
+import static org.smartregister.tasking.util.TaskingConstants.JsonForm.OPERATIONAL_AREA_TAG;
+import static org.smartregister.tasking.util.TaskingConstants.JsonForm.VALID_OPERATIONAL_AREA;
 import static org.smartregister.tasking.util.TaskingConstants.Map.CLICK_SELECT_RADIUS;
 import static org.smartregister.tasking.util.TaskingConstants.Properties.FAMILY_MEMBER_NAMES;
 import static org.smartregister.tasking.util.TaskingConstants.Properties.FEATURE_SELECT_TASK_BUSINESS_STATUS;
@@ -67,6 +78,7 @@ import static org.smartregister.tasking.util.TaskingConstants.Properties.TASK_CO
 import static org.smartregister.tasking.util.TaskingConstants.Properties.TASK_CODE_LIST;
 import static org.smartregister.tasking.util.TaskingConstants.Properties.TASK_IDENTIFIER;
 import static org.smartregister.tasking.util.TaskingConstants.Properties.TASK_STATUS;
+import static org.smartregister.tasking.util.TaskingConstants.REGISTER_STRUCTURE_EVENT;
 import static org.smartregister.tasking.util.TaskingConstants.SPRAY_EVENT;
 import static org.smartregister.tasking.util.Utils.validateFarStructures;
 
@@ -125,7 +137,7 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
 
     private TaskFilterParams filterParams;
 
-    private TaskingLibraryConfiguration libraryConfiguration;
+    private TaskingLibraryConfiguration taskingLibraryConfiguration;
 
     public TaskingHomePresenter(TaskingHomeActivityContract.View view, BaseDrawerContract.Presenter drawerPresenter) {
         this.viewWeakReference = new WeakReference<>(view);
@@ -136,7 +148,7 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
         prefsUtil = PreferencesUtil.getInstance();
         setChangeMapPosition(true);
         taskingLibrary = TaskingLibrary.getInstance();
-        libraryConfiguration = taskingLibrary.getTaskingLibraryConfiguration();
+        taskingLibraryConfiguration = taskingLibrary.getTaskingLibraryConfiguration();
         jsonFormUtils = taskingLibrary.getTaskingLibraryConfiguration().getJsonFormUtils();
         mappingHelper = taskingLibrary.getTaskingLibraryConfiguration().getMappingHelper();
     }
@@ -247,7 +259,7 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
     @Override
     public void onMapClicked(MapboxMap mapboxMap, LatLng point, boolean isLongClick) {
         double currentZoom = mapboxMap.getCameraPosition().zoom;
-        if (currentZoom < libraryConfiguration.getOnClickMaxZoomLevel()) {
+        if (currentZoom < taskingLibraryConfiguration.getOnClickMaxZoomLevel()) {
             Timber.w("onMapClicked Current Zoom level" + currentZoom);
             getView().displayToast(R.string.zoom_in_to_select);
             return;
@@ -295,12 +307,12 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
 
     @Override
     public void onFeatureSelectedByClick(Feature feature) {
-        libraryConfiguration.onFeatureSelectedByClick(feature, this);
+        taskingLibraryConfiguration.onFeatureSelectedByClick(feature, this);
     }
 
     @Override
     public void onFeatureSelectedByLongClick(Feature feature) {
-        libraryConfiguration.onFeatureSelectedByLongClick(feature, this);
+        taskingLibraryConfiguration.onFeatureSelectedByLongClick(feature, this);
     }
 
     @Override
@@ -381,12 +393,12 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
             getView().hideProgressDialog();
             getView().closeAllCardViews();
         }
-        if (libraryConfiguration.isRefreshMapOnEventSaved()) {
+        if (taskingLibraryConfiguration.isRefreshMapOnEventSaved()) {
             refreshStructures(true);
             if (getView() != null) {
                 getView().clearSelectedFeature();
             }
-            libraryConfiguration.setRefreshMapOnEventSaved(false);
+            taskingLibraryConfiguration.setRefreshMapOnEventSaved(false);
         }
     }
 
@@ -405,13 +417,13 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
 
     @Override
     public void startForm(Feature feature, CardDetails cardDetails, String interventionType, Event event) {
-//        String formName = jsonFormUtils.getFormName(null, interventionType);
-//        String sprayStatus = cardDetails == null ? null : cardDetails.getStatus();
-//        String familyHead = null;
+        String formName = jsonFormUtils.getFormName(null, interventionType);
+        String sprayStatus = cardDetails == null ? null : cardDetails.getStatus();
+        String familyHead = null;
 //        if (cardDetails instanceof SprayCardDetails) {
 //            familyHead = ((SprayCardDetails) cardDetails).getFamilyHead();
 //        }
-//        startForm(formName, feature, sprayStatus, familyHead, event);
+        startForm(formName, feature, sprayStatus, familyHead, event);
     }
 
     @Override
@@ -419,6 +431,32 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
         if (getView() != null) {
             JSONObject formJson = jsonFormUtils.getFormJSON(getView().getContext()
                     , formName, feature, sprayStatus, familyHead);
+            Map<String, Object> serverConfigsObjectMap = taskingLibraryConfiguration.getServerConfigs();
+//            if (cardDetails instanceof MosquitoHarvestCardDetails && PAOT.equals(((MosquitoHarvestCardDetails) cardDetails).getInterventionType())) {
+//                jsonFormUtils.populatePAOTForm((MosquitoHarvestCardDetails) cardDetails, formJson);
+//            } else if (cardDetails instanceof SprayCardDetails && Country.NAMIBIA.equals(BuildConfig.BUILD_COUNTRY)) {
+//                jsonFormUtils.populateForm(event, formJson);
+//            } else if (TaskingConstants.JsonForm.SPRAY_FORM_ZAMBIA.equals(formName)) {
+//                try {
+//                    jsonFormUtils.populateField(formJson, DISTRICT_NAME, prefsUtil.getCurrentDistrict().trim(), VALUE);
+//                    jsonFormUtils.populateField(formJson, PROVINCE_NAME, prefsUtil.getCurrentProvince().trim(), VALUE);
+//                } catch (JSONException e) {
+//                    Timber.e(e);
+//                }
+//                Map<String, JSONObject> fields = jsonFormUtils.getFields(formJson);
+//                jsonFormUtils.populateServerOptions(serverConfigsObjectMap, TaskingConstants.CONFIGURATION.HEALTH_FACILITIES, fields.get(TaskingConstants.JsonForm.HFC_SEEK), prefsUtil.getCurrentDistrict());
+//                jsonFormUtils.populateServerOptions(serverConfigsObjectMap, TaskingConstants.CONFIGURATION.HEALTH_FACILITIES, fields.get(TaskingConstants.JsonForm.HFC_BELONG), prefsUtil.getCurrentDistrict());
+//                jsonFormUtils.populateForm(event, formJson);
+//                String dataCollector = RevealApplication.getInstance().getContext().allSharedPreferences().fetchRegisteredANM();
+//                if (StringUtils.isNotBlank(dataCollector)) {
+//                    jsonFormUtils.populateServerOptions(taskingLibraryConfiguration.getServerConfigs(),
+//                            TaskingConstants.CONFIGURATION.SPRAY_OPERATORS, fields.get(TaskingConstants.JsonForm.SPRAY_OPERATOR_CODE),
+//                            dataCollector,"");
+//                }
+//
+//            } else if (TaskingConstants.JsonForm.SPRAY_FORM_REFAPP.equals(formName)) {
+//                jsonFormUtils.populateServerOptions(taskingLibraryConfiguration.getServerConfigs(), TaskingConstants.CONFIGURATION.DATA_COLLECTORS, jsonFormUtils.getFields(formJson).get(TaskingConstants.JsonForm.DATA_COLLECTOR), prefsUtil.getCurrentDistrict());
+//            }
             startForm(formJson);
         }
     }
@@ -440,29 +478,33 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
 
     @Override
     public void saveJsonForm(String json) {
-//        try {
-//            JSONObject jsonForm = new JSONObject(json);
-//            String encounterType = jsonForm.getString(ENCOUNTER_TYPE);
-//            JSONArray fields = JsonFormUtils.getMultiStepFormFields(jsonForm);
-//            String validOperationalArea = JsonFormUtils.getFieldValue(fields, VALID_OPERATIONAL_AREA);
-//            if (Constants.REGISTER_STRUCTURE_EVENT.equals(encounterType) && StringUtils.isNotBlank(validOperationalArea)) {
-//                registerStructureEvent();
-//                getView().showProgressDialog(R.string.opening_form_title, R.string.add_structure_form_redirecting, validOperationalArea);
-//                Boolean locationComponentActive = Boolean.valueOf(JsonFormUtils.getFieldValue(fields, LOCATION_COMPONENT_ACTIVE));
-//                String point = JsonFormUtils.getFieldValue(fields, TaskingConstants.JsonForm.STRUCTURE);
-//                taskingHomeInteractor.fetchLocations(prefsUtil.getCurrentPlanId(), validOperationalArea, point, locationComponentActive);
-//            } else {
-//                if (getView() != null) {
-//                    getView().showProgressDialog(R.string.saving_title, R.string.saving_message);
-//                }
-//                taskingHomeInteractor.saveJsonForm(json);
-//            }
-//        } catch (JSONException e) {
-//            Timber.e(e);
-//            if (getView() != null) {
-//                getView().displayToast(R.string.error_occurred_saving_form);
-//            }
-//        }
+        try {
+            JSONObject jsonForm = new JSONObject(json);
+            String encounterType = jsonForm.getString(ENCOUNTER_TYPE);
+            JSONArray fields = JsonFormUtils.getMultiStepFormFields(jsonForm);
+            String validOperationalArea = JsonFormUtils.getFieldValue(fields, VALID_OPERATIONAL_AREA);
+            if (Constants.REGISTER_STRUCTURE_EVENT.equals(encounterType) && StringUtils.isNotBlank(validOperationalArea)) {
+                registerStructureEvent();
+                getView().showProgressDialog(R.string.opening_form_title, R.string.add_structure_form_redirecting, validOperationalArea);
+                Boolean locationComponentActive = Boolean.valueOf(JsonFormUtils.getFieldValue(fields, LOCATION_COMPONENT_ACTIVE));
+                String point = JsonFormUtils.getFieldValue(fields, TaskingConstants.JsonForm.STRUCTURE);
+                taskingHomeInteractor.fetchLocations(prefsUtil.getCurrentPlanId(), validOperationalArea, point, locationComponentActive);
+            } else {
+                if (getView() != null) {
+                    getView().showProgressDialog(R.string.saving_title, R.string.saving_message);
+                }
+                taskingHomeInteractor.saveJsonForm(json);
+            }
+        } catch (JSONException e) {
+            Timber.e(e);
+            if (getView() != null) {
+                getView().displayToast(R.string.error_occurred_saving_form);
+            }
+        }
+    }
+
+    protected void registerStructureEvent() {
+        //TODO add structure dialog
     }
 
     @Override
@@ -536,10 +578,38 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
 
     @Override
     public void onAddStructureClicked(boolean myLocationComponentActive, String point) {
+        String formName = jsonFormUtils.getFormName(REGISTER_STRUCTURE_EVENT);
+        try {
+            JSONObject formJson = new JSONObject(jsonFormUtils.getFormString(getView().getContext(), formName, null));
+            formJson.put(OPERATIONAL_AREA_TAG, operationalArea.toJson());
+            taskingLibraryConfiguration.setFeatureCollection(featureCollection);
+            jsonFormUtils.populateField(formJson, TaskingConstants.JsonForm.SELECTED_OPERATIONAL_AREA_NAME, prefsUtil.getCurrentOperationalArea(), TEXT);
+            if (StringUtils.isNotBlank(point)) {
+                jsonFormUtils.populateField(formJson, TaskingConstants.JsonForm.STRUCTURE, point, VALUE);
+            }
+            formJson.put(LOCATION_COMPONENT_ACTIVE, myLocationComponentActive);
+            getView().startJsonForm(formJson);
+        } catch (Exception e) {
+            Timber.e(e, "error launching add structure form");
+        }
     }
 
     @Override
     public void onLocationValidated() {
+        if (markStructureIneligibleConfirmed) {
+            onMarkStructureIneligibleConfirmed();
+            markStructureIneligibleConfirmed = false;
+        } else if (REGISTER_FAMILY.equals(selectedFeatureInterventionType)) {
+            getView().registerFamily();
+        } else if (cardDetails == null || !changeInterventionStatus) {
+            startForm(selectedFeature, null, selectedFeatureInterventionType);
+        } else {
+            if (IRS.equals(cardDetails.getInterventionType())) {
+                findLastEvent(selectedFeature.id(), SPRAY_EVENT);
+            } else {
+                startForm(selectedFeature, cardDetails, selectedFeatureInterventionType);
+            }
+        }
     }
 
     @Override
@@ -628,21 +698,21 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
 
 
     public void onResume() {
-        if (libraryConfiguration.isRefreshMapOnEventSaved()) {
+        if (taskingLibraryConfiguration.isRefreshMapOnEventSaved()) {
             refreshStructures(true);
             if (getView() != null) {
                 getView().clearSelectedFeature();
             }
-            libraryConfiguration.setRefreshMapOnEventSaved(false);
+            taskingLibraryConfiguration.setRefreshMapOnEventSaved(false);
         }
         updateLocationComponentState();
     }
 
     private void updateLocationComponentState() {
         if (getView() != null) {
-            if (libraryConfiguration.isMyLocationComponentEnabled() && !getView().isMyLocationComponentActive()) {
+            if (taskingLibraryConfiguration.isMyLocationComponentEnabled() && !getView().isMyLocationComponentActive()) {
                 getView().focusOnUserLocation(true);
-            } else if (!libraryConfiguration.isMyLocationComponentEnabled() && getView().isMyLocationComponentActive()
+            } else if (!taskingLibraryConfiguration.isMyLocationComponentEnabled() && getView().isMyLocationComponentActive()
                     || !getView().isMyLocationComponentActive()) {
                 getView().focusOnUserLocation(false);
                 if (!isTasksFiltered && StringUtils.isBlank(searchPhrase)) {

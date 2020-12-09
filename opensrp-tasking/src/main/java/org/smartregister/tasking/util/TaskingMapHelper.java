@@ -10,10 +10,13 @@ import androidx.annotation.NonNull;
 
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.MultiPolygon;
+import com.mapbox.geojson.Polygon;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
+import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
@@ -29,6 +32,7 @@ import org.smartregister.tasking.layer.MapBoxLayer;
 import org.smartregister.tasking.repository.TaskingMappingHelper;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import io.ona.kujaku.plugin.switcher.BaseLayerSwitcherPlugin;
 import io.ona.kujaku.views.KujakuMapView;
@@ -40,6 +44,8 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.interpolate;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.linear;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.zoom;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillOpacity;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
@@ -50,6 +56,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineWidth;
 import static org.smartregister.tasking.util.TaskingConstants.CONFIGURATION.DEFAULT_GEO_JSON_CIRCLE_SIDES;
 import static org.smartregister.tasking.util.TaskingConstants.CONFIGURATION.DEFAULT_INDEX_CASE_CIRCLE_RADIUS_IN_METRES;
 import static org.smartregister.tasking.util.TaskingConstants.CONFIGURATION.INDEX_CASE_CIRCLE_RADIUS_IN_METRES;
+import static org.smartregister.tasking.util.TaskingConstants.CONFIGURATION.OUTSIDE_OPERATIONAL_AREA_MASK_OPACITY;
 import static org.smartregister.tasking.util.TaskingConstants.GeoJSON.IS_INDEX_CASE;
 import static org.smartregister.tasking.util.Utils.createCircleFeature;
 import static org.smartregister.tasking.util.Utils.getGlobalConfig;
@@ -71,6 +78,15 @@ public class TaskingMapHelper {
 
     private static final String INDEX_CASE_SOURCE = "index_case_source";
 
+    private static final String POTENTIAL_AREA_OF_TRANSMISSION_ICON = "potential-area-of-transmission-icon";
+
+    public static final String LARVAL_BREEDING_LAYER = "larval-breeding-layer";
+
+    public static final String MOSQUITO_COLLECTION_LAYER = "mosquito-collection-layer";
+
+    public static final String POTENTIAL_AREA_OF_TRANSMISSION_LAYER = "potential-area-of-transmission-layer";
+
+
     private Location indexCaseLocation = null;
 
     private GeoJsonSource indexCaseSource;
@@ -88,7 +104,7 @@ public class TaskingMapHelper {
     }
 
     public void addCustomLayers(@NonNull Style mMapboxMapStyle, @NonNull Context context) {
-
+        //TODO add implementation
     }
 
     public void addIndexCaseLayers(MapboxMap mapboxMap, Context context, FeatureCollection featureCollection) {
@@ -176,28 +192,26 @@ public class TaskingMapHelper {
     }
 
     public static void addOutOfBoundaryMask(@NonNull Style mMapboxMapStyle, Feature operationalArea, Feature boundingBoxPolygon, Context context) {
+        // create multi polygon
+        List<Polygon> polygonList = new ArrayList<>();
+        polygonList.add((Polygon) boundingBoxPolygon.geometry());
+        if (operationalArea.geometry() instanceof MultiPolygon) {
+            polygonList.addAll(((MultiPolygon) operationalArea.geometry()).polygons());
+        } else {
+            polygonList.add((Polygon) operationalArea.geometry());
+        }
 
+        MultiPolygon opAreaMultiPolygon = MultiPolygon.fromPolygons(polygonList);
 
-//        // create multi polygon
-//        List<Polygon> polygonList = new ArrayList<>();
-//        polygonList.add((Polygon) boundingBoxPolygon.geometry());
-//        if (operationalArea.geometry() instanceof MultiPolygon) {
-//            polygonList.addAll(((MultiPolygon) operationalArea.geometry()).polygons());
-//        } else {
-//            polygonList.add((Polygon) operationalArea.geometry());
-//        }
-//
-//        MultiPolygon opAreaMultiPolygon = MultiPolygon.fromPolygons(polygonList);
-//
-//        // create mask source
-//        GeoJsonSource outOfBoundarySource = new GeoJsonSource(OUT_OF_BOUNDARY_SOURCE, opAreaMultiPolygon);
-//        mMapboxMapStyle.addSource(outOfBoundarySource);
-//
-//        // add mask
-//        FillLayer maskLayer = new FillLayer(OUT_OF_BOUNDARY_LAYER, outOfBoundarySource.getId());
-//        maskLayer.withProperties(fillColor(context.getResources().getColor(R.color.outside_area_mask)),
-//                fillOpacity(OUTSIDE_OPERATIONAL_AREA_MASK_OPACITY));
-//        mMapboxMapStyle.addLayer(maskLayer);
+        // create mask source
+        GeoJsonSource outOfBoundarySource = new GeoJsonSource(OUT_OF_BOUNDARY_SOURCE, opAreaMultiPolygon);
+        mMapboxMapStyle.addSource(outOfBoundarySource);
+
+        // add mask
+        FillLayer maskLayer = new FillLayer(OUT_OF_BOUNDARY_LAYER, outOfBoundarySource.getId());
+        maskLayer.withProperties(fillColor(context.getResources().getColor(R.color.outside_area_mask)),
+                fillOpacity(OUTSIDE_OPERATIONAL_AREA_MASK_OPACITY));
+        mMapboxMapStyle.addLayer(maskLayer);
 
     }
 
