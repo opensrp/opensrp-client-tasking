@@ -247,7 +247,9 @@ public class DrawerMenuView implements View.OnClickListener, BaseDrawerContract.
 
     @Override
     public void closeDrawerLayout() {
-        mDrawerLayout.closeDrawer(GravityCompat.START);
+        if (getPresenter().isPlanAndOperationalAreaSelected()) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
+        }
     }
 
 

@@ -175,7 +175,7 @@ public class TestRevealApplication extends DrishtiApplication {
 
         @Override
         public Boolean displayDistanceScale() {
-            return null;
+            return true;
         }
 
         @Override
@@ -431,7 +431,7 @@ public class TestRevealApplication extends DrishtiApplication {
 
         @Override
         public Boolean getDrawOperationalAreaBoundaryAndLabel() {
-            return null;
+            return true;
         }
 
         @Override
@@ -481,6 +481,11 @@ public class TestRevealApplication extends DrishtiApplication {
 
         @Override
         public void setFacility(List<String> defaultLocation, BaseDrawerContract.View view) {
+
+        }
+
+        @Override
+        public void openFilterTaskActivity(TaskFilterParams filterParams, TaskingHomeActivity activity) {
 
         }
     }

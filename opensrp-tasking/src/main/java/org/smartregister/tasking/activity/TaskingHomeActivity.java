@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -54,6 +55,7 @@ import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.FetchStatus;
 import org.smartregister.domain.SyncEntity;
 import org.smartregister.domain.SyncProgress;
+import org.smartregister.domain.Task;
 import org.smartregister.dto.UserAssignmentDTO;
 import org.smartregister.receiver.SyncProgressBroadcastReceiver;
 import org.smartregister.receiver.SyncStatusBroadcastReceiver;
@@ -80,12 +82,21 @@ import java.util.List;
 import io.ona.kujaku.callbacks.OnLocationComponentInitializedCallback;
 import io.ona.kujaku.layers.BoundaryLayer;
 import io.ona.kujaku.listeners.OnFeatureLongClickListener;
+import io.ona.kujaku.utils.Constants;
 import timber.log.Timber;
 
 import static android.content.DialogInterface.BUTTON_POSITIVE;
 import static org.smartregister.tasking.util.TaskingConstants.ANIMATE_TO_LOCATION_DURATION;
 import static org.smartregister.tasking.util.TaskingConstants.CONFIGURATION.LOCAL_SYNC_DONE;
 import static org.smartregister.tasking.util.TaskingConstants.CONFIGURATION.UPDATE_LOCATION_BUFFER_RADIUS;
+import static org.smartregister.tasking.util.TaskingConstants.DatabaseKeys.STRUCTURE_ID;
+import static org.smartregister.tasking.util.TaskingConstants.DatabaseKeys.TASK_ID;
+import static org.smartregister.tasking.util.TaskingConstants.Filter.FILTER_SORT_PARAMS;
+import static org.smartregister.tasking.util.TaskingConstants.JSON_FORM_PARAM_JSON;
+import static org.smartregister.tasking.util.TaskingConstants.RequestCode.REQUEST_CODE_FAMILY_PROFILE;
+import static org.smartregister.tasking.util.TaskingConstants.RequestCode.REQUEST_CODE_FILTER_TASKS;
+import static org.smartregister.tasking.util.TaskingConstants.RequestCode.REQUEST_CODE_GET_JSON;
+import static org.smartregister.tasking.util.TaskingConstants.RequestCode.REQUEST_CODE_TASK_LISTS;
 import static org.smartregister.tasking.util.TaskingConstants.VERTICAL_OFFSET;
 import static org.smartregister.tasking.util.Utils.displayDistanceScale;
 import static org.smartregister.tasking.util.Utils.getLocationBuffer;
@@ -278,7 +289,7 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
         uiSettings.setCompassEnabled(true);
     }
 
-    protected void initializeScaleBarPlugin(MapboxMap mapboxMap) {
+    public void initializeScaleBarPlugin(MapboxMap mapboxMap) {
         if (displayDistanceScale()) {
             ScaleBarPlugin scaleBarPlugin = new ScaleBarPlugin(kujakuMapView, mapboxMap);
             // Create a ScaleBarOptions object to use custom styling
@@ -347,11 +358,14 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
             openIndicatorsCardView();
         } else if (v.getId() == R.id.filter_tasks_fab || v.getId() == R.id.filter_tasks_count_layout) {
             taskingHomePresenter.onFilterTasksClicked();
+        } else if (v.getId() == R.id.btn_add_structure) {
+            taskingHomePresenter.onAddStructureClicked(mapHelper.isMyLocationComponentActive(this, myLocationButton));
         }
     }
 
     @Override
     public void openFilterTaskActivity(TaskFilterParams filterParams) {
+        taskingLibraryConfiguration.openFilterTaskActivity(filterParams, this);
     }
 
     private void openIndicatorsCardView() {
@@ -757,6 +771,37 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
     public boolean onMapLongClick(@NonNull LatLng point) {
         taskingHomePresenter.onMapClicked(mMapboxMap, point, true);
         return false;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        onActivityResultExtended(requestCode, resultCode, data);
+    }
+
+    public void onActivityResultExtended(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == REQUEST_CODE_GET_JSON && resultCode == RESULT_OK && data.hasExtra(JSON_FORM_PARAM_JSON)) {
+            String json = data.getStringExtra(JSON_FORM_PARAM_JSON);
+            Timber.d(json);
+            taskingHomePresenter.saveJsonForm(json);
+        } else if (requestCode == Constants.RequestCode.LOCATION_SETTINGS && hasRequestedLocation) {
+            if (resultCode == RESULT_OK) {
+                taskingHomePresenter.getLocationPresenter().waitForUserLocation();
+            } else if (resultCode == RESULT_CANCELED) {
+                taskingHomePresenter.getLocationPresenter().onGetUserLocationFailed();
+            }
+            hasRequestedLocation = false;
+        } else if (requestCode == REQUEST_CODE_FAMILY_PROFILE && resultCode == RESULT_OK && data.hasExtra(STRUCTURE_ID)) {
+            String structureId = data.getStringExtra(STRUCTURE_ID);
+            Task task = (Task) data.getSerializableExtra(TASK_ID);
+            taskingHomePresenter.resetFeatureTasks(structureId, task);
+        } else if (requestCode == REQUEST_CODE_FILTER_TASKS && resultCode == RESULT_OK && data.hasExtra(FILTER_SORT_PARAMS)) {
+            TaskFilterParams filterParams = (TaskFilterParams) data.getSerializableExtra(FILTER_SORT_PARAMS);
+            taskingHomePresenter.filterTasks(filterParams);
+        } else if (requestCode == REQUEST_CODE_TASK_LISTS && resultCode == RESULT_OK && data.hasExtra(FILTER_SORT_PARAMS)) {
+            TaskFilterParams filterParams = (TaskFilterParams) data.getSerializableExtra(FILTER_SORT_PARAMS);
+            taskingHomePresenter.setTaskFilterParams(filterParams);
+        }
     }
 
     @Override

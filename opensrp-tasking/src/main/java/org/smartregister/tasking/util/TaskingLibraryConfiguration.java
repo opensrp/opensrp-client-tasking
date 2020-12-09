@@ -35,7 +35,6 @@ import org.smartregister.tasking.repository.TaskingMappingHelper;
 import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
 import org.smartregister.util.AppExecutors;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -202,4 +201,6 @@ public abstract class TaskingLibraryConfiguration {
     public abstract void validateCurrentPlan(String selectedOperationalArea, String currentPlanId, BaseDrawerContract.Presenter presenter);
 
     public abstract void setFacility(List<String> defaultLocation, BaseDrawerContract.View view);
+
+    public abstract void openFilterTaskActivity(TaskFilterParams filterParams, TaskingHomeActivity activity);
 }

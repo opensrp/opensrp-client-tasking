@@ -431,4 +431,9 @@ public class DefaultTaskingLibraryConfiguration extends TaskingLibraryConfigurat
     public void setFacility(List<String> defaultLocation, BaseDrawerContract.View view) {
 
     }
+
+    @Override
+    public void openFilterTaskActivity(TaskFilterParams filterParams, TaskingHomeActivity activity) {
+
+    }
 }

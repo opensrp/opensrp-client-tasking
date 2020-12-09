@@ -9,7 +9,9 @@ import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.Task;
 import org.smartregister.tasking.R;
 import org.smartregister.tasking.contract.TaskRegisterContract;
+import org.smartregister.tasking.contract.UserLocationContract;
 import org.smartregister.tasking.interactor.TaskRegisterInteractor;
+import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.view.contract.BaseRegisterContract;
 
 import java.util.List;
@@ -56,6 +58,16 @@ public class TaskRegisterPresenter implements TaskRegisterContract.Presenter, Ba
 
     @Override
     public void onFamilyFound(CommonPersonObjectClient finalFamily) {//not used
+    }
+
+    @Override
+    public void filterTasks(TaskFilterParams filterParams) {
+        //do nothing
+    }
+
+    @Override
+    public UserLocationContract.UserLocationPresenter getLocationPresenter() {
+        return null;
     }
 
     @Override
