@@ -39,6 +39,7 @@ import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.tasking.repository.TaskingMappingHelper;
 import org.smartregister.tasking.util.ActivityConfiguration;
+import org.smartregister.tasking.util.DefaultLocationHierarchyUtils;
 import org.smartregister.tasking.util.GeoJsonUtils;
 import org.smartregister.tasking.util.TaskingJsonFormUtils;
 import org.smartregister.tasking.util.TaskingMapHelper;
@@ -101,6 +102,10 @@ public class TestRevealApplication extends DrishtiApplication {
     }
 
     public static class TaskingLibraryConfiguration extends org.smartregister.tasking.util.TaskingLibraryConfiguration {
+
+        private boolean refreshMapOnEventSaved;
+
+        private boolean synced;
 
         @NonNull
         @Override
@@ -266,12 +271,12 @@ public class TestRevealApplication extends DrishtiApplication {
 
         @Override
         public boolean getSynced() {
-            return false;
+            return synced;
         }
 
         @Override
         public void setSynced(boolean synced) {
-
+            this.synced = synced;
         }
 
         @Override
@@ -367,12 +372,12 @@ public class TestRevealApplication extends DrishtiApplication {
 
         @Override
         public boolean isRefreshMapOnEventSaved() {
-            return false;
+            return refreshMapOnEventSaved;
         }
 
         @Override
         public void setRefreshMapOnEventSaved(boolean isRefreshMapOnEventSaved) {
-
+            refreshMapOnEventSaved = isRefreshMapOnEventSaved;
         }
 
         @Override
@@ -387,12 +392,12 @@ public class TestRevealApplication extends DrishtiApplication {
 
         @Override
         public List<String> getFacilityLevels() {
-            return null;
+            return DefaultLocationHierarchyUtils.getFacilityLevels();
         }
 
         @Override
         public List<String> getLocationLevels() {
-            return null;
+            return DefaultLocationHierarchyUtils.getLocationLevels();
         }
 
         @Override
@@ -436,13 +441,13 @@ public class TestRevealApplication extends DrishtiApplication {
         }
 
         @Override
-        public String getProvinceFromTreeDialogValue(ArrayList<String> name) {
-            return null;
+        public String getProvinceFromTreeDialogValue(List<String> name) {
+            return name.get(1);
         }
 
         @Override
-        public String getDistrictFromTreeDialogValue(ArrayList<String> name) {
-            return null;
+        public String getDistrictFromTreeDialogValue(List<String> name) {
+            return name.get(0);
         }
 
         @Override
@@ -472,6 +477,11 @@ public class TestRevealApplication extends DrishtiApplication {
 
         @Override
         public void validateCurrentPlan(String selectedOperationalArea, String currentPlanId, BaseDrawerContract.Presenter presenter) {
+
+        }
+
+        @Override
+        public void setFacility(List<String> defaultLocation, BaseDrawerContract.View view) {
 
         }
     }
