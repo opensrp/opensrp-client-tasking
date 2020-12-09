@@ -157,6 +157,8 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
 
     private LineLayer indexCaseLineLayer;
 
+    private TaskingHomeActivityContract.Presenter presenter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -202,7 +204,10 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
 
     @Override
     public TaskingHomeActivityContract.Presenter getPresenter() {
-        return new TaskingHomePresenter(this, drawerView.getPresenter());
+        if (presenter == null) {
+            presenter = new TaskingHomePresenter(this, drawerView.getPresenter());
+        }
+        return presenter;
     }
 
     @Override

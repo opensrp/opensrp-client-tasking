@@ -508,18 +508,15 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
         if (getView() != null) {
             getView().closeAllCardViews();
             getView().hideProgressDialog();
-        }
-        getFeatureCollection().features().add(feature);
-        setChangeMapPosition(false);
-        getView().setGeoJsonSource(getFeatureCollection(), null, isChangeMapPosition());
-        try {
-            clickedPoint = new LatLng(featureCoordinates.getDouble(1), featureCoordinates.getDouble(0));
-            if (getView() != null) {
+            getFeatureCollection().features().add(feature);
+            setChangeMapPosition(false);
+            getView().setGeoJsonSource(getFeatureCollection(), null, isChangeMapPosition());
+            try {
+                clickedPoint = new LatLng(featureCoordinates.getDouble(1), featureCoordinates.getDouble(0));
                 getView().displaySelectedFeature(feature, clickedPoint, zoomLevel);
+            } catch (JSONException e) {
+                Timber.e(e, "error extracting coordinates of added structure");
             }
-
-        } catch (JSONException e) {
-            Timber.e(e, "error extracting coordinates of added structure");
         }
     }
 
@@ -735,22 +732,22 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
 
     @Override
     public void searchTasks(String searchPhrase) {
-        if (searchPhrase.isEmpty()) {
-            searchFeatureCollection = null;
-            if (getView() != null) {
+        if (getView() != null) {
+            if (searchPhrase.isEmpty()) {
+                searchFeatureCollection = null;
                 getView().setGeoJsonSource(filterFeatureCollection == null ? getFeatureCollection() : FeatureCollection.fromFeatures(filterFeatureCollection), operationalArea, false);
+            } else {
+                List<Feature> features = new ArrayList<>();
+                for (Feature feature : !Utils.isEmptyCollection(searchFeatureCollection) && searchPhrase.length() > this.searchPhrase.length() ? searchFeatureCollection : Utils.isEmptyCollection(filterFeatureCollection) ? getFeatureCollection().features() : filterFeatureCollection) {
+                    String structureName = feature.getStringProperty(STRUCTURE_NAME);
+                    String familyMemberNames = feature.getStringProperty(FAMILY_MEMBER_NAMES);
+                    if (Utils.matchesSearchPhrase(structureName, searchPhrase) ||
+                            Utils.matchesSearchPhrase(familyMemberNames, searchPhrase))
+                        features.add(feature);
+                }
+                searchFeatureCollection = features;
+                getView().setGeoJsonSource(FeatureCollection.fromFeatures(searchFeatureCollection), operationalArea, false);
             }
-        } else {
-            List<Feature> features = new ArrayList<>();
-            for (Feature feature : !Utils.isEmptyCollection(searchFeatureCollection) && searchPhrase.length() > this.searchPhrase.length() ? searchFeatureCollection : Utils.isEmptyCollection(filterFeatureCollection) ? getFeatureCollection().features() : filterFeatureCollection) {
-                String structureName = feature.getStringProperty(STRUCTURE_NAME);
-                String familyMemberNames = feature.getStringProperty(FAMILY_MEMBER_NAMES);
-                if (Utils.matchesSearchPhrase(structureName, searchPhrase) ||
-                        Utils.matchesSearchPhrase(familyMemberNames, searchPhrase))
-                    features.add(feature);
-            }
-            searchFeatureCollection = features;
-            getView().setGeoJsonSource(FeatureCollection.fromFeatures(searchFeatureCollection), operationalArea, false);
         }
         this.searchPhrase = searchPhrase;
     }

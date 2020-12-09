@@ -55,6 +55,4 @@ public class BaseDrawerInteractor implements BaseDrawerContract.Interactor {
         };
         appExecutors.diskIO().execute(runnable);
     }
-
-
 }

@@ -185,9 +185,9 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract GeoJsonUtils getGeoJsonUtils();
 
-    public abstract String getProvinceFromTreeDialogValue(ArrayList<String> name);
+    public abstract String getProvinceFromTreeDialogValue(List<String> name);
 
-    public abstract String getDistrictFromTreeDialogValue(ArrayList<String> name);
+    public abstract String getDistrictFromTreeDialogValue(List<String> name);
 
     public abstract void onShowFilledForms();
 
@@ -200,4 +200,6 @@ public abstract class TaskingLibraryConfiguration {
     public abstract void fetchPlans(String jurisdictionName, BaseDrawerContract.Presenter presenter);
 
     public abstract void validateCurrentPlan(String selectedOperationalArea, String currentPlanId, BaseDrawerContract.Presenter presenter);
+
+    public abstract void setFacility(List<String> defaultLocation, BaseDrawerContract.View view);
 }

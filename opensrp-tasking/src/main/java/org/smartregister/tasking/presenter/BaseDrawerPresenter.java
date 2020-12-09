@@ -88,20 +88,20 @@ public class BaseDrawerPresenter implements BaseDrawerContract.Presenter {
     private void initializeDrawerLayout() {
         if (getView() != null) {
             getView().setOperator();
-        }
 
-        if (StringUtils.isBlank(prefsUtil.getCurrentOperationalArea())) {
+            if (StringUtils.isBlank(prefsUtil.getCurrentOperationalArea())) {
 
-            List<String> defaultLocation = locationHelper.generateDefaultLocationHierarchy(taskingLibraryConfiguration.getLocationLevels());
+                List<String> defaultLocation = locationHelper.generateDefaultLocationHierarchy(taskingLibraryConfiguration.getLocationLevels());
 
-            if (defaultLocation != null) {
-                prefsUtil.setCurrentDistrict(defaultLocation.get(2));
+                if (defaultLocation != null) {
+                    getView().setDistrict(taskingLibraryConfiguration.getDistrictFromTreeDialogValue(defaultLocation));
+                    prefsUtil.setCurrentDistrict(taskingLibraryConfiguration.getDistrictFromTreeDialogValue(defaultLocation));
+                    taskingLibraryConfiguration.setFacility(defaultLocation, getView());
+                }
+            } else {
+                populateLocationsFromPreferences();
             }
-        } else {
-            populateLocationsFromPreferences();
-        }
 
-        if (getView() != null) {
             getView().setPlan(prefsUtil.getCurrentPlan());
         }
     }
@@ -173,12 +173,12 @@ public class BaseDrawerPresenter implements BaseDrawerContract.Presenter {
 
     public Pair<String, ArrayList<String>> extractLocationHierarchy() {
 
-        List<String> operationalAreaLevels = taskingLibraryConfiguration.getFacilityLevels();
+        List<String> operationalAreaLevels = taskingLibraryConfiguration.getLocationLevels();
 
         List<String> defaultLocation = locationHelper.generateDefaultLocationHierarchy(operationalAreaLevels);
 
         if (defaultLocation != null) {
-            List<FormLocation> entireTree = locationHelper.generateLocationHierarchyTree(false, operationalAreaLevels);
+            List<FormLocation> entireTree = locationHelper.generateLocationHierarchyTree(false, taskingLibraryConfiguration.getFacilityLevels());
             if (!prefsUtil.isKeycloakConfigured()) { // Only required when fetching hierarchy from openmrs
                 List<String> authorizedOperationalAreas = Arrays.asList(StringUtils.split(prefsUtil.getPreferenceValue(OPERATIONAL_AREAS), ','));
                 removeUnauthorizedOperationalAreas(authorizedOperationalAreas, entireTree);
@@ -329,21 +329,20 @@ public class BaseDrawerPresenter implements BaseDrawerContract.Presenter {
 
     @Override
     public void onViewResumed() {
-        if (!viewInitialized) {
-            initializeDrawerLayout();
-        }
-        if (getView() == null)
-            return;
+        if (viewInitialized) {
+            if (getView() == null)
+                return;
 
-        if ((StringUtils.isBlank(prefsUtil.getCurrentPlan()) || StringUtils.isBlank(prefsUtil.getCurrentOperationalArea())) &&
-                (StringUtils.isNotBlank(getView().getPlan()) || StringUtils.isNotBlank(getView().getOperationalArea()))) {
-            getView().setOperationalArea(prefsUtil.getCurrentOperationalArea());
-            getView().setPlan(prefsUtil.getCurrentPlan());
-            getView().lockNavigationDrawerForSelection(R.string.select_campaign_operational_area_title, R.string.revoked_plan_operational_area);
-        } else if (!prefsUtil.getCurrentPlan().equals(getView().getPlan())
-                || !prefsUtil.getCurrentOperationalArea().equals(getView().getOperationalArea())) {
-            changedCurrentSelection = true;
-            onDrawerClosed();
+            if ((StringUtils.isBlank(prefsUtil.getCurrentPlan()) || StringUtils.isBlank(prefsUtil.getCurrentOperationalArea())) &&
+                    (StringUtils.isNotBlank(getView().getPlan()) || StringUtils.isNotBlank(getView().getOperationalArea()))) {
+                getView().setOperationalArea(prefsUtil.getCurrentOperationalArea());
+                getView().setPlan(prefsUtil.getCurrentPlan());
+                getView().lockNavigationDrawerForSelection(R.string.select_campaign_operational_area_title, R.string.revoked_plan_operational_area);
+            } else if (!prefsUtil.getCurrentPlan().equals(getView().getPlan())
+                    || !prefsUtil.getCurrentOperationalArea().equals(getView().getOperationalArea())) {
+                changedCurrentSelection = true;
+                onDrawerClosed();
+            }
         } else {
             initializeDrawerLayout();
             viewInitialized = true;

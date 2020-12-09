@@ -388,12 +388,12 @@ public class DefaultTaskingLibraryConfiguration extends TaskingLibraryConfigurat
     }
 
     @Override
-    public String getProvinceFromTreeDialogValue(ArrayList<String> name) {
+    public String getProvinceFromTreeDialogValue(List<String> name) {
         return "";
     }
 
     @Override
-    public String getDistrictFromTreeDialogValue(ArrayList<String> name) {
+    public String getDistrictFromTreeDialogValue(List<String> name) {
         return "";
     }
 
@@ -424,6 +424,11 @@ public class DefaultTaskingLibraryConfiguration extends TaskingLibraryConfigurat
 
     @Override
     public void validateCurrentPlan(String selectedOperationalArea, String currentPlanId, BaseDrawerContract.Presenter presenter) {
+
+    }
+
+    @Override
+    public void setFacility(List<String> defaultLocation, BaseDrawerContract.View view) {
 
     }
 }

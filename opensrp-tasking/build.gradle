@@ -31,6 +31,9 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
         multiDexEnabled true
+
+        buildConfigField "String[]", "LOCATION_LEVELS", '{"Country", "Province", "Region", "District", "Sub-district","Operational Area"}'
+        buildConfigField "String[]", "HEALTH_FACILITY_LEVELS", '{"Country", "Province", "Region", "District", "Sub-district","Operational Area"}'
     }
 
     buildTypes {
