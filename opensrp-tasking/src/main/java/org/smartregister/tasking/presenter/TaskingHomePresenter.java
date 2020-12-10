@@ -178,11 +178,8 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
 
     public void refreshStructures(boolean localSyncDone) {
         setChangeMapPosition(!localSyncDone);
-
         String currentPlanId = prefsUtil.getCurrentPlanId();
         String currentOperationalArea = prefsUtil.getCurrentOperationalArea();
-        if (StringUtils.isBlank(currentPlanId) || StringUtils.isBlank(currentOperationalArea))
-            return;
 
         if (getView() != null) {
             getView().showProgressDialog(R.string.fetching_structures_title, R.string.fetching_structures_message);
