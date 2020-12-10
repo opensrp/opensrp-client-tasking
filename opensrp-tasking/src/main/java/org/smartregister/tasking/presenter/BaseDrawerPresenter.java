@@ -47,7 +47,7 @@ public class BaseDrawerPresenter implements BaseDrawerContract.Presenter {
 
     private BaseDrawerContract.DrawerActivity drawerActivity;
 
-    private PreferencesUtil prefsUtil;
+    protected PreferencesUtil prefsUtil;
 
     private LocationHelper locationHelper;
 
@@ -61,9 +61,9 @@ public class BaseDrawerPresenter implements BaseDrawerContract.Presenter {
 
     private boolean viewInitialized = false;
 
-    private DrishtiApplication drishtiApplication;
+    protected DrishtiApplication drishtiApplication;
 
-    private TaskingLibrary taskingLibrary;
+    protected TaskingLibrary taskingLibrary;
 
     private TaskingLibraryConfiguration taskingLibraryConfiguration;
 
@@ -172,7 +172,6 @@ public class BaseDrawerPresenter implements BaseDrawerContract.Presenter {
     }
 
     public Pair<String, ArrayList<String>> extractLocationHierarchy() {
-
         List<String> operationalAreaLevels = taskingLibraryConfiguration.getLocationLevels();
 
         List<String> defaultLocation = locationHelper.generateDefaultLocationHierarchy(operationalAreaLevels);
@@ -183,9 +182,8 @@ public class BaseDrawerPresenter implements BaseDrawerContract.Presenter {
                 List<String> authorizedOperationalAreas = Arrays.asList(StringUtils.split(prefsUtil.getPreferenceValue(OPERATIONAL_AREAS), ','));
                 removeUnauthorizedOperationalAreas(authorizedOperationalAreas, entireTree);
             }
-            String entireTreeString = AssetHandler.javaToJsonString(entireTree,
-                    new TypeToken<List<FormLocation>>() {
-                    }.getType());
+
+            String entireTreeString = getEntireTree(entireTree);
 
             return new Pair<>(entireTreeString, new ArrayList<>(defaultLocation));
         } else {
@@ -193,6 +191,11 @@ public class BaseDrawerPresenter implements BaseDrawerContract.Presenter {
         }
     }
 
+    public String getEntireTree(List<FormLocation> entireTree) {
+        return AssetHandler.javaToJsonString(entireTree,
+                new TypeToken<List<FormLocation>>() {
+                }.getType());
+    }
 
     @Override
     public void onOperationalAreaSelectorClicked(ArrayList<String> name) {
