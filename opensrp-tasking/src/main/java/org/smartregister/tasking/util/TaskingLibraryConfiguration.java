@@ -11,22 +11,29 @@ import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.json.JSONObject;
-import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.clientandeventmodel.Event;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.Task;
+import org.smartregister.tasking.activity.TaskingHomeActivity;
 import org.smartregister.tasking.adapter.TaskRegisterAdapter;
 import org.smartregister.tasking.configuration.TaskRegisterV1Configuration;
 import org.smartregister.tasking.contract.BaseContract;
 import org.smartregister.tasking.contract.BaseDrawerContract;
 import org.smartregister.tasking.contract.BaseFormFragmentContract;
+import org.smartregister.tasking.contract.TaskingHomeActivityContract;
+import org.smartregister.tasking.layer.DigitalGlobeLayer;
 import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.model.CardDetails;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
+import org.smartregister.tasking.repository.TaskingMappingHelper;
 import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
 import org.smartregister.util.AppExecutors;
 
@@ -55,7 +62,6 @@ public abstract class TaskingLibraryConfiguration {
     public abstract int getResolveLocationTimeoutInSeconds();
 
     public abstract String getAdminPasswordNotNearStructures();
-
 
     public abstract boolean isFocusInvestigation();
 
@@ -127,7 +133,7 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract void saveJsonForm(BaseContract.BaseInteractor baseInteractor, String json);
 
-    public abstract  void openFilterActivity(Activity activity, TaskFilterParams filterParams);
+    public abstract void openFilterActivity(Activity activity, TaskFilterParams filterParams);
 
     public abstract void openFamilyProfile(Activity activity, CommonPersonObjectClient family, BaseTaskDetails taskDetails);
 
@@ -150,6 +156,60 @@ public abstract class TaskingLibraryConfiguration {
     public abstract void showTasksCompleteActionView(TextView actionView);
 
     public abstract Map<String, Object> getServerConfigs();
+
+    public abstract TaskingJsonFormUtils getJsonFormUtils();
+
+    public abstract TaskingMappingHelper getMappingHelper();
+
+    public abstract TaskingMapHelper getMapHelper();
+
+    public abstract boolean isRefreshMapOnEventSaved();
+
+    public abstract void setRefreshMapOnEventSaved(boolean isRefreshMapOnEventSaved);
+
+    public abstract void setFeatureCollection(FeatureCollection featureCollection);
+
+    public abstract DigitalGlobeLayer getDigitalGlobeLayer();
+
+    public abstract List<String> getFacilityLevels();
+
+    public abstract List<String> getLocationLevels();
+
+    public abstract ActivityConfiguration getActivityConfiguration();
+
+    public abstract void registerFamily(Feature selectedFeature);
+
+    public abstract void openTaskRegister(TaskFilterParams filterParams, TaskingHomeActivity taskingHomeActivity);
+
+    public abstract boolean isCompassEnabled();
+
+    public abstract boolean showCurrentLocationButton();
+
+    public abstract boolean disableMyLocationOnMapMove();
+
+    public abstract Boolean getDrawOperationalAreaBoundaryAndLabel();
+
+    public abstract GeoJsonUtils getGeoJsonUtils();
+
+    public abstract String getProvinceFromTreeDialogValue(List<String> name);
+
+    public abstract String getDistrictFromTreeDialogValue(List<String> name);
+
+    public abstract void onShowFilledForms();
+
+    public abstract void onFeatureSelectedByLongClick(Feature feature, TaskingHomeActivityContract.Presenter taskingHomePresenter);
+
+    public abstract void onFeatureSelectedByClick(Feature feature, TaskingHomeActivityContract.Presenter taskingHomePresenter);
+
+    public abstract double getOnClickMaxZoomLevel();
+
+    public abstract void fetchPlans(String jurisdictionName, BaseDrawerContract.Presenter presenter);
+
+    public abstract void validateCurrentPlan(String selectedOperationalArea, String currentPlanId, BaseDrawerContract.Presenter presenter);
+
+    public abstract void setFacility(List<String> defaultLocation, BaseDrawerContract.View view);
+
+    public abstract void openFilterTaskActivity(TaskFilterParams filterParams, TaskingHomeActivity activity);
 
     public TaskRegisterConfiguration getTasksRegisterConfiguration(){
         if (taskRegisterConfiguration == null) {

@@ -7,7 +7,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.0'
+        classpath 'com.android.tools.build:gradle:4.0.2'
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:2.8.3'
         classpath 'org.smartregister:gradle-jarjar-plugin:1.0.0-SNAPSHOT'
     }
@@ -31,7 +31,12 @@ android {
         targetSdkVersion androidTargetSdkVersion
         versionCode 1
         versionName "1.0"
-
+        buildConfigField "int", "DATABASE_VERSION", '1'
+        buildConfigField "boolean", "DISPLAY_DISTANCE_SCALE", 'true'
+        buildConfigField "String[]", "ALLOWED_LEVELS", '{"Health Facility", "Facility"}'
+        buildConfigField "String", "DEFAULT_LOCATION_LEVEL", '"Health Facility"'
+        buildConfigField "String[]", "FACILITY_LEVELS", '{"Country", "Region", "District"}'
+        buildConfigField "String[]", "LOCATION_LEVELS", '{"Country", "Region", "District", "Commune"}'
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -63,7 +68,7 @@ android {
 
 dependencies {
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.9'
-    implementation (project(":opensrp-tasking")) {
+    implementation(project(":opensrp-tasking")) {
         transitive true
         exclude group: 'com.ibm.fhir', module: 'fhir-model'
     }

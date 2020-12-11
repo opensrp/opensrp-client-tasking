@@ -294,7 +294,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
                 R.string.choose_action, R.string.view_details, R.string.undo, new Dialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        switch (which){
+                        switch (which) {
                             case BUTTON_POSITIVE:
                                 getPresenter().onTaskSelected(details, view.getId() == R.id.task_action);
                                 break;
@@ -307,7 +307,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
                         dialog.dismiss();
                     }
 
-         } );
+                });
     }
 
     public void displayResetTaskInfoDialog(TaskDetails details) {
@@ -383,14 +383,17 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
 
     @Override
     public void onDestroy() {
-        getPresenter().onDestroy();
+        if (getPresenter() != null) {
+            getPresenter().onDestroy();
+        }
         super.onDestroy();
     }
 
     @Override
     public void onDrawerClosed() {
-        getPresenter().onDrawerClosed();
-
+        if (getPresenter() != null) {
+            getPresenter().onDrawerClosed();
+        }
     }
 
     @Override
@@ -569,13 +572,12 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
     }
 
     private void openIndicatorsCardView() {
-
         setViewVisibility(indicatorsCardView, true);
     }
 
-
     private void setViewVisibility(View view, boolean isVisible) {
-        view.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+        if (view != null) {
+            view.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+        }
     }
-
 }

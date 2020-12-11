@@ -2,10 +2,12 @@ package org.smartregister.tasking.model;
 
 import androidx.annotation.NonNull;
 
+import java.io.Serializable;
+
 /**
  * Created by samuelgithengi on 4/11/19.
  */
-public class BaseTaskDetails {
+public class BaseTaskDetails implements Serializable {
 
     private String taskId;
 
