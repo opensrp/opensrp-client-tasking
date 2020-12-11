@@ -34,7 +34,6 @@ import org.smartregister.tasking.model.CardDetails;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.tasking.repository.TaskingMappingHelper;
-import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
 import org.smartregister.util.AppExecutors;
 
 import java.util.List;
@@ -187,7 +186,7 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract boolean disableMyLocationOnMapMove();
 
-    public abstract Boolean getDrawOperationalAreaBoundaryAndLabel();
+    public abstract boolean getDrawOperationalAreaBoundaryAndLabel();
 
     public abstract GeoJsonUtils getGeoJsonUtils();
 

@@ -50,7 +50,7 @@ public class TaskingRepository extends BaseRepository {
     }
 
     protected String getStructureNamesSelect(String mainCondition) {
-        return "";
+        return "SELECT * FROM structure ";
     }
 
 

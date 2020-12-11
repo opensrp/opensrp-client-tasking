@@ -420,7 +420,7 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
                     mMapboxMap.setCameraPosition(cameraPosition);
                 }
 
-                Boolean drawOperationalAreaBoundaryAndLabel = getDrawOperationalAreaBoundaryAndLabel();
+                boolean drawOperationalAreaBoundaryAndLabel = getDrawOperationalAreaBoundaryAndLabel();
                 if (drawOperationalAreaBoundaryAndLabel) {
                     if (boundaryLayer == null) {
                         boundaryLayer = createBoundaryLayer(operationalArea);
@@ -447,7 +447,7 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
         }
     }
 
-    private Boolean getDrawOperationalAreaBoundaryAndLabel() {
+    private boolean getDrawOperationalAreaBoundaryAndLabel() {
         return taskingLibraryConfiguration.getDrawOperationalAreaBoundaryAndLabel();
     }
 
@@ -613,7 +613,9 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
         super.onResume();
         formOpening = false;
         SyncStatusBroadcastReceiver.getInstance().addSyncStatusListener(this);
-        ValidateAssignmentReceiver.getInstance().addListener(this);
+        if (ValidateAssignmentReceiver.getInstance() != null) {
+            ValidateAssignmentReceiver.getInstance().addListener(this);
+        }
         IntentFilter filter = new IntentFilter(TaskingConstants.Action.STRUCTURE_TASK_SYNCED);
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(refreshGeowidgetReceiver, filter);
         IntentFilter syncProgressFilter = new IntentFilter(AllConstants.SyncProgressConstants.ACTION_SYNC_PROGRESS);

@@ -382,8 +382,8 @@ public class DefaultTaskingLibraryConfiguration extends TaskingLibraryConfigurat
     }
 
     @Override
-    public Boolean getDrawOperationalAreaBoundaryAndLabel() {
-        return null;
+    public boolean getDrawOperationalAreaBoundaryAndLabel() {
+        return false;
     }
 
     @Override

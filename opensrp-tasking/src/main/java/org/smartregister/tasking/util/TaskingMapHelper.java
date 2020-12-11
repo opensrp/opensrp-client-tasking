@@ -223,8 +223,8 @@ public class TaskingMapHelper {
         BaseLayerSwitcherPlugin baseLayerSwitcherPlugin = new BaseLayerSwitcherPlugin(kujakuMapView, style);
         DigitalGlobeLayer digitalGlobeLayer = TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getDigitalGlobeLayer();
         MapBoxLayer mapBoxLayer = new MapBoxLayer();
-        baseLayerSwitcherPlugin.addBaseLayer(digitalGlobeLayer, true);
-        baseLayerSwitcherPlugin.addBaseLayer(mapBoxLayer, false);
+        baseLayerSwitcherPlugin.addBaseLayer(digitalGlobeLayer, false);
+        baseLayerSwitcherPlugin.addBaseLayer(mapBoxLayer, true);
         kujakuMapView.getMbTilesHelper().setMBTileLayers(context, baseLayerSwitcherPlugin);
         baseLayerSwitcherPlugin.show();
     }
