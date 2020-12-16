@@ -55,10 +55,10 @@ import org.smartregister.receiver.ValidateAssignmentReceiver;
 import org.smartregister.tasking.BaseUnitTest;
 import org.smartregister.tasking.R;
 import org.smartregister.tasking.TaskingLibrary;
-import org.smartregister.tasking.activity.TaskingHomeActivity;
+import org.smartregister.tasking.activity.TaskingMapActivity;
 import org.smartregister.tasking.contract.BaseDrawerContract;
 import org.smartregister.tasking.model.TaskFilterParams;
-import org.smartregister.tasking.presenter.TaskingHomePresenter;
+import org.smartregister.tasking.presenter.TaskingMapPresenter;
 import org.smartregister.tasking.presenter.ValidateUserLocationPresenter;
 import org.smartregister.tasking.util.CardDetailsUtil;
 import org.smartregister.tasking.util.TaskingJsonFormUtils;
@@ -108,12 +108,12 @@ import static org.smartregister.tasking.util.TaskingConstants.RequestCode.REQUES
 /**
  * Created by samuelgithengi on 1/23/20.
  */
-public class TaskingHomeActivityTest extends BaseUnitTest {
+public class TaskingMapActivityTest extends BaseUnitTest {
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
-    private TaskingHomeActivity taskingHomeActivity;
+    private TaskingMapActivity taskingMapActivity;
 
     private android.content.Context context = RuntimeEnvironment.application;
 
@@ -122,7 +122,7 @@ public class TaskingHomeActivityTest extends BaseUnitTest {
     private ImageButton layerSwitcherFab = new ImageButton(context);
 
     @Mock
-    private TaskingHomePresenter taskingHomePresenter;
+    private TaskingMapPresenter taskingMapPresenter;
 
     @Mock
     private TaskingMapHelper taskingMapHelper;
@@ -171,96 +171,96 @@ public class TaskingHomeActivityTest extends BaseUnitTest {
     @Before
     public void setUp() {
         Context.bindtypes = new ArrayList<>();
-        taskingHomeActivity = Robolectric.buildActivity(TaskingHomeActivity.class).create().get();
+        taskingMapActivity = Robolectric.buildActivity(TaskingMapActivity.class).create().get();
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         params.topMargin = 30;
         myLocationButton.setLayoutParams(params);
-        Whitebox.setInternalState(taskingHomeActivity, "myLocationButton", myLocationButton);
-        Whitebox.setInternalState(taskingHomeActivity, "cardDetailsUtil", cardDetailsUtil);
+        Whitebox.setInternalState(taskingMapActivity, "myLocationButton", myLocationButton);
+        Whitebox.setInternalState(taskingMapActivity, "cardDetailsUtil", cardDetailsUtil);
 
         taskingLibraryConfiguration = spy(TaskingLibrary.getInstance().getTaskingLibraryConfiguration());
-        Whitebox.setInternalState(taskingHomeActivity, "taskingLibraryConfiguration", taskingLibraryConfiguration);
+        Whitebox.setInternalState(taskingMapActivity, "taskingLibraryConfiguration", taskingLibraryConfiguration);
         ReflectionHelpers.setStaticField(ValidateAssignmentReceiver.class, "instance", validateAssignmentReceiver);
     }
 
 
     @Test
     public void testOnCreate() {
-        assertNotNull(Robolectric.buildActivity(TaskingHomeActivity.class).create().get());
+        assertNotNull(Robolectric.buildActivity(TaskingMapActivity.class).create().get());
     }
 
 
 //    @Test
 //    public void testCloseSprayCardView() {
-//        View sprayCardView = taskingHomeActivity.findViewById(R.id.spray_card_view);
+//        View sprayCardView = taskingMapActivity.findViewById(R.id.spray_card_view);
 //        sprayCardView.setVisibility(VISIBLE);
-//        taskingHomeActivity.closeCardView(R.id.btn_collapse_spray_card_view);
+//        taskingMapActivity.closeCardView(R.id.btn_collapse_spray_card_view);
 //        assertEquals(GONE, sprayCardView.getVisibility());
 //    }
 //
 //    @Test
 //    public void testCloseMosquitoCardView() {
-//        View cardView = taskingHomeActivity.findViewById(R.id.mosquito_collection_card_view);
+//        View cardView = taskingMapActivity.findViewById(R.id.mosquito_collection_card_view);
 //        cardView.setVisibility(VISIBLE);
-//        taskingHomeActivity.closeCardView(R.id.btn_collapse_mosquito_collection_card_view);
+//        taskingMapActivity.closeCardView(R.id.btn_collapse_mosquito_collection_card_view);
 //        assertEquals(GONE, cardView.getVisibility());
 //    }
 //
 //
 //    @Test
 //    public void testCloseCardLarvalCardView() {
-//        View cardView = taskingHomeActivity.findViewById(R.id.larval_breeding_card_view);
+//        View cardView = taskingMapActivity.findViewById(R.id.larval_breeding_card_view);
 //        cardView.setVisibility(VISIBLE);
-//        taskingHomeActivity.closeCardView(R.id.btn_collapse_larval_breeding_card_view);
+//        taskingMapActivity.closeCardView(R.id.btn_collapse_larval_breeding_card_view);
 //        assertEquals(GONE, cardView.getVisibility());
 //    }
 //
 //    @Test
 //    public void testClosePAOTCardView() {
-//        View cardView = taskingHomeActivity.findViewById(R.id.potential_area_of_transmission_card_view);
+//        View cardView = taskingMapActivity.findViewById(R.id.potential_area_of_transmission_card_view);
 //        cardView.setVisibility(VISIBLE);
-//        taskingHomeActivity.closeCardView(R.id.btn_collapse_paot_card_view);
+//        taskingMapActivity.closeCardView(R.id.btn_collapse_paot_card_view);
 //        assertEquals(GONE, cardView.getVisibility());
 //    }
 //
 //    @Test
 //    public void testCloseIndicatorsCardView() {
-//        View cardView = taskingHomeActivity.findViewById(R.id.indicators_card_view);
+//        View cardView = taskingMapActivity.findViewById(R.id.indicators_card_view);
 //        cardView.setVisibility(VISIBLE);
-//        taskingHomeActivity.closeCardView(R.id.btn_collapse_indicators_card_view);
+//        taskingMapActivity.closeCardView(R.id.btn_collapse_indicators_card_view);
 //        assertEquals(GONE, cardView.getVisibility());
 //    }
 //
 //    @Test
 //    public void testCloseVerificationCardView() {
-//        View cardView = taskingHomeActivity.findViewById(R.id.irs_verification_card_view);
+//        View cardView = taskingMapActivity.findViewById(R.id.irs_verification_card_view);
 //        cardView.setVisibility(VISIBLE);
-//        taskingHomeActivity.closeCardView(R.id.btn_collapse_irs_verification_card_view);
+//        taskingMapActivity.closeCardView(R.id.btn_collapse_irs_verification_card_view);
 //        assertEquals(GONE, cardView.getVisibility());
 //    }
 //
 //
 //    @Test
 //    public void testCloseAllCardViews() {
-//        taskingHomeActivity.findViewById(R.id.spray_card_view).setVisibility(VISIBLE);
-//        taskingHomeActivity.findViewById(R.id.mosquito_collection_card_view).setVisibility(VISIBLE);
-//        taskingHomeActivity.findViewById(R.id.larval_breeding_card_view).setVisibility(VISIBLE);
-//        taskingHomeActivity.findViewById(R.id.potential_area_of_transmission_card_view).setVisibility(VISIBLE);
-//        taskingHomeActivity.findViewById(R.id.indicators_card_view).setVisibility(VISIBLE);
-//        taskingHomeActivity.findViewById(R.id.irs_verification_card_view).setVisibility(VISIBLE);
-//        taskingHomeActivity.closeAllCardViews();
-//        assertEquals(GONE, taskingHomeActivity.findViewById(R.id.spray_card_view).getVisibility());
-//        assertEquals(GONE, taskingHomeActivity.findViewById(R.id.mosquito_collection_card_view).getVisibility());
-//        assertEquals(GONE, taskingHomeActivity.findViewById(R.id.larval_breeding_card_view).getVisibility());
-//        assertEquals(GONE, taskingHomeActivity.findViewById(R.id.potential_area_of_transmission_card_view).getVisibility());
-//        assertEquals(GONE, taskingHomeActivity.findViewById(R.id.indicators_card_view).getVisibility());
-//        assertEquals(GONE, taskingHomeActivity.findViewById(R.id.irs_verification_card_view).getVisibility());
+//        taskingMapActivity.findViewById(R.id.spray_card_view).setVisibility(VISIBLE);
+//        taskingMapActivity.findViewById(R.id.mosquito_collection_card_view).setVisibility(VISIBLE);
+//        taskingMapActivity.findViewById(R.id.larval_breeding_card_view).setVisibility(VISIBLE);
+//        taskingMapActivity.findViewById(R.id.potential_area_of_transmission_card_view).setVisibility(VISIBLE);
+//        taskingMapActivity.findViewById(R.id.indicators_card_view).setVisibility(VISIBLE);
+//        taskingMapActivity.findViewById(R.id.irs_verification_card_view).setVisibility(VISIBLE);
+//        taskingMapActivity.closeAllCardViews();
+//        assertEquals(GONE, taskingMapActivity.findViewById(R.id.spray_card_view).getVisibility());
+//        assertEquals(GONE, taskingMapActivity.findViewById(R.id.mosquito_collection_card_view).getVisibility());
+//        assertEquals(GONE, taskingMapActivity.findViewById(R.id.larval_breeding_card_view).getVisibility());
+//        assertEquals(GONE, taskingMapActivity.findViewById(R.id.potential_area_of_transmission_card_view).getVisibility());
+//        assertEquals(GONE, taskingMapActivity.findViewById(R.id.indicators_card_view).getVisibility());
+//        assertEquals(GONE, taskingMapActivity.findViewById(R.id.irs_verification_card_view).getVisibility());
 //    }
 
     @Test
     public void testPositionMyLocation() {
-        taskingHomeActivity = spy(taskingHomeActivity);
-        taskingHomeActivity.positionMyLocationAndLayerSwitcher();
+        taskingMapActivity = spy(taskingMapActivity);
+        taskingMapActivity.positionMyLocationAndLayerSwitcher();
         FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) myLocationButton.getLayoutParams();
         assertEquals(0, layoutParams.topMargin);
         assertEquals(30, layoutParams.bottomMargin);
@@ -270,10 +270,10 @@ public class TaskingHomeActivityTest extends BaseUnitTest {
     //
 //    @Test
 //    public void testPositionMyLocationZambia() {
-//        taskingHomeActivity = spy(taskingHomeActivity);
-//        when(taskingHomeActivity.getBuildCountry()).thenReturn(Country.ZAMBIA);
-//        Whitebox.setInternalState(taskingHomeActivity, "myLocationButton", myLocationButton);
-//        taskingHomeActivity.positionMyLocationAndLayerSwitcher();
+//        taskingMapActivity = spy(taskingMapActivity);
+//        when(taskingMapActivity.getBuildCountry()).thenReturn(Country.ZAMBIA);
+//        Whitebox.setInternalState(taskingMapActivity, "myLocationButton", myLocationButton);
+//        taskingMapActivity.positionMyLocationAndLayerSwitcher();
 //        FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) myLocationButton.getLayoutParams();
 //        assertEquals(0, layoutParams.topMargin);
 //        int progressHeight = context.getResources().getDimensionPixelSize(R.dimen.progress_height);
@@ -284,103 +284,103 @@ public class TaskingHomeActivityTest extends BaseUnitTest {
 //
     @Test
     public void testOpenFilterTaskActivity() {
-        taskingHomeActivity.findViewById(R.id.filter_tasks_fab).performClick();
-        verify(taskingLibraryConfiguration).openFilterTaskActivity(isNull(), any(TaskingHomeActivity.class));
+        taskingMapActivity.findViewById(R.id.filter_tasks_fab).performClick();
+        verify(taskingLibraryConfiguration).openFilterTaskActivity(isNull(), any(TaskingMapActivity.class));
     }
 
 
     @Test
     public void testOpenTaskRegister() {
-        taskingHomeActivity.findViewById(R.id.task_register).performClick();
-        verify(taskingLibraryConfiguration).openTaskRegister(isNull(), any(TaskingHomeActivity.class));
+        taskingMapActivity.findViewById(R.id.task_register).performClick();
+        verify(taskingLibraryConfiguration).openTaskRegister(isNull(), any(TaskingMapActivity.class));
     }
 
 
     @Test
     public void testOnAddStructure() {
-        Whitebox.setInternalState(taskingHomeActivity, "taskingHomePresenter", taskingHomePresenter);
-        Whitebox.setInternalState(taskingHomeActivity, "mapHelper", taskingMapHelper);
-        taskingHomeActivity.findViewById(R.id.btn_add_structure).performClick();
-        verify(taskingHomePresenter).onAddStructureClicked(false);
+        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
+        Whitebox.setInternalState(taskingMapActivity, "mapHelper", taskingMapHelper);
+        taskingMapActivity.findViewById(R.id.btn_add_structure).performClick();
+        verify(taskingMapPresenter).onAddStructureClicked(false);
         verify(taskingMapHelper).isMyLocationComponentActive(any(), any());
     }
 
 //    @Test
 //    public void testOnChangeSprayStatus() {
-//        Whitebox.setInternalState(taskingHomeActivity, "taskingHomePresenter", taskingHomePresenter);
-//        taskingHomeActivity.findViewById(R.id.change_spray_status).performClick();
-//        verify(taskingHomePresenter).onChangeInterventionStatus(Intervention.IRS);
+//        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
+//        taskingMapActivity.findViewById(R.id.change_spray_status).performClick();
+//        verify(taskingMapPresenter).onChangeInterventionStatus(Intervention.IRS);
 //    }
 //
 //
 //    @Test
 //    public void testRecordMosquitoCollection() {
-//        Whitebox.setInternalState(taskingHomeActivity, "taskingHomePresenter", taskingHomePresenter);
-//        taskingHomeActivity.findViewById(R.id.btn_record_mosquito_collection).performClick();
-//        verify(taskingHomePresenter).onChangeInterventionStatus(Intervention.MOSQUITO_COLLECTION);
+//        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
+//        taskingMapActivity.findViewById(R.id.btn_record_mosquito_collection).performClick();
+//        verify(taskingMapPresenter).onChangeInterventionStatus(Intervention.MOSQUITO_COLLECTION);
 //    }
 //
 //
 //    @Test
 //    public void testRecordLarvalDipping() {
-//        Whitebox.setInternalState(taskingHomeActivity, "taskingHomePresenter", taskingHomePresenter);
-//        taskingHomeActivity.findViewById(R.id.btn_record_larval_dipping).performClick();
-//        verify(taskingHomePresenter).onChangeInterventionStatus(Intervention.LARVAL_DIPPING);
+//        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
+//        taskingMapActivity.findViewById(R.id.btn_record_larval_dipping).performClick();
+//        verify(taskingMapPresenter).onChangeInterventionStatus(Intervention.LARVAL_DIPPING);
 //    }
 //
 //    @Test
 //    public void testEditPAOTDetails() {
-//        Whitebox.setInternalState(taskingHomeActivity, "taskingHomePresenter", taskingHomePresenter);
-//        taskingHomeActivity.findViewById(R.id.btn_edit_paot_details).performClick();
-//        verify(taskingHomePresenter).onChangeInterventionStatus(Intervention.PAOT);
+//        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
+//        taskingMapActivity.findViewById(R.id.btn_edit_paot_details).performClick();
+//        verify(taskingMapPresenter).onChangeInterventionStatus(Intervention.PAOT);
 //    }
 //
 //    @Test
 //    public void testCloseCardView() {
 //
-//        taskingHomeActivity.findViewById(R.id.btn_collapse_spray_card_view).performClick();
-//        assertEquals(GONE, taskingHomeActivity.findViewById(R.id.spray_card_view).getVisibility());
+//        taskingMapActivity.findViewById(R.id.btn_collapse_spray_card_view).performClick();
+//        assertEquals(GONE, taskingMapActivity.findViewById(R.id.spray_card_view).getVisibility());
 //    }
 //
 //    @Test
 //    public void testOtherCardView() {
-//        taskingHomeActivity.findViewById(R.id.btn_collapse_mosquito_collection_card_view).performClick();
-//        assertEquals(GONE, taskingHomeActivity.findViewById(R.id.mosquito_collection_card_view).getVisibility());
+//        taskingMapActivity.findViewById(R.id.btn_collapse_mosquito_collection_card_view).performClick();
+//        assertEquals(GONE, taskingMapActivity.findViewById(R.id.mosquito_collection_card_view).getVisibility());
 //    }
 
     @Test
     public void testOpenDrawerMenu() {
-        Whitebox.setInternalState(taskingHomeActivity, "drawerView", drawerView);
-        taskingHomeActivity.findViewById(R.id.drawerMenu).performClick();
+        Whitebox.setInternalState(taskingMapActivity, "drawerView", drawerView);
+        taskingMapActivity.findViewById(R.id.drawerMenu).performClick();
         verify(drawerView).openDrawerLayout();
     }
 
     @Test
     public void testOpenIndicators() {
-        assertEquals(GONE, taskingHomeActivity.findViewById(R.id.indicators_card_view).getVisibility());
-        taskingHomeActivity.findViewById(R.id.progressIndicatorsGroupView).performClick();
-        assertEquals(VISIBLE, taskingHomeActivity.findViewById(R.id.indicators_card_view).getVisibility());
+        assertEquals(GONE, taskingMapActivity.findViewById(R.id.indicators_card_view).getVisibility());
+        taskingMapActivity.findViewById(R.id.progressIndicatorsGroupView).performClick();
+        assertEquals(VISIBLE, taskingMapActivity.findViewById(R.id.indicators_card_view).getVisibility());
     }
 
 //    @Test
 //    public void testRegisterFamily() {
-//        Whitebox.setInternalState(taskingHomeActivity, "taskingHomePresenter", taskingHomePresenter);
-//        when(taskingHomePresenter.getSelectedFeature()).thenReturn(feature);
-//        taskingHomeActivity.findViewById(R.id.register_family).performClick();
-//        Intent startedIntent = shadowOf(taskingHomeActivity).getNextStartedActivity();
+//        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
+//        when(taskingMapPresenter.getSelectedFeature()).thenReturn(feature);
+//        taskingMapActivity.findViewById(R.id.register_family).performClick();
+//        Intent startedIntent = shadowOf(taskingMapActivity).getNextStartedActivity();
 //        assertEquals(FamilyRegisterActivity.class, shadowOf(startedIntent).getIntentClass());
-//        assertEquals(GONE, taskingHomeActivity.findViewById(R.id.spray_card_view).getVisibility());
+//        assertEquals(GONE, taskingMapActivity.findViewById(R.id.spray_card_view).getVisibility());
 //        assertTrue(startedIntent.hasExtra(TASK_IDENTIFIER));
 //    }
 //
 //
 //    @Test
 //    public void testOpenStructureProfile() {
-//        Whitebox.setInternalState(taskingHomeActivity, "taskingHomePresenter", taskingHomePresenter);
-//        when(taskingHomePresenter.getSelectedFeature()).thenReturn(feature);
+//        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
+//        when(taskingMapPresenter.getSelectedFeature()).thenReturn(feature);
 //        CommonPersonObjectClient client = TestingUtils.getCommonPersonObjectClient();
-//        taskingHomeActivity.openStructureProfile(client);
-//        Intent startedIntent = shadowOf(taskingHomeActivity).getNextStartedActivity();
+//        taskingMapActivity.openStructureProfile(client);
+//        Intent startedIntent = shadowOf(taskingMapActivity).getNextStartedActivity();
 //        assertEquals(FamilyProfileActivity.class, shadowOf(startedIntent).getIntentClass());
 //        assertEquals(client.getColumnmaps().get(FIRST_NAME), startedIntent.getStringExtra(INTENT_KEY.FAMILY_NAME));
 //        assertEquals(client.getCaseId(), startedIntent.getStringExtra(INTENT_KEY.FAMILY_BASE_ENTITY_ID));
@@ -391,9 +391,9 @@ public class TaskingHomeActivityTest extends BaseUnitTest {
 
     @Test
     public void testSetGeoJsonSourceWithNullOperationalArea() {
-        Whitebox.setInternalState(taskingHomeActivity, "geoJsonSource", geoJsonSource);
+        Whitebox.setInternalState(taskingMapActivity, "geoJsonSource", geoJsonSource);
         FeatureCollection featureCollection = FeatureCollection.fromFeature(feature);
-        taskingHomeActivity.setGeoJsonSource(featureCollection, null, true);
+        taskingMapActivity.setGeoJsonSource(featureCollection, null, true);
         verify(geoJsonSource).setGeoJson(featureCollection);
         verifyZeroInteractions(mMapboxMap);
     }
@@ -401,23 +401,23 @@ public class TaskingHomeActivityTest extends BaseUnitTest {
 
     @Test
     public void testSetGeoJsonSource() {
-        Whitebox.setInternalState(taskingHomeActivity, "taskingHomePresenter", taskingHomePresenter);
-        Whitebox.setInternalState(taskingHomeActivity, "mMapboxMap", mMapboxMap);
-        Whitebox.setInternalState(taskingHomeActivity, "geoJsonSource", geoJsonSource);
-        Whitebox.setInternalState(taskingHomeActivity, "kujakuMapView", kujakuMapView);
-        Whitebox.setInternalState(taskingHomeActivity, "mapHelper", taskingMapHelper);
+        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
+        Whitebox.setInternalState(taskingMapActivity, "mMapboxMap", mMapboxMap);
+        Whitebox.setInternalState(taskingMapActivity, "geoJsonSource", geoJsonSource);
+        Whitebox.setInternalState(taskingMapActivity, "kujakuMapView", kujakuMapView);
+        Whitebox.setInternalState(taskingMapActivity, "mapHelper", taskingMapHelper);
         Feature operationalArea = mock(Feature.class);
         doReturn(mock(Geometry.class)).when(operationalArea).geometry();
 
         CameraPosition cameraPosition = new CameraPosition.Builder().build();
         when(mMapboxMap.getCameraForGeometry(operationalArea.geometry())).thenReturn(cameraPosition);
-        when(taskingHomePresenter.getInterventionLabel()).thenReturn(R.string.focus_investigation);
+        when(taskingMapPresenter.getInterventionLabel()).thenReturn(R.string.focus_investigation);
         FeatureCollection featureCollection = FeatureCollection.fromFeature(feature);
-        taskingHomeActivity.setGeoJsonSource(featureCollection, operationalArea, true);
+        taskingMapActivity.setGeoJsonSource(featureCollection, operationalArea, true);
         verify(geoJsonSource).setGeoJson(featureCollection);
         verify(mMapboxMap).setCameraPosition(cameraPosition);
         verify(kujakuMapView).addLayer(boundaryLayerArgumentCaptor.capture());
-        verify(taskingMapHelper).addIndexCaseLayers(mMapboxMap, taskingHomeActivity, featureCollection);
+        verify(taskingMapHelper).addIndexCaseLayers(mMapboxMap, taskingMapActivity, featureCollection);
         assertEquals(FeatureCollection.fromFeature(operationalArea), boundaryLayerArgumentCaptor.getValue().getFeatureCollection());
         assertEquals(2, boundaryLayerArgumentCaptor.getValue().getLayerIds().length);
     }
@@ -425,50 +425,50 @@ public class TaskingHomeActivityTest extends BaseUnitTest {
 
     @Test
     public void testSetGeoJsonSourceSetsCameraOnIndexCase() {
-        Whitebox.setInternalState(taskingHomeActivity, "taskingHomePresenter", taskingHomePresenter);
-        Whitebox.setInternalState(taskingHomeActivity, "mMapboxMap", mMapboxMap);
-        Whitebox.setInternalState(taskingHomeActivity, "geoJsonSource", geoJsonSource);
-        Whitebox.setInternalState(taskingHomeActivity, "kujakuMapView", kujakuMapView);
-        Whitebox.setInternalState(taskingHomeActivity, "mapHelper", taskingMapHelper);
+        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
+        Whitebox.setInternalState(taskingMapActivity, "mMapboxMap", mMapboxMap);
+        Whitebox.setInternalState(taskingMapActivity, "geoJsonSource", geoJsonSource);
+        Whitebox.setInternalState(taskingMapActivity, "kujakuMapView", kujakuMapView);
+        Whitebox.setInternalState(taskingMapActivity, "mapHelper", taskingMapHelper);
         Feature indexCase = Feature.fromJson("{\"type\":\"Feature\",\"id\":\"000c99d7\",\"geometry\":{\"type\":\"Point\",\"coordinates\":[28.821878,-10.203831]}}");
         FeatureCollection featureCollection = FeatureCollection.fromFeature(feature);
         CameraPosition cameraPosition = new CameraPosition.Builder().zoom(18.5).build();
         when(mMapboxMap.getCameraPosition()).thenReturn(cameraPosition);
         when(taskingMapHelper.getIndexCase(featureCollection)).thenReturn(indexCase);
-        when(taskingHomePresenter.getInterventionLabel()).thenReturn(R.string.focus_investigation);
-        taskingHomeActivity.setGeoJsonSource(featureCollection, mock(Feature.class), true);
+        when(taskingMapPresenter.getInterventionLabel()).thenReturn(R.string.focus_investigation);
+        taskingMapActivity.setGeoJsonSource(featureCollection, mock(Feature.class), true);
         verify(geoJsonSource).setGeoJson(featureCollection);
         verify(mMapboxMap).setCameraPosition(cameraPositionArgumentCaptor.capture());
         verify(kujakuMapView).addLayer(boundaryLayerArgumentCaptor.capture());
-        verify(taskingMapHelper).addIndexCaseLayers(mMapboxMap, taskingHomeActivity, featureCollection);
+        verify(taskingMapHelper).addIndexCaseLayers(mMapboxMap, taskingMapActivity, featureCollection);
         assertEquals(28.821878, cameraPositionArgumentCaptor.getValue().target.getLongitude(), 0);
         assertEquals(-10.203831, cameraPositionArgumentCaptor.getValue().target.getLatitude(), 0);
     }
 
     @Test
     public void testSetGeoJsonSourceUpdatesBoundaryLayerAndIndexCaseLayers() throws JSONException {
-        Whitebox.setInternalState(taskingHomeActivity, "taskingHomePresenter", taskingHomePresenter);
-        Whitebox.setInternalState(taskingHomeActivity, "mMapboxMap", mMapboxMap);
-        Whitebox.setInternalState(taskingHomeActivity, "geoJsonSource", geoJsonSource);
-        Whitebox.setInternalState(taskingHomeActivity, "kujakuMapView", kujakuMapView);
-        Whitebox.setInternalState(taskingHomeActivity, "mapHelper", taskingMapHelper);
+        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
+        Whitebox.setInternalState(taskingMapActivity, "mMapboxMap", mMapboxMap);
+        Whitebox.setInternalState(taskingMapActivity, "geoJsonSource", geoJsonSource);
+        Whitebox.setInternalState(taskingMapActivity, "kujakuMapView", kujakuMapView);
+        Whitebox.setInternalState(taskingMapActivity, "mapHelper", taskingMapHelper);
         BoundaryLayer boundaryLayer = mock(BoundaryLayer.class);
-        Whitebox.setInternalState(taskingHomeActivity, "boundaryLayer", boundaryLayer);
+        Whitebox.setInternalState(taskingMapActivity, "boundaryLayer", boundaryLayer);
         Feature operationalArea = mock(Feature.class);
-        when(taskingHomePresenter.getInterventionLabel()).thenReturn(R.string.focus_investigation);
+        when(taskingMapPresenter.getInterventionLabel()).thenReturn(R.string.focus_investigation);
         FeatureCollection featureCollection = FeatureCollection.fromFeature(feature);
         when(taskingMapHelper.getIndexCaseLineLayer()).thenReturn(mock(LineLayer.class));
-        taskingHomeActivity.setGeoJsonSource(featureCollection, operationalArea, true);
+        taskingMapActivity.setGeoJsonSource(featureCollection, operationalArea, true);
         verify(geoJsonSource).setGeoJson(featureCollection);
         verify(boundaryLayer).updateFeatures(FeatureCollection.fromFeature(operationalArea));
-        verify(taskingMapHelper).updateIndexCaseLayers(mMapboxMap, featureCollection, taskingHomeActivity);
+        verify(taskingMapHelper).updateIndexCaseLayers(mMapboxMap, featureCollection, taskingMapActivity);
 
     }
 
 
     @Test
     public void testDisplayNotificationWithArgs() {
-        taskingHomeActivity.displayNotification(R.string.archive_family, R.string.archive_family_failed, "Test");
+        taskingMapActivity.displayNotification(R.string.archive_family, R.string.archive_family_failed, "Test");
         AlertDialog alertDialog = (AlertDialog) ShadowAlertDialog.getLatestDialog();
         assertTrue(alertDialog.isShowing());
         TextView tv = alertDialog.findViewById(android.R.id.message);
@@ -478,7 +478,7 @@ public class TaskingHomeActivityTest extends BaseUnitTest {
 
     @Test
     public void testDisplayNotification() {
-        taskingHomeActivity.displayNotification(R.string.archive_family, R.string.confirm_archive_family);
+        taskingMapActivity.displayNotification(R.string.archive_family, R.string.confirm_archive_family);
         AlertDialog alertDialog = (AlertDialog) ShadowAlertDialog.getLatestDialog();
         assertTrue(alertDialog.isShowing());
         TextView tv = alertDialog.findViewById(android.R.id.message);
@@ -488,132 +488,132 @@ public class TaskingHomeActivityTest extends BaseUnitTest {
 
 //    @Test
 //    public void testOpenSprayCardView() {
-//        assertEquals(GONE, taskingHomeActivity.findViewById(R.id.spray_card_view).getVisibility());
-//        Whitebox.setInternalState(taskingHomeActivity, "cardDetailsUtil", cardDetailsUtil);
+//        assertEquals(GONE, taskingMapActivity.findViewById(R.id.spray_card_view).getVisibility());
+//        Whitebox.setInternalState(taskingMapActivity, "cardDetailsUtil", cardDetailsUtil);
 //        SprayCardDetails cardDetails = mock(SprayCardDetails.class);
-//        taskingHomeActivity.openCardView(cardDetails);
-//        verify(cardDetailsUtil).populateSprayCardTextViews(cardDetails, taskingHomeActivity);
-//        assertEquals(VISIBLE, taskingHomeActivity.findViewById(R.id.spray_card_view).getVisibility());
+//        taskingMapActivity.openCardView(cardDetails);
+//        verify(cardDetailsUtil).populateSprayCardTextViews(cardDetails, taskingMapActivity);
+//        assertEquals(VISIBLE, taskingMapActivity.findViewById(R.id.spray_card_view).getVisibility());
 //    }
 //
 //    @Test
 //    public void testOpenMosquitoCardView() {
 //        MosquitoHarvestCardDetails mosquitoHarvestCardDetails = mock(MosquitoHarvestCardDetails.class);
-//        taskingHomeActivity.openCardView(mosquitoHarvestCardDetails);
-//        verify(cardDetailsUtil).populateAndOpenMosquitoHarvestCard(mosquitoHarvestCardDetails, taskingHomeActivity);
+//        taskingMapActivity.openCardView(mosquitoHarvestCardDetails);
+//        verify(cardDetailsUtil).populateAndOpenMosquitoHarvestCard(mosquitoHarvestCardDetails, taskingMapActivity);
 //    }
 //
 //    @Test
 //    public void testOpenIRSVerificationCardView() {
 //        IRSVerificationCardDetails irsVerificationCardDetails = mock(IRSVerificationCardDetails.class);
-//        taskingHomeActivity.openCardView(irsVerificationCardDetails);
-//        verify(cardDetailsUtil).populateAndOpenIRSVerificationCard(irsVerificationCardDetails, taskingHomeActivity);
+//        taskingMapActivity.openCardView(irsVerificationCardDetails);
+//        verify(cardDetailsUtil).populateAndOpenIRSVerificationCard(irsVerificationCardDetails, taskingMapActivity);
 //    }
 
 //    @Test
 //    public void testOpenFamilyCardView() {
-//        assertEquals(GONE, taskingHomeActivity.findViewById(R.id.spray_card_view).getVisibility());
+//        assertEquals(GONE, taskingMapActivity.findViewById(R.id.spray_card_view).getVisibility());
 //        FamilyCardDetails familyCardDetails = mock(FamilyCardDetails.class);
-//        taskingHomeActivity.openCardView(familyCardDetails);
-//        verify(cardDetailsUtil).populateFamilyCard(familyCardDetails, taskingHomeActivity);
-//        assertEquals(VISIBLE, taskingHomeActivity.findViewById(R.id.spray_card_view).getVisibility());
+//        taskingMapActivity.openCardView(familyCardDetails);
+//        verify(cardDetailsUtil).populateFamilyCard(familyCardDetails, taskingMapActivity);
+//        assertEquals(VISIBLE, taskingMapActivity.findViewById(R.id.spray_card_view).getVisibility());
 //    }
 
     @Test
     public void testStartJsonForm() {
         TaskingJsonFormUtils jsonFormUtils = mock(TaskingJsonFormUtils.class);
-        Whitebox.setInternalState(taskingHomeActivity, "jsonFormUtils", jsonFormUtils);
+        Whitebox.setInternalState(taskingMapActivity, "jsonFormUtils", jsonFormUtils);
         JSONObject form = new JSONObject();
-        taskingHomeActivity.startJsonForm(form);
-        verify(jsonFormUtils).startJsonForm(form, taskingHomeActivity);
+        taskingMapActivity.startJsonForm(form);
+        verify(jsonFormUtils).startJsonForm(form, taskingMapActivity);
     }
 
     @Test
     public void testDisplaySelectedFeature() {
-        Whitebox.setInternalState(taskingHomeActivity, "kujakuMapView", kujakuMapView);
-        Whitebox.setInternalState(taskingHomeActivity, "selectedGeoJsonSource", geoJsonSource);
-        Whitebox.setInternalState(taskingHomeActivity, "mMapboxMap", mMapboxMap);
+        Whitebox.setInternalState(taskingMapActivity, "kujakuMapView", kujakuMapView);
+        Whitebox.setInternalState(taskingMapActivity, "selectedGeoJsonSource", geoJsonSource);
+        Whitebox.setInternalState(taskingMapActivity, "mMapboxMap", mMapboxMap);
         LatLng latLng = new LatLng();
         when(mMapboxMap.getCameraPosition()).thenReturn(new CameraPosition.Builder().zoom(18).build());
-        taskingHomeActivity.displaySelectedFeature(feature, latLng);
+        taskingMapActivity.displaySelectedFeature(feature, latLng);
         verify(kujakuMapView).centerMap(latLng, ANIMATE_TO_LOCATION_DURATION, 18);
         verify(geoJsonSource).setGeoJson(FeatureCollection.fromFeature(feature));
     }
 
     @Test
     public void testClearSelectedFeature() {
-        Whitebox.setInternalState(taskingHomeActivity, "selectedGeoJsonSource", geoJsonSource);
-        taskingHomeActivity.clearSelectedFeature();
+        Whitebox.setInternalState(taskingMapActivity, "selectedGeoJsonSource", geoJsonSource);
+        taskingMapActivity.clearSelectedFeature();
         verify(geoJsonSource).setGeoJson("{\"type\":\"FeatureCollection\",\"features\":[]}");
     }
 
 
     @Test
     public void testOnActivityResultSavesForm() {
-        Whitebox.setInternalState(taskingHomeActivity, "taskingHomePresenter", taskingHomePresenter);
+        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
         Intent intent = new Intent();
         intent.putExtra(JSON_FORM_PARAM_JSON, "{form_data}");
-        taskingHomeActivity.onActivityResultExtended(REQUEST_CODE_GET_JSON, Activity.RESULT_OK, intent);
-        verify(taskingHomePresenter).saveJsonForm("{form_data}");
+        taskingMapActivity.onActivityResultExtended(REQUEST_CODE_GET_JSON, Activity.RESULT_OK, intent);
+        verify(taskingMapPresenter).saveJsonForm("{form_data}");
     }
 
     @Test
     public void testOnActivityResultWaitForUserLocation() {
-        Whitebox.setInternalState(taskingHomeActivity, "taskingHomePresenter", taskingHomePresenter);
-        Whitebox.setInternalState(taskingHomeActivity, "hasRequestedLocation", true);
-        when(taskingHomePresenter.getLocationPresenter()).thenReturn(locationPresenter);
-        taskingHomeActivity.onActivityResultExtended(LOCATION_SETTINGS, Activity.RESULT_OK, null);
+        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
+        Whitebox.setInternalState(taskingMapActivity, "hasRequestedLocation", true);
+        when(taskingMapPresenter.getLocationPresenter()).thenReturn(locationPresenter);
+        taskingMapActivity.onActivityResultExtended(LOCATION_SETTINGS, Activity.RESULT_OK, null);
         verify(locationPresenter).waitForUserLocation();
-        assertFalse(Whitebox.getInternalState(taskingHomeActivity, "hasRequestedLocation"));
+        assertFalse(Whitebox.getInternalState(taskingMapActivity, "hasRequestedLocation"));
     }
 
     @Test
     public void testOnActivityResultWaitForUserLocationCancelled() {
-        Whitebox.setInternalState(taskingHomeActivity, "taskingHomePresenter", taskingHomePresenter);
-        Whitebox.setInternalState(taskingHomeActivity, "hasRequestedLocation", true);
-        when(taskingHomePresenter.getLocationPresenter()).thenReturn(locationPresenter);
-        taskingHomeActivity.onActivityResultExtended(LOCATION_SETTINGS, Activity.RESULT_CANCELED, null);
+        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
+        Whitebox.setInternalState(taskingMapActivity, "hasRequestedLocation", true);
+        when(taskingMapPresenter.getLocationPresenter()).thenReturn(locationPresenter);
+        taskingMapActivity.onActivityResultExtended(LOCATION_SETTINGS, Activity.RESULT_CANCELED, null);
         verify(locationPresenter).onGetUserLocationFailed();
-        assertFalse(Whitebox.getInternalState(taskingHomeActivity, "hasRequestedLocation"));
+        assertFalse(Whitebox.getInternalState(taskingMapActivity, "hasRequestedLocation"));
     }
 
 
     @Test
     public void testOnActivityResultResetFeatures() {
-        Whitebox.setInternalState(taskingHomeActivity, "taskingHomePresenter", taskingHomePresenter);
+        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
         Intent intent = new Intent();
         String id = UUID.randomUUID().toString();
         Task task = TestingUtils.getTask(id);
         intent.putExtra(STRUCTURE_ID, id);
         intent.putExtra(TASK_ID, task);
-        taskingHomeActivity.onActivityResultExtended(REQUEST_CODE_FAMILY_PROFILE, Activity.RESULT_OK, intent);
-        verify(taskingHomePresenter).resetFeatureTasks(id, task);
+        taskingMapActivity.onActivityResultExtended(REQUEST_CODE_FAMILY_PROFILE, Activity.RESULT_OK, intent);
+        verify(taskingMapPresenter).resetFeatureTasks(id, task);
     }
 
     @Test
     public void testOnActivityResultFilterFeatures() {
-        Whitebox.setInternalState(taskingHomeActivity, "taskingHomePresenter", taskingHomePresenter);
+        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
         TaskFilterParams params = new TaskFilterParams("Doe");
         Intent intent = new Intent();
         intent.putExtra(FILTER_SORT_PARAMS, params);
-        taskingHomeActivity.onActivityResultExtended(REQUEST_CODE_FILTER_TASKS, Activity.RESULT_OK, intent);
-        verify(taskingHomePresenter).filterTasks(params);
+        taskingMapActivity.onActivityResultExtended(REQUEST_CODE_FILTER_TASKS, Activity.RESULT_OK, intent);
+        verify(taskingMapPresenter).filterTasks(params);
     }
 
 
     @Test
     public void testOnActivityResultInializeFilterParams() {
-        Whitebox.setInternalState(taskingHomeActivity, "taskingHomePresenter", taskingHomePresenter);
+        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
         TaskFilterParams params = new TaskFilterParams("Doe");
         Intent intent = new Intent();
         intent.putExtra(FILTER_SORT_PARAMS, params);
-        taskingHomeActivity.onActivityResultExtended(REQUEST_CODE_TASK_LISTS, Activity.RESULT_OK, intent);
-        verify(taskingHomePresenter).setTaskFilterParams(params);
+        taskingMapActivity.onActivityResultExtended(REQUEST_CODE_TASK_LISTS, Activity.RESULT_OK, intent);
+        verify(taskingMapPresenter).setTaskFilterParams(params);
     }
 
     @Test
     public void testShowProgressDialog() {
-        taskingHomeActivity.showProgressDialog(R.string.saving_title, R.string.saving_message);
+        taskingMapActivity.showProgressDialog(R.string.saving_title, R.string.saving_message);
         ProgressDialog progressDialog = (ProgressDialog) ShadowProgressDialog.getLatestDialog();
         assertNotNull(progressDialog);
         assertTrue(progressDialog.isShowing());
@@ -622,9 +622,9 @@ public class TaskingHomeActivityTest extends BaseUnitTest {
 
     @Test
     public void testHideProgressDialog() {
-        taskingHomeActivity.showProgressDialog(R.string.saving_title, R.string.saving_message);
+        taskingMapActivity.showProgressDialog(R.string.saving_title, R.string.saving_message);
         ProgressDialog progressDialog = (ProgressDialog) ShadowProgressDialog.getLatestDialog();
-        taskingHomeActivity.hideProgressDialog();
+        taskingMapActivity.hideProgressDialog();
         assertNotNull(progressDialog);
         assertFalse(progressDialog.isShowing());
     }
@@ -632,35 +632,35 @@ public class TaskingHomeActivityTest extends BaseUnitTest {
 
     @Test
     public void testGetUserCurrentLocation() {
-        Whitebox.setInternalState(taskingHomeActivity, "kujakuMapView", kujakuMapView);
-        Location location = taskingHomeActivity.getUserCurrentLocation();
+        Whitebox.setInternalState(taskingMapActivity, "kujakuMapView", kujakuMapView);
+        Location location = taskingMapActivity.getUserCurrentLocation();
         assertNull(location);
 
         Location expected = new Location("test");
         when(kujakuMapView.getLocationClient()).thenReturn(locationClient);
         when(locationClient.getLastLocation()).thenReturn(expected);
-        assertEquals(expected, taskingHomeActivity.getUserCurrentLocation());
+        assertEquals(expected, taskingMapActivity.getUserCurrentLocation());
 
     }
 
     @Test
     public void testRequestUserLocation() {
-        Whitebox.setInternalState(taskingHomeActivity, "kujakuMapView", kujakuMapView);
-        taskingHomeActivity.requestUserLocation();
+        Whitebox.setInternalState(taskingMapActivity, "kujakuMapView", kujakuMapView);
+        taskingMapActivity.requestUserLocation();
         verify(kujakuMapView).setWarmGps(true, getString(R.string.location_service_disabled), getString(R.string.location_services_disabled_spray));
-        assertTrue(Whitebox.getInternalState(taskingHomeActivity, "hasRequestedLocation"));
+        assertTrue(Whitebox.getInternalState(taskingMapActivity, "hasRequestedLocation"));
     }
 
 
     @Test
     public void testOnDestroy() {
-        taskingHomeActivity.onDestroy();
-        assertNull(Whitebox.getInternalState(taskingHomeActivity, "taskingHomePresenter"));
+        taskingMapActivity.onDestroy();
+        assertNull(Whitebox.getInternalState(taskingMapActivity, "taskingMapPresenter"));
     }
 
     @Test
     public void testDisplayToast() {
-        taskingHomeActivity.displayToast(R.string.sync_complete);
+        taskingMapActivity.displayToast(R.string.sync_complete);
         assertEquals(getString(R.string.sync_complete), ShadowToast.getTextOfLatestToast());
     }
 
@@ -668,10 +668,10 @@ public class TaskingHomeActivityTest extends BaseUnitTest {
     public void testOnSyncStart() {
         init(context);
         Whitebox.setInternalState(getInstance(), "isSyncing", true);
-        taskingHomeActivity = spy(taskingHomeActivity);
-        doNothing().when(taskingHomeActivity).toggleProgressBarView(true);
-        taskingHomeActivity.onSyncStart();
-        Snackbar snackbar = Whitebox.getInternalState(taskingHomeActivity, "syncProgressSnackbar");
+        taskingMapActivity = spy(taskingMapActivity);
+        doNothing().when(taskingMapActivity).toggleProgressBarView(true);
+        taskingMapActivity.onSyncStart();
+        Snackbar snackbar = Whitebox.getInternalState(taskingMapActivity, "syncProgressSnackbar");
         assertTrue(snackbar.isShown());
     }
 
@@ -679,8 +679,8 @@ public class TaskingHomeActivityTest extends BaseUnitTest {
     @Test
     public void testOnSyncInProgressFetchedDataSnackBarIsStillShown() {
         init(context);
-        taskingHomeActivity.onSyncInProgress(FetchStatus.fetched);
-        Snackbar snackbar = Whitebox.getInternalState(taskingHomeActivity, "syncProgressSnackbar");
+        taskingMapActivity.onSyncInProgress(FetchStatus.fetched);
+        Snackbar snackbar = Whitebox.getInternalState(taskingMapActivity, "syncProgressSnackbar");
         assertTrue(snackbar.isShown());
     }
 
@@ -688,8 +688,8 @@ public class TaskingHomeActivityTest extends BaseUnitTest {
     @Test
     public void testOnSyncInProgressFetchFailedSnackBarIsDismissed() {
         init(context);
-        taskingHomeActivity.onSyncInProgress(FetchStatus.fetchedFailed);
-        Snackbar snackbar = Whitebox.getInternalState(taskingHomeActivity, "syncProgressSnackbar");
+        taskingMapActivity.onSyncInProgress(FetchStatus.fetchedFailed);
+        Snackbar snackbar = Whitebox.getInternalState(taskingMapActivity, "syncProgressSnackbar");
         assertFalse(snackbar.isShown());
 
 
@@ -698,45 +698,45 @@ public class TaskingHomeActivityTest extends BaseUnitTest {
     @Test
     public void testOnSyncInProgressNothingFetchedSnackBarIsDismissed() {
         init(context);
-        taskingHomeActivity.onSyncInProgress(FetchStatus.nothingFetched);
-        Snackbar snackbar = Whitebox.getInternalState(taskingHomeActivity, "syncProgressSnackbar");
+        taskingMapActivity.onSyncInProgress(FetchStatus.nothingFetched);
+        Snackbar snackbar = Whitebox.getInternalState(taskingMapActivity, "syncProgressSnackbar");
         assertFalse(snackbar.isShown());
     }
 
     @Test
     public void testOnSyncInProgressNoConnectionSnackBarIsDismissed() {
         init(context);
-        taskingHomeActivity.onSyncInProgress(FetchStatus.noConnection);
-        Snackbar snackbar = Whitebox.getInternalState(taskingHomeActivity, "syncProgressSnackbar");
+        taskingMapActivity.onSyncInProgress(FetchStatus.noConnection);
+        Snackbar snackbar = Whitebox.getInternalState(taskingMapActivity, "syncProgressSnackbar");
         assertFalse(snackbar.isShown());
     }
 
     @Test
     public void testOnSyncCompleteSnackBarIsDismissed() {
         init(context);
-        taskingHomeActivity = spy(taskingHomeActivity);
-        doNothing().when(taskingHomeActivity).toggleProgressBarView(false);
-        taskingHomeActivity.onSyncComplete(FetchStatus.nothingFetched);
-        Snackbar snackbar = Whitebox.getInternalState(taskingHomeActivity, "syncProgressSnackbar");
+        taskingMapActivity = spy(taskingMapActivity);
+        doNothing().when(taskingMapActivity).toggleProgressBarView(false);
+        taskingMapActivity.onSyncComplete(FetchStatus.nothingFetched);
+        Snackbar snackbar = Whitebox.getInternalState(taskingMapActivity, "syncProgressSnackbar");
         assertFalse(snackbar.isShown());
     }
 
     @Test
     public void testOnResume() {
         init(context);
-        Whitebox.setInternalState(taskingHomeActivity, "drawerView", drawerView);
-        Whitebox.setInternalState(taskingHomeActivity, "taskingHomePresenter", taskingHomePresenter);
-        taskingHomeActivity.onResume();
+        Whitebox.setInternalState(taskingMapActivity, "drawerView", drawerView);
+        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
+        taskingMapActivity.onResume();
         verify(drawerView).onResume();
-        verify(taskingHomePresenter).onResume();
+        verify(taskingMapPresenter).onResume();
     }
 
     @Test
     public void testOnPause() {
         init(context);
-        Whitebox.setInternalState(taskingHomeActivity, "mapHelper", taskingMapHelper);
-        getInstance().addSyncStatusListener(taskingHomeActivity);
-        taskingHomeActivity.onPause();
+        Whitebox.setInternalState(taskingMapActivity, "mapHelper", taskingMapHelper);
+        getInstance().addSyncStatusListener(taskingMapActivity);
+        taskingMapActivity.onPause();
         List<SyncStatusListener> syncStatusListeners = Whitebox.getInternalState(getInstance(), "syncStatusListeners");
         assertTrue(syncStatusListeners.isEmpty());
         assertFalse(taskingLibraryConfiguration.isMyLocationComponentEnabled());
@@ -744,62 +744,62 @@ public class TaskingHomeActivityTest extends BaseUnitTest {
 
     @Test
     public void testOnDrawerClosed() {
-        Whitebox.setInternalState(taskingHomeActivity, "taskingHomePresenter", taskingHomePresenter);
-        taskingHomeActivity.onDrawerClosed();
-        verify(taskingHomePresenter).onDrawerClosed();
+        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
+        taskingMapActivity.onDrawerClosed();
+        verify(taskingMapPresenter).onDrawerClosed();
     }
 
     @Test
     public void testFocusOnUserLocation() {
-        Whitebox.setInternalState(taskingHomeActivity, "kujakuMapView", kujakuMapView);
-        taskingHomeActivity.focusOnUserLocation(true);
+        Whitebox.setInternalState(taskingMapActivity, "kujakuMapView", kujakuMapView);
+        taskingMapActivity.focusOnUserLocation(true);
         verify(kujakuMapView).focusOnUserLocation(true, RenderMode.COMPASS);
     }
 
     @Test
     public void testDisplayMarkStructureInactiveDialog() {
-        Whitebox.setInternalState(taskingHomeActivity, "taskingHomePresenter", taskingHomePresenter);
-        taskingHomeActivity.displayMarkStructureInactiveDialog();
+        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
+        taskingMapActivity.displayMarkStructureInactiveDialog();
         AlertDialog alertDialog = (AlertDialog) ShadowAlertDialog.getLatestDialog();
         assertTrue(alertDialog.isShowing());
         TextView tv = alertDialog.findViewById(android.R.id.message);
         assertEquals(getString(R.string.confirm_mark_location_inactive), tv.getText());
 
         alertDialog.getButton(BUTTON_POSITIVE).performClick();
-        verify(taskingHomePresenter).onMarkStructureInactiveConfirmed();
+        verify(taskingMapPresenter).onMarkStructureInactiveConfirmed();
         assertFalse(alertDialog.isShowing());
 
     }
 
     @Test
     public void testSetNumberOfFiltersToZero() {
-        taskingHomeActivity.setNumberOfFilters(0);
-        assertEquals(VISIBLE, taskingHomeActivity.findViewById(R.id.filter_tasks_fab).getVisibility());
-        assertEquals(GONE, taskingHomeActivity.findViewById(R.id.filter_tasks_count_layout).getVisibility());
+        taskingMapActivity.setNumberOfFilters(0);
+        assertEquals(VISIBLE, taskingMapActivity.findViewById(R.id.filter_tasks_fab).getVisibility());
+        assertEquals(GONE, taskingMapActivity.findViewById(R.id.filter_tasks_count_layout).getVisibility());
     }
 
     @Test
     public void testSetNumberOfFiltersToNoneZero() {
-        taskingHomeActivity.setNumberOfFilters(3);
-        assertEquals(GONE, taskingHomeActivity.findViewById(R.id.filter_tasks_fab).getVisibility());
-        assertEquals(VISIBLE, taskingHomeActivity.findViewById(R.id.filter_tasks_count_layout).getVisibility());
-        assertEquals("3", ((TextView) taskingHomeActivity.findViewById(R.id.filter_tasks_count)).getText());
+        taskingMapActivity.setNumberOfFilters(3);
+        assertEquals(GONE, taskingMapActivity.findViewById(R.id.filter_tasks_fab).getVisibility());
+        assertEquals(VISIBLE, taskingMapActivity.findViewById(R.id.filter_tasks_count_layout).getVisibility());
+        assertEquals("3", ((TextView) taskingMapActivity.findViewById(R.id.filter_tasks_count)).getText());
     }
 
     @Test
     public void testSetSearchPhrase() {
-        Whitebox.setInternalState(taskingHomeActivity, "taskingHomePresenter", taskingHomePresenter);
+        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
         String searchBy = "Jane Doe";
-        taskingHomeActivity.setSearchPhrase(searchBy);
-        assertEquals(searchBy, ((TextView) taskingHomeActivity.findViewById(R.id.edt_search)).getText().toString());
-        verify(taskingHomePresenter).searchTasks(searchBy);
+        taskingMapActivity.setSearchPhrase(searchBy);
+        assertEquals(searchBy, ((TextView) taskingMapActivity.findViewById(R.id.edt_search)).getText().toString());
+        verify(taskingMapPresenter).searchTasks(searchBy);
     }
 
 
 //    @Test
 //    public void testDisplayResetTaskInfoDialog() {
-//        Whitebox.setInternalState(taskingHomeActivity, "taskingHomePresenter", taskingHomePresenter);
-//        taskingHomeActivity.displayResetInterventionTaskDialog(BEDNET_DISTRIBUTION);
+//        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
+//        taskingMapActivity.displayResetInterventionTaskDialog(BEDNET_DISTRIBUTION);
 //
 //        AlertDialog alertDialog = (AlertDialog) ShadowAlertDialog.getLatestDialog();
 //        assertTrue(alertDialog.isShowing());
@@ -808,18 +808,18 @@ public class TaskingHomeActivityTest extends BaseUnitTest {
 //        assertEquals(getString(R.string.undo_task_msg), tv.getText());
 //
 //        alertDialog.getButton(BUTTON_POSITIVE).performClick();
-//        verify(taskingHomePresenter).onUndoInterventionStatus(eq(BEDNET_DISTRIBUTION));
+//        verify(taskingMapPresenter).onUndoInterventionStatus(eq(BEDNET_DISTRIBUTION));
 //        assertFalse(alertDialog.isShowing());
 //    }
 
     @Test
     public void testInitScaleBarPlugin() {
-        Whitebox.setInternalState(taskingHomeActivity, "kujakuMapView", kujakuMapView);
+        Whitebox.setInternalState(taskingMapActivity, "kujakuMapView", kujakuMapView);
         when(projection.getMetersPerPixelAtLatitude(12.06766)).thenReturn(1.0);
         LatLng target = new LatLng(12.06766, -18.02341);
         when(mMapboxMap.getCameraPosition()).thenReturn(new CameraPosition.Builder().zoom(18).target(target).build());
         when(mMapboxMap.getProjection()).thenReturn(projection);
-        taskingHomeActivity.initializeScaleBarPlugin(mMapboxMap);
+        taskingMapActivity.initializeScaleBarPlugin(mMapboxMap);
         verify(kujakuMapView).addView(scaleBarWidgetArgumentCaptor.capture());
         ScaleBarWidget actualScaleBarWidget = scaleBarWidgetArgumentCaptor.getValue();
         assertNotNull(actualScaleBarWidget);
@@ -830,7 +830,7 @@ public class TaskingHomeActivityTest extends BaseUnitTest {
 
 //    @Test
 //    public void testDisplayNotificationWithSingleParam() {
-//        taskingHomeActivity.displayNotification(context.getString(R.string.confirm_archive_family));
+//        taskingMapActivity.displayNotification(context.getString(R.string.confirm_archive_family));
 //        AlertDialog alertDialog = (AlertDialog) ShadowAlertDialog.getLatestDialog();
 //        assertTrue(alertDialog.isShowing());
 //        TextView tv = alertDialog.findViewById(android.R.id.message);
@@ -843,23 +843,23 @@ public class TaskingHomeActivityTest extends BaseUnitTest {
         TextView progressLabel = new TextView(context);
         SyncProgress mockSyncProgress = mock(SyncProgress.class);
         SyncEntity mockSyncEntity = mock(SyncEntity.class);
-        TaskingHomeActivity spyTaskingHomeActivity = spy(taskingHomeActivity);
+        TaskingMapActivity spyTaskingMapActivity = spy(taskingMapActivity);
         doReturn(50).when(mockSyncProgress).getPercentageSynced();
         doReturn(mockSyncEntity).when(mockSyncProgress).getSyncEntity();
         doReturn("Tasks").when(mockSyncEntity).toString();
-        doReturn(progress).when(spyTaskingHomeActivity).findViewById(eq(R.id.sync_progress_bar));
-        doReturn(progressLabel).when(spyTaskingHomeActivity).findViewById(eq(R.id.sync_progress_bar_label));
+        doReturn(progress).when(spyTaskingMapActivity).findViewById(eq(R.id.sync_progress_bar));
+        doReturn(progressLabel).when(spyTaskingMapActivity).findViewById(eq(R.id.sync_progress_bar_label));
 
-        spyTaskingHomeActivity.onSyncProgress(mockSyncProgress);
+        spyTaskingMapActivity.onSyncProgress(mockSyncProgress);
 
         assertEquals(progressLabel.getText(), String.format(context.getString(R.string.progressBarLabel), "Tasks", 50));
     }
 
     @Test
     public void testOnUserAssignmentRevokedShouldResumeDrawer() {
-        Whitebox.setInternalState(taskingHomeActivity, "drawerView", drawerView);
+        Whitebox.setInternalState(taskingMapActivity, "drawerView", drawerView);
         doNothing().when(drawerView).onResume();
-        taskingHomeActivity.onUserAssignmentRevoked(mock(UserAssignmentDTO.class));
+        taskingMapActivity.onUserAssignmentRevoked(mock(UserAssignmentDTO.class));
         verify(drawerView).onResume();
     }
 }

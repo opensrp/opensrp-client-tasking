@@ -11,7 +11,6 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.Event;
@@ -26,7 +25,7 @@ import java.util.List;
 /**
  * Created by samuelgithengi on 11/27/18.
  */
-public interface TaskingHomeActivityContract {
+public interface TaskingMapActivityContract {
 
     interface View extends UserLocationContract.UserLocationView, BaseDrawerContract.DrawerActivity {
 
@@ -164,6 +163,6 @@ public interface TaskingHomeActivityContract {
 
         void searchTasks(String searchPhrase);
 
-        TaskingHomeActivityContract.View getView();
+        TaskingMapActivityContract.View getView();
     }
 }

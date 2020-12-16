@@ -14,7 +14,7 @@ import org.smartregister.repository.StructureRepository;
 import org.smartregister.repository.TaskRepository;
 import org.smartregister.tasking.R;
 import org.smartregister.tasking.TaskingLibrary;
-import org.smartregister.tasking.contract.TaskingHomeActivityContract;
+import org.smartregister.tasking.contract.TaskingMapActivityContract;
 import org.smartregister.tasking.model.StructureDetails;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.repository.TaskingRepository;
@@ -36,19 +36,19 @@ import static org.smartregister.tasking.util.Utils.getInterventionLabel;
 /**
  * Created by samuelgithengi on 11/27/18.
  */
-public class TaskingHomeInteractor extends BaseInteractor {
+public class TaskingMapInteractor extends BaseInteractor {
 
     private CommonRepository commonRepository;
     private InteractorUtils interactorUtils;
     private StructureRepository structureRepository;
     private TaskRepository taskRepository;
     private TaskingLibrary taskingLibrary;
-    private TaskingHomeActivityContract.Presenter presenter;
+    private TaskingMapActivityContract.Presenter presenter;
     private TaskingRepository taskingRepository;
     private GeoJsonUtils geoJsonUtils;
     private TaskingLibraryConfiguration taskingLibraryConfiguration;
 
-    public TaskingHomeInteractor(TaskingHomeActivityContract.Presenter presenter) {
+    public TaskingMapInteractor(TaskingMapActivityContract.Presenter presenter) {
         super(presenter);
         this.presenter = presenter;
         commonRepository = getCommonRepository();
@@ -122,7 +122,7 @@ public class TaskingHomeInteractor extends BaseInteractor {
         return featureCollection;
     }
 
-    public TaskingHomeActivityContract.Presenter getPresenter() {
+    public TaskingMapActivityContract.Presenter getPresenter() {
         return presenter;
     }
 

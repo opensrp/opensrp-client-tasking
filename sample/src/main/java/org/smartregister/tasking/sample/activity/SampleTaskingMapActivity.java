@@ -7,12 +7,12 @@ import androidx.annotation.NonNull;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 
-import org.smartregister.tasking.activity.TaskingHomeActivity;
+import org.smartregister.tasking.activity.TaskingMapActivity;
 import org.smartregister.tasking.util.PreferencesUtil;
 
 import java.util.UUID;
 
-public class SampleTaskingHomeActivity extends TaskingHomeActivity {
+public class SampleTaskingMapActivity extends TaskingMapActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

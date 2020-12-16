@@ -28,9 +28,9 @@ import org.smartregister.tasking.R;
 import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.BaseDrawerContract;
 import org.smartregister.tasking.contract.PasswordRequestCallback;
-import org.smartregister.tasking.contract.TaskingHomeActivityContract;
+import org.smartregister.tasking.contract.TaskingMapActivityContract;
 import org.smartregister.tasking.contract.UserLocationContract;
-import org.smartregister.tasking.interactor.TaskingHomeInteractor;
+import org.smartregister.tasking.interactor.TaskingMapInteractor;
 import org.smartregister.tasking.model.CardDetails;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
@@ -86,12 +86,12 @@ import static org.smartregister.tasking.util.Utils.validateFarStructures;
 /**
  * Created by samuelgithengi on 11/27/18.
  */
-public class TaskingHomePresenter implements TaskingHomeActivityContract.Presenter, PasswordRequestCallback,
+public class TaskingMapPresenter implements TaskingMapActivityContract.Presenter, PasswordRequestCallback,
         UserLocationContract.UserLocationCallback {
 
-    private WeakReference<TaskingHomeActivityContract.View> viewWeakReference;
+    private WeakReference<TaskingMapActivityContract.View> viewWeakReference;
 
-    private TaskingHomeInteractor taskingHomeInteractor;
+    private TaskingMapInteractor taskingMapInteractor;
 
     private PreferencesUtil prefsUtil;
 
@@ -139,10 +139,10 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
 
     private TaskingLibraryConfiguration taskingLibraryConfiguration;
 
-    public TaskingHomePresenter(TaskingHomeActivityContract.View view, BaseDrawerContract.Presenter drawerPresenter) {
+    public TaskingMapPresenter(TaskingMapActivityContract.View view, BaseDrawerContract.Presenter drawerPresenter) {
         this.viewWeakReference = new WeakReference<>(view);
         this.drawerPresenter = drawerPresenter;
-        taskingHomeInteractor = getTaskingHomeInteractor();
+        taskingMapInteractor = getTaskingMapInteractor();
         passwordDialog = PasswordDialogUtils.initPasswordDialog(view.getContext(), this);
         locationPresenter = new ValidateUserLocationPresenter(view, this);
         prefsUtil = PreferencesUtil.getInstance();
@@ -153,11 +153,11 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
         mappingHelper = taskingLibrary.getTaskingLibraryConfiguration().getMappingHelper();
     }
 
-    public TaskingHomeInteractor getTaskingHomeInteractor() {
-        if (taskingHomeInteractor == null) {
-            taskingHomeInteractor = new TaskingHomeInteractor(this);
+    public TaskingMapInteractor getTaskingMapInteractor() {
+        if (taskingMapInteractor == null) {
+            taskingMapInteractor = new TaskingMapInteractor(this);
         }
-        return taskingHomeInteractor;
+        return taskingMapInteractor;
     }
 
     @Override
@@ -172,7 +172,7 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
             if (getView() != null) {
                 getView().showProgressDialog(R.string.fetching_structures_title, R.string.fetching_structures_message);
             }
-            taskingHomeInteractor.fetchLocations(prefsUtil.getCurrentPlanId(), prefsUtil.getCurrentOperationalArea());
+            taskingMapInteractor.fetchLocations(prefsUtil.getCurrentPlanId(), prefsUtil.getCurrentOperationalArea());
         }
     }
 
@@ -184,7 +184,7 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
         if (getView() != null) {
             getView().showProgressDialog(R.string.fetching_structures_title, R.string.fetching_structures_message);
         }
-        taskingHomeInteractor.fetchLocations(currentPlanId, currentOperationalArea);
+        taskingMapInteractor.fetchLocations(currentPlanId, currentOperationalArea);
     }
 
     @Override
@@ -214,8 +214,11 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
                     getView().displayNotification(R.string.fetching_structures_title, R.string.no_structures_found);
                 }
             } else {
-                getView().displayNotification(R.string.fetching_structures_title,
-                        R.string.fetch_location_and_structures_failed, prefsUtil.getCurrentOperationalArea());
+                String currentOperationalArea = prefsUtil.getCurrentOperationalArea();
+                if (StringUtils.isNotBlank(currentOperationalArea)) {
+                    getView().displayNotification(R.string.fetching_structures_title,
+                            R.string.fetch_location_and_structures_failed, currentOperationalArea);
+                }
                 try {
                     if (structuresGeoJson != null) {
                         structuresGeoJson.put(FEATURES, new JSONArray());
@@ -244,7 +247,7 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
 
         if (StringUtils.isNotBlank(planId) &&
                 StringUtils.isNotBlank(operationalArea)) {
-            taskingHomeInteractor.fetchLocations(planId, operationalArea);
+            taskingMapInteractor.fetchLocations(planId, operationalArea);
         } else {
             if (getView() != null) {
                 getView().displayNotification(R.string.select_campaign_operational_area_title, R.string.select_campaign_operational_area);
@@ -377,7 +380,7 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
     }
 
     @Override
-    public TaskingHomeActivityContract.View getView() {
+    public TaskingMapActivityContract.View getView() {
         if (viewWeakReference != null) {
             return viewWeakReference.get();
         }
@@ -470,7 +473,7 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
         if (getView() != null) {
             getView().showProgressDialog(R.string.resetting_task_title, R.string.resetting_task_msg);
         }
-        taskingHomeInteractor.resetInterventionTaskInfo(interventionType, selectedFeature.id());
+        taskingMapInteractor.resetInterventionTaskInfo(interventionType, selectedFeature.id());
     }
 
     @Override
@@ -485,12 +488,12 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
                 getView().showProgressDialog(R.string.opening_form_title, R.string.add_structure_form_redirecting, validOperationalArea);
                 Boolean locationComponentActive = Boolean.valueOf(JsonFormUtils.getFieldValue(fields, LOCATION_COMPONENT_ACTIVE));
                 String point = JsonFormUtils.getFieldValue(fields, TaskingConstants.JsonForm.STRUCTURE);
-                taskingHomeInteractor.fetchLocations(prefsUtil.getCurrentPlanId(), validOperationalArea, point, locationComponentActive);
+                taskingMapInteractor.fetchLocations(prefsUtil.getCurrentPlanId(), validOperationalArea, point, locationComponentActive);
             } else {
                 if (getView() != null) {
                     getView().showProgressDialog(R.string.saving_title, R.string.saving_message);
                 }
-                taskingHomeInteractor.saveJsonForm(json);
+                taskingMapInteractor.saveJsonForm(json);
             }
         } catch (JSONException e) {
             Timber.e(e);
@@ -520,7 +523,7 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
         if (getView() != null) {
             getView().setGeoJsonSource(getFeatureCollection(), null, isChangeMapPosition());
         }
-        taskingHomeInteractor.fetchInterventionDetails(interventionType, structureId, false);
+        taskingMapInteractor.fetchInterventionDetails(interventionType, structureId, false);
     }
 
     @Override
@@ -644,7 +647,7 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
 
     @Override
     public void onMarkStructureInactiveConfirmed() {
-        taskingHomeInteractor.markStructureAsInactive(selectedFeature);
+        taskingMapInteractor.markStructureAsInactive(selectedFeature);
     }
 
     @Override
@@ -665,7 +668,7 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
 
     @Override
     public void onMarkStructureIneligibleConfirmed() {
-        taskingHomeInteractor.markStructureAsIneligible(selectedFeature, reasonUnEligible);
+        taskingMapInteractor.markStructureAsIneligible(selectedFeature, reasonUnEligible);
     }
 
     @Override

@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
 
 import com.mapbox.geojson.Feature;
-import com.mapbox.geojson.Geometry;
+import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 import com.mapbox.turf.TurfMeasurement;
@@ -31,8 +31,8 @@ import io.ona.kujaku.helpers.OfflineServiceHelper;
 import timber.log.Timber;
 
 import static io.ona.kujaku.data.MapBoxDownloadTask.MAP_NAME;
-import static org.smartregister.tasking.util.Constants.Map.DOWNLOAD_MAX_ZOOM;
-import static org.smartregister.tasking.util.Constants.Map.DOWNLOAD_MIN_ZOOM;
+import static org.smartregister.tasking.util.TaskingConstants.Map.DOWNLOAD_MAX_ZOOM;
+import static org.smartregister.tasking.util.TaskingConstants.Map.DOWNLOAD_MIN_ZOOM;
 
 /**
  * Created by Richard Kareko on 1/30/20.
@@ -45,23 +45,20 @@ public class OfflineMapHelper {
         List<String> offlineRegionNames = new ArrayList<>();
         Map<String, OfflineRegion> modelMap = new HashMap<>();
 
-        for (int position = 0; position < offlineRegions.length; position++) {
-
-            byte[] metadataBytes = offlineRegions[position].getMetadata();
+        for (OfflineRegion offlineRegion : offlineRegions) {
+            byte[] metadataBytes = offlineRegion.getMetadata();
             try {
                 JSONObject jsonObject = new JSONObject(new String(metadataBytes));
                 if (jsonObject.has(MapBoxOfflineResourcesDownloader.METADATA_JSON_FIELD_REGION_NAME)) {
                     String regionName = jsonObject.getString(MapBoxOfflineResourcesDownloader.METADATA_JSON_FIELD_REGION_NAME);
                     offlineRegionNames.add(regionName);
-                    modelMap.put(regionName, offlineRegions[position]);
+                    modelMap.put(regionName, offlineRegion);
                 }
 
             } catch (JSONException e) {
                 Timber.e(e);
             }
-
         }
-
         return new Pair(offlineRegionNames, modelMap);
     }
 
@@ -89,54 +86,59 @@ public class OfflineMapHelper {
         return offlineQueueTaskMap;
     }
 
+    public static void downloadMap(double[] bbox, final String mapName, final Context context) {
+        Runnable runnable = new Runnable() {
+            public void run() {
+
+                double minX = bbox[0];
+                double minY = bbox[1];
+                double maxX = bbox[2];
+                double maxY = bbox[3];
+
+                double topLeftLat = maxY;
+                double topLeftLng = minX;
+                double bottomRightLat = minY;
+                double bottomRightLng = maxX;
+                double topRightLat = maxY;
+                double topRightLng = maxX;
+                double bottomLeftLat = minY;
+                double bottomLeftLng = minX;
+
+                String mapboxStyle = context.getString(R.string.localhost_url, FileHTTPServer.PORT);
+
+                LatLng topLeftBound = new LatLng(topLeftLat, topLeftLng);
+                LatLng topRightBound = new LatLng(topRightLat, topRightLng);
+                LatLng bottomRightBound = new LatLng(bottomRightLat, bottomRightLng);
+                LatLng bottomLeftBound = new LatLng(bottomLeftLat, bottomLeftLng);
+
+                Pair<Double, Double> minMaxDownloadPair = TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getMinMaxZoomMapDownloadPair();
+
+                double minZoom = minMaxDownloadPair == null ? DOWNLOAD_MIN_ZOOM : minMaxDownloadPair.first;
+                double maxZoom = minMaxDownloadPair == null ? DOWNLOAD_MAX_ZOOM : minMaxDownloadPair.second;
+
+                OfflineServiceHelper.ZoomRange zoomRange = new OfflineServiceHelper.ZoomRange(minZoom, maxZoom);
+                OfflineServiceHelper.requestOfflineMapDownload(context
+                        , mapName
+                        , mapboxStyle
+                        , TaskingLibrary.getInstance().getMapboxAccessToken()
+                        , topLeftBound
+                        , topRightBound
+                        , bottomRightBound
+                        , bottomLeftBound
+                        , zoomRange
+                );
+            }
+        };
+
+        TaskingLibrary.getInstance().getAppExecutors().diskIO().execute(runnable);
+    }
+
+    public static void downloadMap(final FeatureCollection operationalAreaFeature, final String mapName, final Context context) {
+        downloadMap(TurfMeasurement.bbox(operationalAreaFeature), mapName, context);
+    }
+
     public static void downloadMap(final Feature operationalAreaFeature, final String mapName, final Context context) {
-        Geometry geometry = operationalAreaFeature.geometry();
-        if (geometry != null) {
-            Runnable runnable = new Runnable() {
-                public void run() {
-                    double[] bbox = TurfMeasurement.bbox(geometry);
-
-                    double minX = bbox[0];
-                    double minY = bbox[1];
-                    double maxX = bbox[2];
-                    double maxY = bbox[3];
-
-                    double topLeftLat = maxY;
-                    double topLeftLng = minX;
-                    double bottomRightLat = minY;
-                    double bottomRightLng = maxX;
-                    double topRightLat = maxY;
-                    double topRightLng = maxX;
-                    double bottomLeftLat = minY;
-                    double bottomLeftLng = minX;
-
-                    String mapboxStyle = context.getString(R.string.localhost_url, FileHTTPServer.PORT);
-
-                    LatLng topLeftBound = new LatLng(topLeftLat, topLeftLng);
-                    LatLng topRightBound = new LatLng(topRightLat, topRightLng);
-                    LatLng bottomRightBound = new LatLng(bottomRightLat, bottomRightLng);
-                    LatLng bottomLeftBound = new LatLng(bottomLeftLat, bottomLeftLng);
-
-                    double maxZoom = DOWNLOAD_MAX_ZOOM;
-                    double minZoom = DOWNLOAD_MIN_ZOOM;
-
-                    OfflineServiceHelper.ZoomRange zoomRange = new OfflineServiceHelper.ZoomRange(minZoom, maxZoom);
-
-                    OfflineServiceHelper.requestOfflineMapDownload(context
-                            , mapName
-                            , mapboxStyle
-                            , TaskingLibrary.getInstance().getMapboxAccessToken()
-                            , topLeftBound
-                            , topRightBound
-                            , bottomRightBound
-                            , bottomLeftBound
-                            , zoomRange
-                    );
-                }
-            };
-
-            TaskingLibrary.getInstance().getAppExecutors().diskIO().execute(runnable);
-        }
+        downloadMap(TurfMeasurement.bbox(operationalAreaFeature), mapName, context);
     }
 
     public static void initializeFileHTTPServer(Context context, String digitalGlobeIdPlaceholder, String mapStyleAssetPath) {
@@ -146,7 +148,7 @@ public class OfflineMapHelper {
                 httpServer.start();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            Timber.e(e);
         }
     }
 

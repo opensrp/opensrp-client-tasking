@@ -63,11 +63,11 @@ import org.smartregister.receiver.ValidateAssignmentReceiver;
 import org.smartregister.tasking.R;
 import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.BaseDrawerContract;
-import org.smartregister.tasking.contract.TaskingHomeActivityContract;
+import org.smartregister.tasking.contract.TaskingMapActivityContract;
 import org.smartregister.tasking.contract.UserLocationContract;
 import org.smartregister.tasking.model.CardDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
-import org.smartregister.tasking.presenter.TaskingHomePresenter;
+import org.smartregister.tasking.presenter.TaskingMapPresenter;
 import org.smartregister.tasking.repository.TaskingMappingHelper;
 import org.smartregister.tasking.util.AlertDialogUtils;
 import org.smartregister.tasking.util.CardDetailsUtil;
@@ -105,12 +105,12 @@ import static org.smartregister.tasking.util.Utils.getPixelsPerDPI;
 /**
  * Created by samuelgithengi on 11/20/18.
  */
-public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeActivityContract.View,
+public class TaskingMapActivity extends BaseMapActivity implements TaskingMapActivityContract.View,
         View.OnClickListener, SyncStatusBroadcastReceiver.SyncStatusListener, UserLocationContract.UserLocationView,
         OnLocationComponentInitializedCallback, SyncProgressBroadcastReceiver.SyncProgressListener,
         ValidateAssignmentReceiver.UserAssignmentListener, OnMapReadyCallback, Style.OnStyleLoaded, MapboxMap.OnMapClickListener, MapboxMap.OnMapLongClickListener, View.OnTouchListener {
 
-    protected TaskingHomePresenter taskingHomePresenter;
+    protected TaskingMapPresenter taskingMapPresenter;
 
     private android.view.View rootView;
 
@@ -168,12 +168,11 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
 
     private LineLayer indexCaseLineLayer;
 
-    private TaskingHomeActivityContract.Presenter presenter;
+    private TaskingMapActivityContract.Presenter presenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(getLayoutId());
 
         taskingLibrary = TaskingLibrary.getInstance();
@@ -188,7 +187,7 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
 
         mapHelper = taskingLibraryConfiguration.getMapHelper();
 
-        taskingHomePresenter = (TaskingHomePresenter) getPresenter();
+        taskingMapPresenter = (TaskingMapPresenter) getPresenter();
 
         rootView = findViewById(R.id.content_frame);
 
@@ -214,16 +213,16 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
     }
 
     @Override
-    public TaskingHomeActivityContract.Presenter getPresenter() {
+    public TaskingMapActivityContract.Presenter getPresenter() {
         if (presenter == null) {
-            presenter = new TaskingHomePresenter(this, drawerView.getPresenter());
+            presenter = new TaskingMapPresenter(this, drawerView.getPresenter());
         }
         return presenter;
     }
 
     @Override
     public int getLayoutId() {
-        return R.layout.activity_tasking_home;
+        return R.layout.activity_tasking_map;
     }
 
     protected void initializeCardViews() {
@@ -336,7 +335,7 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
 
             @Override
             public void afterTextChanged(Editable s) {
-                taskingHomePresenter.searchTasks(s.toString().trim());
+                taskingMapPresenter.searchTasks(s.toString().trim());
             }
         });
 
@@ -351,15 +350,15 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
     @Override
     public void onClick(android.view.View v) {
         if (v.getId() == R.id.task_register) {
-            taskingHomePresenter.onOpenTaskRegisterClicked();
+            taskingMapPresenter.onOpenTaskRegisterClicked();
         } else if (v.getId() == R.id.drawerMenu) {
             drawerView.openDrawerLayout();
         } else if (v.getId() == R.id.progressIndicatorsGroupView) {
             openIndicatorsCardView();
         } else if (v.getId() == R.id.filter_tasks_fab || v.getId() == R.id.filter_tasks_count_layout) {
-            taskingHomePresenter.onFilterTasksClicked();
+            taskingMapPresenter.onFilterTasksClicked();
         } else if (v.getId() == R.id.btn_add_structure) {
-            taskingHomePresenter.onAddStructureClicked(mapHelper.isMyLocationComponentActive(this, myLocationButton));
+            taskingMapPresenter.onAddStructureClicked(mapHelper.isMyLocationComponentActive(this, myLocationButton));
         }
     }
 
@@ -405,7 +404,7 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
                 if (operationalArea.geometry() != null) {
                     cameraPosition = mMapboxMap.getCameraForGeometry(operationalArea.geometry());
                 }
-                if (taskingHomePresenter.getInterventionLabel() == R.string.focus_investigation) {
+                if (taskingMapPresenter.getInterventionLabel() == R.string.focus_investigation) {
                     Feature indexCase = mapHelper.getIndexCase(featureCollection);
                     if (indexCase != null) {
                         Location center = mappingHelper.getCenter(indexCase.geometry().toJson());
@@ -429,7 +428,7 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
                         kujakuMapView.setOnFeatureLongClickListener(new OnFeatureLongClickListener() {
                             @Override
                             public void onFeatureLongClick(List<Feature> features) {
-                                taskingHomePresenter.onFociBoundaryLongClicked();
+                                taskingMapPresenter.onFociBoundaryLongClicked();
                             }
                         }, boundaryLayer.getLayerIds());
 
@@ -438,7 +437,7 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
                     }
                 }
 
-                if (taskingHomePresenter.getInterventionLabel() == R.string.focus_investigation && mapHelper.getIndexCaseLineLayer() == null) {
+                if (taskingMapPresenter.getInterventionLabel() == R.string.focus_investigation && mapHelper.getIndexCaseLineLayer() == null) {
                     mapHelper.addIndexCaseLayers(mMapboxMap, getContext(), featureCollection);
                 } else {
                     mapHelper.updateIndexCaseLayers(mMapboxMap, featureCollection, this);
@@ -571,7 +570,7 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
 
     @Override
     public void onDestroy() {
-        taskingHomePresenter = null;
+        taskingMapPresenter = null;
         super.onDestroy();
     }
 
@@ -619,7 +618,7 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
         IntentFilter syncProgressFilter = new IntentFilter(AllConstants.SyncProgressConstants.ACTION_SYNC_PROGRESS);
         LocalBroadcastManager.getInstance(getApplicationContext()).registerReceiver(syncProgressBroadcastReceiver, syncProgressFilter);
         drawerView.onResume();
-        taskingHomePresenter.onResume();
+        taskingMapPresenter.onResume();
 
         if (SyncStatusBroadcastReceiver.getInstance().isSyncing()) {
             syncProgressSnackbar.show();
@@ -640,7 +639,7 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
 
     @Override
     public void onDrawerClosed() {
-        taskingHomePresenter.onDrawerClosed();
+        taskingMapPresenter.onDrawerClosed();
     }
 
     @Override
@@ -670,7 +669,7 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (which == BUTTON_POSITIVE)
-                            taskingHomePresenter.onMarkStructureInactiveConfirmed();
+                            taskingMapPresenter.onMarkStructureInactiveConfirmed();
                         dialog.dismiss();
                     }
                 });
@@ -736,7 +735,7 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
 
         mapboxMap.setStyle(builder, this);
 
-        taskingHomePresenter.onMapReady();
+        taskingMapPresenter.onMapReady();
 
         positionMyLocationAndLayerSwitcher();
     }
@@ -750,9 +749,9 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
 
         selectedGeoJsonSource = style.getSourceAs(getString(R.string.selected_datasource_name));
 
-        mapHelper.addCustomLayers(style, TaskingHomeActivity.this);
+        mapHelper.addCustomLayers(style, TaskingMapActivity.this);
 
-        mapHelper.addBaseLayers(kujakuMapView, style, TaskingHomeActivity.this);
+        mapHelper.addBaseLayers(kujakuMapView, style, TaskingMapActivity.this);
 
         initializeScaleBarPlugin(mMapboxMap);
     }
@@ -763,13 +762,13 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
 
     @Override
     public boolean onMapClick(@NonNull LatLng point) {
-        taskingHomePresenter.onMapClicked(mMapboxMap, point, false);
+        taskingMapPresenter.onMapClicked(mMapboxMap, point, false);
         return false;
     }
 
     @Override
     public boolean onMapLongClick(@NonNull LatLng point) {
-        taskingHomePresenter.onMapClicked(mMapboxMap, point, true);
+        taskingMapPresenter.onMapClicked(mMapboxMap, point, true);
         return false;
     }
 
@@ -783,24 +782,24 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
         if (requestCode == REQUEST_CODE_GET_JSON && resultCode == RESULT_OK && data.hasExtra(JSON_FORM_PARAM_JSON)) {
             String json = data.getStringExtra(JSON_FORM_PARAM_JSON);
             Timber.d(json);
-            taskingHomePresenter.saveJsonForm(json);
+            taskingMapPresenter.saveJsonForm(json);
         } else if (requestCode == Constants.RequestCode.LOCATION_SETTINGS && hasRequestedLocation) {
             if (resultCode == RESULT_OK) {
-                taskingHomePresenter.getLocationPresenter().waitForUserLocation();
+                taskingMapPresenter.getLocationPresenter().waitForUserLocation();
             } else if (resultCode == RESULT_CANCELED) {
-                taskingHomePresenter.getLocationPresenter().onGetUserLocationFailed();
+                taskingMapPresenter.getLocationPresenter().onGetUserLocationFailed();
             }
             hasRequestedLocation = false;
         } else if (requestCode == REQUEST_CODE_FAMILY_PROFILE && resultCode == RESULT_OK && data.hasExtra(STRUCTURE_ID)) {
             String structureId = data.getStringExtra(STRUCTURE_ID);
             Task task = (Task) data.getSerializableExtra(TASK_ID);
-            taskingHomePresenter.resetFeatureTasks(structureId, task);
+            taskingMapPresenter.resetFeatureTasks(structureId, task);
         } else if (requestCode == REQUEST_CODE_FILTER_TASKS && resultCode == RESULT_OK && data.hasExtra(FILTER_SORT_PARAMS)) {
             TaskFilterParams filterParams = (TaskFilterParams) data.getSerializableExtra(FILTER_SORT_PARAMS);
-            taskingHomePresenter.filterTasks(filterParams);
+            taskingMapPresenter.filterTasks(filterParams);
         } else if (requestCode == REQUEST_CODE_TASK_LISTS && resultCode == RESULT_OK && data.hasExtra(FILTER_SORT_PARAMS)) {
             TaskFilterParams filterParams = (TaskFilterParams) data.getSerializableExtra(FILTER_SORT_PARAMS);
-            taskingHomePresenter.setTaskFilterParams(filterParams);
+            taskingMapPresenter.setTaskFilterParams(filterParams);
         }
     }
 
@@ -819,7 +818,7 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
                 kujakuMapView.setLocationBufferRadius(bufferRadius);
             }
             localSyncDone = extras != null && extras.getBoolean(LOCAL_SYNC_DONE);
-            taskingHomePresenter.refreshStructures(localSyncDone);
+            taskingMapPresenter.refreshStructures(localSyncDone);
         }
     }
 }

@@ -82,17 +82,25 @@ public abstract class OfflineMapsActivity extends AppCompatActivity implements O
     protected ViewPager setupViewPager() {
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        availableOfflineMapsFragment = AvailableOfflineMapsFragment.newInstance(this.getIntent().getExtras(), getMapStyleAssetPath());
+        availableOfflineMapsFragment = getAvailableOfflineMapsFragment();
         availableOfflineMapsFragment.setOfflineMapDownloadCallback(this);
         adapter.addFragment(availableOfflineMapsFragment, this.getString(R.string.available).toUpperCase());
 
-        downloadedOfflineMapsFragment = DownloadedOfflineMapsFragment.newInstance(this.getIntent().getExtras(), this);
+        downloadedOfflineMapsFragment = getDownloadedOfflineMapsFragment();
         downloadedOfflineMapsFragment.setOfflineMapDownloadCallback(this);
         adapter.addFragment(downloadedOfflineMapsFragment, this.getString(R.string.downloaded).toUpperCase());
 
         viewPager.setAdapter(adapter);
 
         return viewPager;
+    }
+
+    protected AvailableOfflineMapsFragment getAvailableOfflineMapsFragment() {
+        return AvailableOfflineMapsFragment.newInstance(this.getIntent().getExtras(), getMapStyleAssetPath());
+    }
+
+    protected DownloadedOfflineMapsFragment getDownloadedOfflineMapsFragment() {
+        return DownloadedOfflineMapsFragment.newInstance(this.getIntent().getExtras(), this);
     }
 
     public OfflineManager initOfflineManager() {

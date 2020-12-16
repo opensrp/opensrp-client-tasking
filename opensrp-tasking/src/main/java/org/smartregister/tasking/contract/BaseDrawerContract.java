@@ -6,8 +6,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.util.Pair;
 
-import com.google.android.material.navigation.NavigationView;
-
 import org.smartregister.domain.PlanDefinition;
 
 import java.util.ArrayList;
@@ -31,7 +29,7 @@ public interface BaseDrawerContract {
 
         void initializeDrawerLayout();
 
-        void setUpViews(NavigationView navigationView);
+        void setUpViews();
 
         void setPlan(String campaign);
 

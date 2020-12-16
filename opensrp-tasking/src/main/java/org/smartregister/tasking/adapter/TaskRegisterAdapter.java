@@ -8,22 +8,13 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import org.apache.commons.lang3.StringUtils;
-import org.smartregister.domain.Task;
 import org.smartregister.tasking.R;
 import org.smartregister.tasking.TaskingLibrary;
-import org.smartregister.tasking.model.CardDetails;
-import org.smartregister.tasking.model.TaskDetails;
-import org.smartregister.tasking.util.CardDetailsUtil;
-import org.smartregister.tasking.util.Constants.Intervention;
-import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.smartregister.tasking.util.Constants.BusinessStatus.NOT_ELIGIBLE;
 
 /**
  * Created by samuelgithengi on 3/20/19.
@@ -115,7 +106,7 @@ public class TaskRegisterAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             viewHolder.hideHouseNumber();
         }*/
 
-        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().onTaskRegisterBindViewHolder(context, (TaskRegisterViewHolder) viewHolder, registerActionHandler, taskDetails.get(position), position);
+        TaskingLibrary.getInstance().getTaskingLibraryConfiguration().onTaskRegisterBindViewHolder(context, viewHolder, registerActionHandler, taskDetails.get(position), position);
     }
 
     @Override

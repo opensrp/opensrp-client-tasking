@@ -37,21 +37,21 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
 
     private RecyclerView offlineMapRecyclerView;
 
-    private AvailableOfflineMapAdapter adapter;
+    protected AvailableOfflineMapAdapter adapter;
 
-    private AvailableOfflineMapsPresenter presenter;
+    protected AvailableOfflineMapsPresenter presenter;
 
     private List<OfflineMapModel> offlineMapModelList = new ArrayList<>();
 
     private List<Location> operationalAreasToDownload = new ArrayList<>();
 
-    private OfflineMapDownloadCallback callback;
+    protected OfflineMapDownloadCallback callback;
 
     private Button btnDownloadMap;
 
     private String mapStyleAssetPath;
 
-    private static Gson gson = new GsonBuilder().setDateFormat(Constants.DateFormat.EVENT_DATE_FORMAT_Z)
+    protected static Gson gson = new GsonBuilder().setDateFormat(Constants.DateFormat.EVENT_DATE_FORMAT_Z)
             .registerTypeAdapter(DateTime.class, new DateTimeTypeConverter())
             .registerTypeAdapter(LocationProperty.class, new PropertiesConverter()).create();
 
@@ -71,12 +71,16 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initializePresenter();
+
+        btnDownloadMap = null;
+        new FileHttpServerTask(getContext(), getMapStyleAssetPath()).execute();
+    }
+
+    protected void initializePresenter() {
         if (presenter == null) {
             presenter = new AvailableOfflineMapsPresenter(this);
         }
-        btnDownloadMap = null;
-
-        new FileHttpServerTask(getContext(), getMapStyleAssetPath()).execute();
     }
 
     @Nullable
@@ -94,7 +98,6 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
         btnDownloadMap = view.findViewById(R.id.download_map);
 
         btnDownloadMap.setOnClickListener(this);
-
     }
 
     private void initializeAdapter() {
@@ -103,7 +106,6 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
         if (offlineMapModelList != null) {
             setOfflineMapModelList(offlineMapModelList);
         }
-
     }
 
     @Override
@@ -200,11 +202,15 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
         }
 
         for (Location location : this.operationalAreasToDownload) {
-            Feature operationalAreaFeature = Feature.fromJson(gson.toJson(location));
-            String mapName = location.getId();
-            currentMapDownload = mapName;
-            OfflineMapHelper.downloadMap(operationalAreaFeature, mapName, getActivity());
+            downloadLocation(location);
         }
+    }
+
+    protected void downloadLocation(@NonNull Location location) {
+        Feature operationalAreaFeature = Feature.fromJson(gson.toJson(location));
+        String mapName = location.getId();
+        setCurrentMapDownload(mapName);
+        OfflineMapHelper.downloadMap(operationalAreaFeature, mapName, getActivity());
     }
 
     public void setOfflineMapDownloadCallback(OfflineMapDownloadCallback callBack) {

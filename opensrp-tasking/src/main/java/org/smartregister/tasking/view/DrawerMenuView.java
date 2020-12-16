@@ -15,7 +15,6 @@ import androidx.core.util.Pair;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
-import com.google.android.material.navigation.NavigationView;
 import com.vijay.jsonwizard.customviews.TreeViewDialog;
 
 import org.apache.commons.lang3.StringUtils;
@@ -72,40 +71,37 @@ public class DrawerMenuView implements View.OnClickListener, BaseDrawerContract.
 
         mDrawerLayout.addDrawerListener(this);
 
-        NavigationView navigationView = getContext().findViewById(R.id.nav_view);
-
-        setUpViews(navigationView);
+        setUpViews();
 
         checkSynced();
     }
 
     @Override
-    public void setUpViews(NavigationView navigationView) {
-        View headerView = navigationView.getHeaderView(0);
+    public void setUpViews() {
 
         try {
             String manifestVersion = getManifestVersion();
             String appVersion = getContext().getString(R.string.tasking_app_version, org.smartregister.util.Utils.getVersion(getContext()));
             String appVersionText = appVersion + (manifestVersion == null ? "" : getContext().getString(R.string.manifest_version_parenthesis_placeholder, manifestVersion));
-            ((TextView) headerView.findViewById(R.id.application_version))
+            ((TextView) getContext().findViewById(R.id.application_version))
                     .setText(appVersionText);
         } catch (PackageManager.NameNotFoundException e) {
             Timber.e(e);
         }
 
-        TextView offlineMapTextView = headerView.findViewById(R.id.btn_navMenu_offline_maps);
+        TextView offlineMapTextView = getContext().findViewById(R.id.btn_navMenu_offline_maps);
 
-        TextView summaryFormsTextView = headerView.findViewById(R.id.btn_navMenu_summaryForms);
+        TextView summaryFormsTextView = getContext().findViewById(R.id.btn_navMenu_summaryForms);
 
-        planTextView = headerView.findViewById(R.id.plan_selector);
+        planTextView = getContext().findViewById(R.id.plan_selector);
 
-        operationalAreaTextView = headerView.findViewById(R.id.operational_area_selector);
+        operationalAreaTextView = getContext().findViewById(R.id.operational_area_selector);
 
-        districtTextView = headerView.findViewById(R.id.district_label);
+        districtTextView = getContext().findViewById(R.id.district_label);
 
-        facilityTextView = headerView.findViewById(R.id.facility_label);
+        facilityTextView = getContext().findViewById(R.id.facility_label);
 
-        p2pSyncTextView = headerView.findViewById(R.id.btn_navMenu_p2pSyncBtn);
+        p2pSyncTextView = getContext().findViewById(R.id.btn_navMenu_p2pSyncBtn);
 
         operatorTextView = getContext().findViewById(R.id.operator_label);
 
@@ -118,8 +114,8 @@ public class DrawerMenuView implements View.OnClickListener, BaseDrawerContract.
         offlineMapTextView.setVisibility(View.VISIBLE);
         offlineMapTextView.setOnClickListener(this);
 
-        headerView.findViewById(R.id.sync_button).setOnClickListener(this);
-        headerView.findViewById(R.id.btn_navMenu_offline_maps).setOnClickListener(this);
+        getContext().findViewById(R.id.sync_button).setOnClickListener(this);
+        getContext().findViewById(R.id.btn_navMenu_offline_maps).setOnClickListener(this);
 
         districtTextView.setOnLongClickListener(this);
 

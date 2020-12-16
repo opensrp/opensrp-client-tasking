@@ -34,8 +34,8 @@ import org.smartregister.tasking.BaseUnitTest;
 import org.smartregister.tasking.R;
 import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.BaseDrawerContract;
-import org.smartregister.tasking.contract.TaskingHomeActivityContract;
-import org.smartregister.tasking.interactor.TaskingHomeInteractor;
+import org.smartregister.tasking.contract.TaskingMapActivityContract;
+import org.smartregister.tasking.interactor.TaskingMapInteractor;
 import org.smartregister.tasking.model.CardDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.tasking.util.Constants;
@@ -88,21 +88,21 @@ import static org.smartregister.tasking.util.TaskingConstants.SPRAY_EVENT;
 /**
  * Created by samuelgithengi on 1/27/20.
  */
-public class TaskingHomePresenterTest extends BaseUnitTest {
+public class TaskingMapPresenterTest extends BaseUnitTest {
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
-    private TaskingHomePresenter presenter;
+    private TaskingMapPresenter presenter;
 
     @Mock
-    private TaskingHomeActivityContract.View view;
+    private TaskingMapActivityContract.View view;
 
     @Mock
     private BaseDrawerContract.Presenter drawerPresenter;
 
     @Mock
-    private TaskingHomeInteractor taskingHomeInteractor;
+    private TaskingMapInteractor taskingMapInteractor;
 
     @Mock
     private BaseDrawerContract.View drawerView;
@@ -153,8 +153,8 @@ public class TaskingHomePresenterTest extends BaseUnitTest {
     @Before
     public void setUp() {
         org.smartregister.Context.bindtypes = new ArrayList<>();
-        presenter = new TaskingHomePresenter(view, drawerPresenter);
-        Whitebox.setInternalState(presenter, "taskingHomeInteractor", taskingHomeInteractor);
+        presenter = new TaskingMapPresenter(view, drawerPresenter);
+        Whitebox.setInternalState(presenter, "taskingMapInteractor", taskingMapInteractor);
         Whitebox.setInternalState(presenter, "jsonFormUtils", jsonFormUtils);
         prefsUtil.setCurrentPlanId(planId);
         prefsUtil.setCurrentOperationalArea(operationalArea);
@@ -170,7 +170,7 @@ public class TaskingHomePresenterTest extends BaseUnitTest {
         when(drawerPresenter.isChangedCurrentSelection()).thenReturn(true);
         presenter.onDrawerClosed();
         verify(view).showProgressDialog(R.string.fetching_structures_title, R.string.fetching_structures_message);
-        verify(taskingHomeInteractor).fetchLocations(planId, operationalArea);
+        verify(taskingMapInteractor).fetchLocations(planId, operationalArea);
     }
 
     @Test
@@ -241,7 +241,7 @@ public class TaskingHomePresenterTest extends BaseUnitTest {
     @Test
     public void testOnMapReady() {
         presenter.onMapReady();
-        verify(taskingHomeInteractor).fetchLocations(planId, operationalArea);
+        verify(taskingMapInteractor).fetchLocations(planId, operationalArea);
 
     }
 
@@ -465,7 +465,7 @@ public class TaskingHomePresenterTest extends BaseUnitTest {
         Whitebox.setInternalState(presenter, "reasonUnEligible", "No residents");
         presenter.onMarkStructureIneligibleConfirmed();
 
-        verify(taskingHomeInteractor).markStructureAsIneligible(featureArgumentCaptor.capture(), stringArgumentCaptor.capture());
+        verify(taskingMapInteractor).markStructureAsIneligible(featureArgumentCaptor.capture(), stringArgumentCaptor.capture());
         assertEquals("No residents", stringArgumentCaptor.getValue());
         assertEquals(mapboxFeature.id(), featureArgumentCaptor.getValue().id());
     }
@@ -565,7 +565,7 @@ public class TaskingHomePresenterTest extends BaseUnitTest {
         presenter.onUndoInterventionStatus(BLOOD_SCREENING);
 
         verify(view).showProgressDialog(R.string.resetting_task_title, R.string.resetting_task_msg);
-        verify(taskingHomeInteractor).resetInterventionTaskInfo(BLOOD_SCREENING, mapboxFeature.id());
+        verify(taskingMapInteractor).resetInterventionTaskInfo(BLOOD_SCREENING, mapboxFeature.id());
 
     }
 
@@ -575,7 +575,7 @@ public class TaskingHomePresenterTest extends BaseUnitTest {
 
         presenter.saveJsonForm(jsonString);
         verify(view).showProgressDialog(R.string.saving_title, R.string.saving_message);
-        verify(taskingHomeInteractor).saveJsonForm(jsonString);
+        verify(taskingMapInteractor).saveJsonForm(jsonString);
     }
 
 
@@ -585,7 +585,7 @@ public class TaskingHomePresenterTest extends BaseUnitTest {
         presenter.saveJsonForm(jsonString);
         String name = JsonFormUtils.getFieldValue(jsonString, TaskingConstants.JsonForm.VALID_OPERATIONAL_AREA);
         verify(view).showProgressDialog(R.string.opening_form_title, R.string.add_structure_form_redirecting, name);
-        verify(taskingHomeInteractor).fetchLocations(planId, name, JsonFormUtils.getFieldValue(jsonString, TaskingConstants.JsonForm.STRUCTURE), Boolean.valueOf(JsonFormUtils.getFieldValue(jsonString, LOCATION_COMPONENT_ACTIVE)));
+        verify(taskingMapInteractor).fetchLocations(planId, name, JsonFormUtils.getFieldValue(jsonString, TaskingConstants.JsonForm.STRUCTURE), Boolean.valueOf(JsonFormUtils.getFieldValue(jsonString, LOCATION_COMPONENT_ACTIVE)));
     }
 
     @Test
@@ -616,7 +616,7 @@ public class TaskingHomePresenterTest extends BaseUnitTest {
         assertEquals(COMPLETE, featureCollectionArgumentCaptor.getValue().features().get(0).getStringProperty(TASK_BUSINESS_STATUS));
         assertEquals(IN_PROGRESS.name(), featureCollectionArgumentCaptor.getValue().features().get(0).getStringProperty(TASK_STATUS));
 
-        verify(taskingHomeInteractor).fetchInterventionDetails(BLOOD_SCREENING, structureId, false);
+        verify(taskingMapInteractor).fetchInterventionDetails(BLOOD_SCREENING, structureId, false);
     }
 
     @Test
@@ -828,7 +828,7 @@ public class TaskingHomePresenterTest extends BaseUnitTest {
 //        Whitebox.setInternalState(presenter, "selectedFeature", mapboxFeature);
 //        presenter.onChangeInterventionStatus(IRS);
 //        verify(view).showProgressDialog(R.string.fetching_structure_title, R.string.fetching_structure_message);
-//        verify(taskingHomeInteractor).fetchInterventionDetails(IRS, "id1", true);
+//        verify(taskingMapInteractor).fetchInterventionDetails(IRS, "id1", true);
 //    }
 //
 //    @Test
@@ -838,7 +838,7 @@ public class TaskingHomePresenterTest extends BaseUnitTest {
 //        Whitebox.setInternalState(presenter, "selectedFeature", mapboxFeature);
 //        presenter.onChangeInterventionStatus(MOSQUITO_COLLECTION);
 //        verify(view).showProgressDialog(R.string.fetching_mosquito_collection_points_title, R.string.fetching_mosquito_collection_points_message);
-//        verify(taskingHomeInteractor).fetchInterventionDetails(MOSQUITO_COLLECTION, "id1", true);
+//        verify(taskingMapInteractor).fetchInterventionDetails(MOSQUITO_COLLECTION, "id1", true);
 //    }
 //
 //    @Test
@@ -848,7 +848,7 @@ public class TaskingHomePresenterTest extends BaseUnitTest {
 //        Whitebox.setInternalState(presenter, "selectedFeature", mapboxFeature);
 //        presenter.onChangeInterventionStatus(LARVAL_DIPPING);
 //        verify(view).showProgressDialog(R.string.fetching_larval_dipping_points_title, R.string.fetching_larval_dipping_points_message);
-//        verify(taskingHomeInteractor).fetchInterventionDetails(LARVAL_DIPPING, "id1", true);
+//        verify(taskingMapInteractor).fetchInterventionDetails(LARVAL_DIPPING, "id1", true);
 //    }
 //
 //    @Test
@@ -858,7 +858,7 @@ public class TaskingHomePresenterTest extends BaseUnitTest {
 //        Whitebox.setInternalState(presenter, "selectedFeature", mapboxFeature);
 //        presenter.onChangeInterventionStatus(PAOT);
 //        verify(view).showProgressDialog(R.string.fetching_paot_title, R.string.fetching_paot_message);
-//        verify(taskingHomeInteractor).fetchInterventionDetails(PAOT, "id1", true);
+//        verify(taskingMapInteractor).fetchInterventionDetails(PAOT, "id1", true);
 //    }
 //
 //    @Test

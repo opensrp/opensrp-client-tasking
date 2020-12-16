@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
@@ -26,12 +27,12 @@ import org.smartregister.configurableviews.ConfigurableViewsLibrary;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.Task;
 import org.smartregister.repository.Repository;
-import org.smartregister.tasking.activity.TaskingHomeActivity;
+import org.smartregister.tasking.activity.TaskingMapActivity;
 import org.smartregister.tasking.adapter.TaskRegisterAdapter;
 import org.smartregister.tasking.contract.BaseContract;
 import org.smartregister.tasking.contract.BaseDrawerContract;
 import org.smartregister.tasking.contract.BaseFormFragmentContract;
-import org.smartregister.tasking.contract.TaskingHomeActivityContract;
+import org.smartregister.tasking.contract.TaskingMapActivityContract;
 import org.smartregister.tasking.layer.DigitalGlobeLayer;
 import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.model.CardDetails;
@@ -43,7 +44,6 @@ import org.smartregister.tasking.util.DefaultLocationHierarchyUtils;
 import org.smartregister.tasking.util.GeoJsonUtils;
 import org.smartregister.tasking.util.TaskingJsonFormUtils;
 import org.smartregister.tasking.util.TaskingMapHelper;
-import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
 import org.smartregister.util.AppExecutors;
 import org.smartregister.view.activity.DrishtiApplication;
 
@@ -329,7 +329,7 @@ public class TestRevealApplication extends DrishtiApplication {
         }
 
         @Override
-        public void onTaskRegisterBindViewHolder(@NonNull android.content.Context context, @NonNull TaskRegisterViewHolder viewHolder, @NonNull View.OnClickListener registerActionHandler, @NonNull TaskDetails taskDetails, int position) {
+        public void onTaskRegisterBindViewHolder(@NonNull android.content.Context context, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull View.OnClickListener registerActionHandler, @NonNull TaskDetails taskDetails, int position) {
 
         }
 
@@ -410,7 +410,7 @@ public class TestRevealApplication extends DrishtiApplication {
         }
 
         @Override
-        public void openTaskRegister(TaskFilterParams filterParams, TaskingHomeActivity taskingHomeActivity) {
+        public void openTaskRegister(TaskFilterParams filterParams, TaskingMapActivity taskingMapActivity) {
 
         }
 
@@ -455,12 +455,12 @@ public class TestRevealApplication extends DrishtiApplication {
         }
 
         @Override
-        public void onFeatureSelectedByLongClick(Feature feature, TaskingHomeActivityContract.Presenter taskingHomePresenter) {
+        public void onFeatureSelectedByLongClick(Feature feature, TaskingMapActivityContract.Presenter taskingMapPresenter) {
 
         }
 
         @Override
-        public void onFeatureSelectedByClick(Feature feature, TaskingHomeActivityContract.Presenter taskingHomePresenter) {
+        public void onFeatureSelectedByClick(Feature feature, TaskingMapActivityContract.Presenter taskingMapPresenter) {
 
         }
 
@@ -485,8 +485,18 @@ public class TestRevealApplication extends DrishtiApplication {
         }
 
         @Override
-        public void openFilterTaskActivity(TaskFilterParams filterParams, TaskingHomeActivity activity) {
+        public void openFilterTaskActivity(TaskFilterParams filterParams, TaskingMapActivity activity) {
 
+        }
+
+        @Override
+        public List<Location> getLocationsIdsForDownload(List<String> locationIds) {
+            return null;
+        }
+
+        @Override
+        public Pair<Double, Double> getMinMaxZoomMapDownloadPair() {
+            return null;
         }
     }
 }

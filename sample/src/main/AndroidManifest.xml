@@ -13,7 +13,7 @@
         android:theme="@style/AppTheme"
         tools:replace="android:theme">
         <activity
-            android:name=".activity.SampleTaskingHomeActivity"
+            android:name=".activity.SampleTaskingMapActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"

@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
@@ -20,19 +21,18 @@ import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.Task;
-import org.smartregister.tasking.activity.TaskingHomeActivity;
+import org.smartregister.tasking.activity.TaskingMapActivity;
 import org.smartregister.tasking.adapter.TaskRegisterAdapter;
 import org.smartregister.tasking.contract.BaseContract;
 import org.smartregister.tasking.contract.BaseDrawerContract;
 import org.smartregister.tasking.contract.BaseFormFragmentContract;
-import org.smartregister.tasking.contract.TaskingHomeActivityContract;
+import org.smartregister.tasking.contract.TaskingMapActivityContract;
 import org.smartregister.tasking.layer.DigitalGlobeLayer;
 import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.model.CardDetails;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.tasking.repository.TaskingMappingHelper;
-import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
 import org.smartregister.util.AppExecutors;
 
 import java.util.List;
@@ -139,7 +139,7 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract void startMapActivity(Activity activity, String searchViewText, TaskFilterParams taskFilterParams);
 
-    public abstract void onTaskRegisterBindViewHolder(@NonNull Context context, @NonNull TaskRegisterViewHolder viewHolder, @NonNull View.OnClickListener registerActionHandler, @NonNull TaskDetails taskDetails, int position);
+    public abstract void onTaskRegisterBindViewHolder(@NonNull Context context, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull View.OnClickListener registerActionHandler, @NonNull TaskDetails taskDetails, int position);
 
     @NonNull
     public abstract AppExecutors getAppExecutors();
@@ -172,7 +172,7 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract void registerFamily(Feature selectedFeature);
 
-    public abstract void openTaskRegister(TaskFilterParams filterParams, TaskingHomeActivity taskingHomeActivity);
+    public abstract void openTaskRegister(TaskFilterParams filterParams, TaskingMapActivity taskingMapActivity);
 
     public abstract boolean isCompassEnabled();
 
@@ -190,9 +190,9 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract void onShowFilledForms();
 
-    public abstract void onFeatureSelectedByLongClick(Feature feature, TaskingHomeActivityContract.Presenter taskingHomePresenter);
+    public abstract void onFeatureSelectedByLongClick(Feature feature, TaskingMapActivityContract.Presenter taskingMapPresenter);
 
-    public abstract void onFeatureSelectedByClick(Feature feature, TaskingHomeActivityContract.Presenter taskingHomePresenter);
+    public abstract void onFeatureSelectedByClick(Feature feature, TaskingMapActivityContract.Presenter taskingMapPresenter);
 
     public abstract double getOnClickMaxZoomLevel();
 
@@ -202,5 +202,9 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract void setFacility(List<String> defaultLocation, BaseDrawerContract.View view);
 
-    public abstract void openFilterTaskActivity(TaskFilterParams filterParams, TaskingHomeActivity activity);
+    public abstract void openFilterTaskActivity(TaskFilterParams filterParams, TaskingMapActivity activity);
+
+    public abstract List<Location> getLocationsIdsForDownload(List<String> locationIds);
+
+    public abstract Pair<Double, Double> getMinMaxZoomMapDownloadPair();
 }
