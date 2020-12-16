@@ -2,6 +2,8 @@ package org.smartregister.tasking.model;
 
 import androidx.annotation.NonNull;
 
+import org.smartregister.domain.Task;
+
 import java.io.Serializable;
 
 /**
@@ -27,6 +29,8 @@ public class BaseTaskDetails implements Serializable {
     private String familyMemberNames;
 
     private long authoredOn;
+
+    private int priority;
 
     public BaseTaskDetails(@NonNull String taskId) {
         this.taskId = taskId;
@@ -94,6 +98,14 @@ public class BaseTaskDetails implements Serializable {
 
     public void setAuthoredOn(long authoredOn) {
         this.authoredOn = authoredOn;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
     }
 
     @Override

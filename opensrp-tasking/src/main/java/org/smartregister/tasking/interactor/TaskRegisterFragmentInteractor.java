@@ -16,7 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.smartregister.CoreLibrary;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
-import org.smartregister.domain.Client;
 import org.smartregister.repository.EventClientRepository.event_column;
 import org.smartregister.repository.LocationRepository;
 import org.smartregister.tasking.TaskingLibrary;
@@ -30,7 +29,6 @@ import org.smartregister.tasking.util.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import timber.log.Timber;
@@ -55,6 +53,7 @@ import static org.smartregister.tasking.util.Constants.DatabaseKeys.NOT_SRAYED_O
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.NOT_SRAYED_REASON;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.OTHER;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.PLAN_ID;
+import static org.smartregister.tasking.util.Constants.DatabaseKeys.PRIORITY;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.REFERENCE_REASON;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.SPRAY_STATUS;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.STATUS;
@@ -321,6 +320,13 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
             task.setClient(client);
             // TODO -> Uncomment above lines
         }
+
+
+        int colIndex = cursor.getColumnIndex(PRIORITY);
+        if (colIndex != -1) {
+            task.setPriority(cursor.getInt(colIndex));
+        }
+
 
         calculateDistance(task, location, lastLocation, operationalAreaCenter);
 
