@@ -48,10 +48,28 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|start"
                 android:text="@string/exit_map"
+                android:textAllCaps="false"
                 android:layout_margin="@dimen/hamburger_margin"
                 app:backgroundTint="@color/white"
                 app:icon="@drawable/ic_action_arrow_back"
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Widget.Button"
                 app:elevation="6dp"
+                android:visibility="gone"/>
+
+
+            <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+                android:theme="@style/Theme.MaterialComponents.Light.DarkActionBar"
+                android:id="@+id/filter_priority_tasks"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|start"
+                android:text="@string/show_priority_tasks_only"
+                android:textAllCaps="false"
+                android:layout_margin="@dimen/hamburger_margin"
+                app:backgroundTint="@color/white"
+                app:icon="@drawable/ic_action_remove_red_eye"
+                app:elevation="6dp"
+                android:textAppearance="@android:style/TextAppearance.DeviceDefault.Widget.Button"
                 android:visibility="gone"/>
 
             <FrameLayout

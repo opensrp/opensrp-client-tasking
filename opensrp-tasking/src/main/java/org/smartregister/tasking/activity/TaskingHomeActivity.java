@@ -193,6 +193,18 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
                     }
                 });
             }
+
+            ExtendedFloatingActionButton filterPriorityTasksBtn = findViewById(R.id.filter_priority_tasks);
+            if (filterPriorityTasksBtn != null) {
+                filterPriorityTasksBtn.setVisibility(View.VISIBLE);
+                filterPriorityTasksBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // TODO: Filter tasks being shown (priority Vs all tasks)
+                        // TODO: Toggle red-eye icon
+                    }
+                });
+            }
         }
 
         taskingLibrary = TaskingLibrary.getInstance();
