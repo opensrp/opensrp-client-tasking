@@ -176,6 +176,13 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
 
         setContentView(getLayoutId());
 
+        if (TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design()) {
+            View toolbar = findViewById(R.id.toolbar_parent_layout);
+            if (toolbar != null) {
+                toolbar.setVisibility(View.GONE);
+            }
+        }
+
         taskingLibrary = TaskingLibrary.getInstance();
 
         taskingLibraryConfiguration = taskingLibrary.getTaskingLibraryConfiguration();
