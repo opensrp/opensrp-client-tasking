@@ -31,6 +31,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.geojson.Feature;
@@ -180,6 +181,17 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
             View toolbar = findViewById(R.id.toolbar_parent_layout);
             if (toolbar != null) {
                 toolbar.setVisibility(View.GONE);
+            }
+
+            ExtendedFloatingActionButton exitMapBtn = findViewById(R.id.exit_map);
+            if (exitMapBtn != null) {
+                exitMapBtn.setVisibility(View.VISIBLE);
+                exitMapBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        finish();
+                    }
+                });
             }
         }
 
