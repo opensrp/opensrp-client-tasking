@@ -87,6 +87,11 @@ public class LocationTaskIntentService extends IntentService {
         Intent intent = new Intent();
         intent.setAction(SyncStatusBroadcastReceiver.ACTION_SYNC_STATUS);
         intent.putExtra(SyncStatusBroadcastReceiver.EXTRA_FETCH_STATUS, fetchStatus);
+        if (fetchStatus.equals(FetchStatus.fetchedFailed)
+                || fetchStatus.equals(FetchStatus.noConnection)
+                || fetchStatus.equals(FetchStatus.nothingFetched)) {
+            intent.putExtra(SyncStatusBroadcastReceiver.EXTRA_COMPLETE_STATUS, true);
+        }
         sendBroadcast(intent);
     }
 
