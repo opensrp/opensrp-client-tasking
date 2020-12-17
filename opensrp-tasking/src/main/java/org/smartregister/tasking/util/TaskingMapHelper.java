@@ -226,7 +226,10 @@ public class TaskingMapHelper {
         baseLayerSwitcherPlugin.addBaseLayer(digitalGlobeLayer, false);
         baseLayerSwitcherPlugin.addBaseLayer(mapBoxLayer, true);
         kujakuMapView.getMbTilesHelper().setMBTileLayers(context, baseLayerSwitcherPlugin);
-        baseLayerSwitcherPlugin.show();
+
+        if (!TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design()) {
+            baseLayerSwitcherPlugin.show();
+        }
     }
 
 }
