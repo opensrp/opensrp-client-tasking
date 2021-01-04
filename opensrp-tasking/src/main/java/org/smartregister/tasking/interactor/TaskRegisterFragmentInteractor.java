@@ -243,6 +243,10 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
             cursor = getDatabase().rawQuery(query, params);
             while (cursor != null && cursor.moveToNext()) {
                 TaskDetails taskDetails = readTaskDetails(cursor, lastLocation, operationalAreaCenter, houseLabel, groupedTasks);
+                if (taskDetails == null || taskDetails.getClient() == null) {
+                    continue;
+                }
+
                 //skip BCC and Case confirmation tasks in tracking tasks within buffer
                 if (taskDetails.getDistanceFromUser() <= locationBuffer && taskDetails.getDistanceFromUser() >= 0) {
                     structuresWithinBuffer += 1;
@@ -317,8 +321,10 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
             // TODO: Check if the client details from below query can be outdated/stale due to client edit registrations
             // Get the client related to the task
             CommonPersonObjectClient client = CoreLibrary.getInstance().context().getEventClientRepository().fetchCommonPersonObjectClientByBaseEntityId(task.getTaskEntity());
-            task.setClient(client);
-            // TODO -> Uncomment above lines
+            if (client != null && !TextUtils.isEmpty(client.getDetails().get("birthdate"))) {
+                task.setClient(client);
+                // TODO -> Uncomment above lines
+            }
         }
 
 
