@@ -340,6 +340,11 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
     }
 
     private void calculateDistance(TaskDetails task, Location location, Location lastLocation, Location operationalAreaCenter) {
+        if (location == null) {
+            task.setDistanceFromUser(-1);
+            return;
+        }
+
         if (BCC.equals(task.getTaskCode())) {
             //set distance to -2 to always display on top of register
             task.setDistanceFromUser(-2);
@@ -349,8 +354,10 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
         } else if (lastLocation != null) {
             task.setDistanceFromUser(location.distanceTo(lastLocation));
         } else {
-            task.setDistanceFromUser(location.distanceTo(operationalAreaCenter));
-            task.setDistanceFromCenter(true);
+            if (operationalAreaCenter != null) {
+                task.setDistanceFromUser(location.distanceTo(operationalAreaCenter));
+                task.setDistanceFromCenter(true);
+            }
         }
     }
 
