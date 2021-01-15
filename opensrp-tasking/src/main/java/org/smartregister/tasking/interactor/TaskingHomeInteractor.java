@@ -8,6 +8,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonRepository;
+import org.smartregister.domain.Client;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.Task;
 import org.smartregister.repository.StructureRepository;
@@ -25,6 +26,7 @@ import org.smartregister.tasking.util.TaskingConstants;
 import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 import org.smartregister.tasking.util.Utils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -84,10 +86,21 @@ public class TaskingHomeInteractor extends BaseInteractor {
                         List<Location> structures = structureRepository.getLocationsByParentId(operationalAreaLocation.getId());
                         Map<String, StructureDetails> structureNames = taskingRepository.getStructureName(operationalAreaLocation.getId());
                         taskDetailsList = IndicatorUtils.processTaskDetails(tasks);
+
                         String indexCase = null;
-                        if (getInterventionLabel() == R.string.focus_investigation)
+                        if (getInterventionLabel() == R.string.focus_investigation) {
                             indexCase = taskingRepository.getIndexCaseStructure(plan);
-                        String features = geoJsonUtils.getGeoJsonFromStructuresAndTasks(structures, tasks, indexCase, structureNames);
+                        }
+
+                        String features = null;
+                        if (TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design()) {
+                            HashMap<String, Set<Task>> personTasks = taskingRepository.getClientTasksByPlanAndGroup(plan, operationalAreaLocation.getId());
+                            HashMap<String, Client> locationClientBaseEntityIdMap = taskingRepository.getLocationToClient(personTasks.keySet());
+                            features = geoJsonUtils.getGeoJsonFromClientLocationsAndTasks(structures, personTasks, locationClientBaseEntityIdMap);
+                        } else {
+                            features = geoJsonUtils.getGeoJsonFromStructuresAndTasks(structures, tasks, indexCase, structureNames);
+                        }
+
                         featureCollection.put(TaskingConstants.GeoJSON.FEATURES, new JSONArray(features));
                     }
                 } catch (Exception e) {

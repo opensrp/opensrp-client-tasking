@@ -1,13 +1,18 @@
 package org.smartregister.tasking.util;
 
+import android.text.TextUtils;
+
 import androidx.annotation.NonNull;
 
+import org.smartregister.domain.Client;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.Task;
 import org.smartregister.tasking.interactor.BaseInteractor;
 import org.smartregister.tasking.model.StructureDetails;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -82,6 +87,66 @@ public class GeoJsonUtils {
 
         }
         return BaseInteractor.gson.toJson(structures);
+    }
+
+    public String getGeoJsonFromClientLocationsAndTasks(List<Location> structures, Map<String, Set<Task>> personTasks, HashMap<String, Client> locationToClientEntityIdMap) {
+        ArrayList<Location> locationsWithTasks = new ArrayList<>();
+
+        HashSet<Task.TaskStatus> invalidTaskStatus = new HashSet<>();
+        invalidTaskStatus.add(Task.TaskStatus.ARCHIVED);
+        invalidTaskStatus.add(Task.TaskStatus.COMPLETED);
+        invalidTaskStatus.add(Task.TaskStatus.FAILED);
+
+        for (Location structure : structures) {
+            Client client = locationToClientEntityIdMap.get(structure.getProperties().getUid());
+
+            if (client == null || TextUtils.isEmpty(client.getBaseEntityId())) {
+                continue;
+            }
+
+            Set<Task> taskSet = personTasks.get(client.getBaseEntityId());
+
+            if (taskSet == null) {
+                continue;
+            }
+
+            Map<String, String> locationCustomProperties = structure.getProperties().getCustomProperties();
+            boolean isLocationValid = false;
+
+            // TODO: Ask PM what happens when we have multiple tasks on one family
+            for (Task task : taskSet) {
+
+                // TODO: Move this to the SQLite query to reduce the performance hit here
+                // Ignore tasks which are completed
+                if (invalidTaskStatus.contains(task.getStatus())) {
+                    continue;
+                }
+
+                locationCustomProperties.put(TASK_IDENTIFIER, task.getIdentifier());
+                locationCustomProperties.put(TASK_BUSINESS_STATUS, task.getBusinessStatus());
+                locationCustomProperties.put(TaskingConstants.Properties.FEATURE_SELECT_TASK_BUSINESS_STATUS, task.getBusinessStatus()); // used to determine action to take when a feature is selected
+                locationCustomProperties.put(TASK_STATUS, task.getStatus().name());
+                locationCustomProperties.put(TaskingConstants.Properties.TASK_CODE, task.getCode());
+                locationCustomProperties.put(TaskingConstants.Properties.TASK_PRIORITY, String.valueOf(task.getPriority()));
+
+                locationCustomProperties.put(TaskingConstants.Properties.LOCATION_UUID, structure.getProperties().getUid());
+                locationCustomProperties.put(TaskingConstants.Properties.LOCATION_VERSION, structure.getProperties().getVersion() + "");
+                locationCustomProperties.put(TaskingConstants.Properties.LOCATION_TYPE, structure.getProperties().getType());
+
+                String clientName = client.getFirstName() + " " + client.getLastName();
+                locationCustomProperties.put(Constants.DatabaseKeys.STRUCTURE_NAME, clientName);
+                locationCustomProperties.put(TaskingConstants.Properties.FAMILY_MEMBER_NAMES, clientName);
+                isLocationValid = true;
+            }
+
+            structure.getProperties().setCustomProperties(locationCustomProperties);
+
+            if (isLocationValid) {
+                locationsWithTasks.add(structure);
+            }
+        }
+
+        return BaseInteractor.gson.toJson(locationsWithTasks);
     }
 
     public void calculateState(Task task, StateWrapper state, @NonNull Map<String, Integer> mdaStatusMap) {
