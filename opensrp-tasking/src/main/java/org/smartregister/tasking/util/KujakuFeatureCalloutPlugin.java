@@ -16,6 +16,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
+import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
@@ -75,23 +76,27 @@ public class KujakuFeatureCalloutPlugin implements MapCalloutFeature.Plugin, Map
     }
 
     protected void setupCalloutLayer(@NonNull Style style, @NonNull String featureSourceId) {
-        style.addLayer(new SymbolLayer(CALLOUT_LAYER_ID, featureSourceId)
-                        .withProperties(
-                                /* show image with id title based on the value of the title feature property */
-                                PropertyFactory.iconImage("{title}"),
+        Layer calloutLayer = style.getLayer(CALLOUT_LAYER_ID);
 
-                                /* set anchor of icon to bottom-left */
-                                PropertyFactory.iconAnchor(Property.ICON_ANCHOR_BOTTOM_LEFT),
+        if (calloutLayer == null) {
+            style.addLayer(new SymbolLayer(CALLOUT_LAYER_ID, featureSourceId)
+                            .withProperties(
+                                    /* show image with id title based on the value of the title feature property */
+                                    PropertyFactory.iconImage(String.format("{%s}", getLabelProperty())),
 
-                                /* offset icon slightly to match bubble layout */
-                                PropertyFactory.iconOffset(new Float[] {-20.0f, -10.0f}),
-                                PropertyFactory.iconAllowOverlap(true),
-                                PropertyFactory.iconIgnorePlacement(true)
-                        )
+                                    /* set anchor of icon to bottom-left */
+                                    PropertyFactory.iconAnchor(Property.ICON_ANCHOR_BOTTOM_LEFT),
 
-                /* add a filter to show only when selected feature property is true */
-                //.withFilter(Expression.eq(Expression.literal(PROPERTY_SELECTED), true))
-        );
+                                    /* offset icon slightly to match bubble layout */
+                                    PropertyFactory.iconOffset(new Float[]{-20.0f, -10.0f}),
+                                    PropertyFactory.iconAllowOverlap(true),
+                                    PropertyFactory.iconIgnorePlacement(true)
+                            )
+
+                    /* add a filter to show only when selected feature property is true */
+                    //.withFilter(Expression.eq(Expression.literal(PROPERTY_SELECTED), true))
+            );
+        }
     }
 
     @Override
