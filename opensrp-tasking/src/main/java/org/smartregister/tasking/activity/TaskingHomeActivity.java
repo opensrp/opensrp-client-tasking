@@ -481,7 +481,7 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
                 }
             }
 
-            kujakuFeatureCalloutPlugin.setupOnMap(getString(R.string.reveal_datasource_name));
+            kujakuFeatureCalloutPlugin.setupOnMap(featureCollection.features(), geoJsonSource.getId());
         }
     }
 
@@ -812,7 +812,7 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
 
         // Load the callouts plugin
         kujakuFeatureCalloutPlugin = new KujakuFeatureCalloutPlugin(this, style);
-        kujakuFeatureCalloutPlugin.setupOnMap(dataSourceId);
+        kujakuFeatureCalloutPlugin.setupOnMap(geoJsonSource);
     }
 
     protected boolean isCompassEnabled() {

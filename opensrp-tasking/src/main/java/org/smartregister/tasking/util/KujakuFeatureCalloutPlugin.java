@@ -62,17 +62,25 @@ public class KujakuFeatureCalloutPlugin implements MapCalloutFeature.Plugin, Map
             GeoJsonSource geoJsonSource = (GeoJsonSource) style.getSourceAs(featureSourceId);
 
             if (geoJsonSource != null) {
-                List<Feature> featureList = geoJsonSource.querySourceFeatures(Expression.all());
-                setupCalloutLayer(style, featureSourceId);
-
-                GenerateViewIconTask generateViewIconTask = new GenerateViewIconTask(this);
-
-                generateViewIconTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, featureList);
-                mapView.getMapboxMap().addOnMapClickListener(this);
+                setupOnMap(geoJsonSource);
             } else {
                 Timber.e(new Exception(), "Could not setup %s! GeoJsonSource could not be found", KujakuFeatureCalloutPlugin.class.getName());
             }
         }
+    }
+
+    public void setupOnMap(@NonNull GeoJsonSource geoJsonSource) {
+        List<Feature> featureList = geoJsonSource.querySourceFeatures(Expression.all());
+        setupOnMap(featureList, geoJsonSource.getId());
+    }
+
+    public void setupOnMap(@NonNull List<Feature> featureList, @NonNull String geoJsonSourceId) {
+        setupCalloutLayer(style, geoJsonSourceId);
+
+        GenerateViewIconTask generateViewIconTask = new GenerateViewIconTask(this);
+
+        generateViewIconTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, featureList);
+        mapView.getMapboxMap().addOnMapClickListener(this);
     }
 
     protected void setupCalloutLayer(@NonNull Style style, @NonNull String featureSourceId) {
