@@ -62,7 +62,7 @@ public class TaskingRepository extends BaseRepository {
     }
 
     protected String getStructureNamesSelect(String mainCondition) {
-        return "SELECT * FROM structure ";
+        return "SELECT * FROM structure WHERE " + mainCondition;
     }
 
 

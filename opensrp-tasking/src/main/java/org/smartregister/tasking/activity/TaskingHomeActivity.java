@@ -64,6 +64,7 @@ import org.smartregister.receiver.ValidateAssignmentReceiver;
 import org.smartregister.tasking.R;
 import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.BaseDrawerContract;
+import org.smartregister.tasking.contract.MapCalloutFeature;
 import org.smartregister.tasking.contract.TaskingHomeActivityContract;
 import org.smartregister.tasking.contract.UserLocationContract;
 import org.smartregister.tasking.model.CardDetails;
@@ -72,6 +73,7 @@ import org.smartregister.tasking.presenter.TaskingHomePresenter;
 import org.smartregister.tasking.repository.TaskingMappingHelper;
 import org.smartregister.tasking.util.AlertDialogUtils;
 import org.smartregister.tasking.util.CardDetailsUtil;
+import org.smartregister.tasking.util.KujakuFeatureCalloutPlugin;
 import org.smartregister.tasking.util.TaskingConstants;
 import org.smartregister.tasking.util.TaskingJsonFormUtils;
 import org.smartregister.tasking.util.TaskingLibraryConfiguration;
@@ -109,7 +111,9 @@ import static org.smartregister.tasking.util.Utils.getPixelsPerDPI;
 public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeActivityContract.View,
         View.OnClickListener, SyncStatusBroadcastReceiver.SyncStatusListener, UserLocationContract.UserLocationView,
         OnLocationComponentInitializedCallback, SyncProgressBroadcastReceiver.SyncProgressListener,
-        ValidateAssignmentReceiver.UserAssignmentListener, OnMapReadyCallback, Style.OnStyleLoaded, MapboxMap.OnMapClickListener, MapboxMap.OnMapLongClickListener, View.OnTouchListener {
+        ValidateAssignmentReceiver.UserAssignmentListener, OnMapReadyCallback, Style.OnStyleLoaded,
+        MapboxMap.OnMapClickListener, MapboxMap.OnMapLongClickListener, View.OnTouchListener,
+        MapCalloutFeature.MapView {
 
     protected TaskingHomePresenter taskingHomePresenter;
 
@@ -170,6 +174,7 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
     private LineLayer indexCaseLineLayer;
 
     private TaskingHomeActivityContract.Presenter presenter;
+    private KujakuFeatureCalloutPlugin kujakuFeatureCalloutPlugin;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -475,6 +480,8 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
                     mapHelper.updateIndexCaseLayers(mMapboxMap, featureCollection, this);
                 }
             }
+
+            kujakuFeatureCalloutPlugin.setupOnMap(getString(R.string.reveal_datasource_name));
         }
     }
 
@@ -596,8 +603,20 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
     }
 
     @Override
+    public void refreshCalloutSource() {
+        /*if (kujakuMapView != null && featureCollection != null) {
+            kujakuMapView.addFeaturePoints(featureCollection);
+        }*/
+    }
+
+    @Override
     public Context getContext() {
         return this;
+    }
+
+    @Override
+    public MapboxMap getMapboxMap() {
+        return kujakuMapView.getMapboxMap();
     }
 
     @Override
@@ -759,6 +778,7 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
     @Override
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
         mMapboxMap = mapboxMap;
+        kujakuMapView.setMapboxMap(mapboxMap);
 
         mapboxMap.addOnMapClickListener(this);
 
@@ -779,7 +799,8 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
         if (isCompassEnabled()) {
             enableCompass(mMapboxMap);
         }
-        geoJsonSource = style.getSourceAs(getString(R.string.reveal_datasource_name));
+        String dataSourceId = getString(R.string.reveal_datasource_name);
+        geoJsonSource = style.getSourceAs(dataSourceId);
 
         selectedGeoJsonSource = style.getSourceAs(getString(R.string.selected_datasource_name));
 
@@ -788,6 +809,10 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
         mapHelper.addBaseLayers(kujakuMapView, style, TaskingHomeActivity.this);
 
         initializeScaleBarPlugin(mMapboxMap);
+
+        // Load the callouts plugin
+        kujakuFeatureCalloutPlugin = new KujakuFeatureCalloutPlugin(this, style);
+        kujakuFeatureCalloutPlugin.setupOnMap(dataSourceId);
     }
 
     protected boolean isCompassEnabled() {

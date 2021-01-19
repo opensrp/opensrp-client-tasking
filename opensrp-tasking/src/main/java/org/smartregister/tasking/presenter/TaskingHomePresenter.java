@@ -213,6 +213,9 @@ public class TaskingHomePresenter implements TaskingHomeActivityContract.Present
                 if (org.smartregister.util.Utils.isEmptyCollection(getFeatureCollection().features())) {
                     getView().displayNotification(R.string.fetching_structures_title, R.string.no_structures_found);
                 }
+
+                // Add the callout generator
+
             } else {
                 getView().displayNotification(R.string.fetching_structures_title,
                         R.string.fetch_location_and_structures_failed, prefsUtil.getCurrentOperationalArea());
