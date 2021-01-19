@@ -36,8 +36,6 @@ public interface MapCalloutFeature {
 
         String getLabelProperty();
 
-        String getStyleProperty();
-
         @Nullable
         Style getStyle();
     }

@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.mapbox.geojson.Feature;
+import com.mapbox.mapboxsdk.annotations.BubbleLayout;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Style;
@@ -186,18 +187,10 @@ public class KujakuFeatureCalloutPlugin implements MapCalloutFeature.Plugin, Map
         return Constants.DatabaseKeys.STRUCTURE_NAME;
     }
 
-    @Override
-    public String getStyleProperty() {
-        return null;
-    }
-
-
-
     @Nullable
     public HashMap<String, Bitmap> generateCalloutBitmaps(List<Feature> featureList) {
         MapCalloutFeature.MapView activity = getMapView();
         String labelProperty = getPlugin().getLabelProperty();
-        String styleProperty = getPlugin().getStyleProperty();
         if (activity != null && labelProperty != null) {
             HashMap<String, Bitmap> imagesMap = new HashMap<>();
             LayoutInflater inflater = LayoutInflater.from(activity.getContext());
@@ -209,16 +202,34 @@ public class KujakuFeatureCalloutPlugin implements MapCalloutFeature.Plugin, Map
                 TextView titleTv = view.findViewById(R.id.title);
                 titleTv.setText(name);
 
-                if (styleProperty != null) {
-                    String style = feature.getStringProperty(styleProperty);
-                    TextView styleTv = view.findViewById(R.id.style);
-                    styleTv.setText(style);
+                String priority = feature.getStringProperty(TaskingConstants.Properties.TASK_PRIORITY);
+                BubbleLayout bubbleLayout = view.findViewById(R.id.calloutLayout);
+
+                int bubbleColor = -1;
+
+                if (priority != null) {
+                    switch (priority) {
+                        case "0":
+                            bubbleColor = R.color.map_tasking_red;
+                            break;
+
+                        case "1":
+                            bubbleColor = R.color.map_tasking_orange;
+                            break;
+
+                        case "2":
+                            bubbleColor = R.color.map_tasking_blue;
+                            break;
+
+                        case "3":
+                            bubbleColor = R.color.map_tasking_blue;
+                            break;
+                    }
                 }
 
-                    /*Boolean favourite_ = feature.getBooleanProperty(PROPERTY_FAVOURITE);
-                    boolean favourite = favourite_ == null ? false : favourite_;
-                    ImageView imageView = (ImageView) view.findViewById(R.id.logoView);
-                    imageView.setImageResource(favourite ? R.drawable.ic_favorite : R.drawable.ic_favorite_border);*/
+                if (bubbleColor != -1) {
+                    bubbleLayout.setBubbleColor(bubbleColor);
+                }
 
                 Bitmap bitmap = SymbolGenerator.generate(view);
                 imagesMap.put(name, bitmap);
