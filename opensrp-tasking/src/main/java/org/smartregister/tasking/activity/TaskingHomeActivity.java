@@ -36,6 +36,8 @@ import com.google.android.material.snackbar.Snackbar;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Geometry;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationComponent;
@@ -54,6 +56,7 @@ import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.pluginscalebar.ScaleBarOptions;
 import com.mapbox.pluginscalebar.ScaleBarPlugin;
+import com.mapbox.turf.TurfMeasurement;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -86,6 +89,8 @@ import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 import org.smartregister.tasking.util.TaskingMapHelper;
 import org.smartregister.tasking.util.Utils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import io.ona.kujaku.callbacks.OnLocationComponentInitializedCallback;
@@ -462,8 +467,9 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
     public void setGeoJsonSource(@NonNull FeatureCollection featureCollection, Feature operationalArea, boolean isChangeMapPosition) {
         if (geoJsonSource != null) {
             geoJsonSource.setGeoJson(featureCollection);
+            CameraPosition cameraPosition = null;
+
             if (operationalArea != null) {
-                CameraPosition cameraPosition = null;
                 if (operationalArea.geometry() != null) {
                     cameraPosition = mMapboxMap.getCameraForGeometry(operationalArea.geometry());
                 }
@@ -504,6 +510,88 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
                     mapHelper.addIndexCaseLayers(mMapboxMap, getContext(), featureCollection);
                 } else {
                     mapHelper.updateIndexCaseLayers(mMapboxMap, featureCollection, this);
+                }
+            }
+
+            // Calculate the camera position to the area with most features
+            if (cameraPosition == null && TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design()) {
+                List<Feature> featureList = featureCollection.features();
+                HashMap<Feature, List<Feature>> features = new HashMap<>();
+                Feature largestFeatureGroup = null;
+
+                ArrayList<Feature> initialGroupFeatures = new ArrayList<>();
+                initialGroupFeatures.add(featureList.get(0));
+                features.put(featureList.get(0), initialGroupFeatures);
+                largestFeatureGroup = featureList.get(0);
+                int largestFeatureGroupSize = 1;
+
+                for (Feature feature: featureList) {
+                    if (!features.containsKey(feature)) {
+                        Geometry featureGeometry = feature.geometry();
+                        Point featurePoint = null;
+                        if (featureGeometry instanceof Point) {
+                            featurePoint = (Point) featureGeometry;
+                        } else {
+                            continue;
+                        }
+
+                        boolean foundGroup = false;
+                        for (Feature featureGroup: features.keySet()) {
+                            Geometry featureGroupGeometry = featureGroup.geometry();
+                            Point featureGroupPoint = null;
+
+                            if (featureGroupGeometry instanceof Point) {
+                                featureGroupPoint = (Point) featureGroupGeometry;
+                            } else if (featureGeometry.bbox() != null) {
+                                featureGroupPoint = TurfMeasurement.midpoint(featureGroupGeometry.bbox().northeast(), featureGroupGeometry.bbox().southwest());
+                            } else {
+                                continue;
+                            }
+
+                            double distanceInKm = TurfMeasurement.distance(featurePoint, featureGroupPoint);
+
+                            if (distanceInKm <= 13) {
+                                List<Feature> groupFeatures = features.get(featureGroup);
+                                groupFeatures.add(feature);
+
+                                if (groupFeatures.size() > largestFeatureGroupSize) {
+                                    largestFeatureGroupSize = groupFeatures.size();
+                                    largestFeatureGroup = featureGroup;
+                                }
+                                foundGroup = true;
+                                break;
+                            }
+                        }
+
+                        if (!foundGroup) {
+                            ArrayList<Feature> groupFeatures = new ArrayList<>();
+                            groupFeatures.add(feature);
+                            features.put(feature, groupFeatures);
+                        }
+                    }
+                }
+
+                if (largestFeatureGroup != null) {
+                    Geometry largestFeatureGroupGeometry = largestFeatureGroup.geometry();
+                    Point mapCenter = null;
+
+                    if (largestFeatureGroupGeometry instanceof Point) {
+                        mapCenter = (Point) largestFeatureGroupGeometry;
+                    } else if (largestFeatureGroupGeometry.bbox() != null) {
+                        mapCenter = TurfMeasurement.midpoint(largestFeatureGroupGeometry.bbox().northeast(), largestFeatureGroupGeometry.bbox().southwest());
+                    }
+
+                    if (mapCenter != null) {
+                        double currentZoom = mMapboxMap.getCameraPosition().zoom;
+
+                        if (currentZoom > 15d) {
+                            currentZoom = 14d;
+                        }
+
+                        cameraPosition = new CameraPosition.Builder()
+                                .target(new LatLng(mapCenter.latitude(), mapCenter.longitude())).zoom(currentZoom).build();
+                        mMapboxMap.setCameraPosition(cameraPosition);
+                    }
                 }
             }
 
