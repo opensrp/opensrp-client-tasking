@@ -84,6 +84,7 @@ import org.smartregister.tasking.util.AlertDialogUtils;
 import org.smartregister.tasking.util.CardDetailsUtil;
 import org.smartregister.tasking.util.KujakuFeatureCalloutPlugin;
 import org.smartregister.tasking.util.TaskingConstants;
+import org.smartregister.tasking.util.TaskingCoordinateUtils;
 import org.smartregister.tasking.util.TaskingJsonFormUtils;
 import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 import org.smartregister.tasking.util.TaskingMapHelper;
@@ -573,23 +574,20 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
 
                 if (largestFeatureGroup != null) {
                     Geometry largestFeatureGroupGeometry = largestFeatureGroup.geometry();
-                    Point mapCenter = null;
 
-                    if (largestFeatureGroupGeometry instanceof Point) {
-                        mapCenter = (Point) largestFeatureGroupGeometry;
-                    } else if (largestFeatureGroupGeometry.bbox() != null) {
-                        mapCenter = TurfMeasurement.midpoint(largestFeatureGroupGeometry.bbox().northeast(), largestFeatureGroupGeometry.bbox().southwest());
-                    }
+                    LatLng mapCenter = TaskingCoordinateUtils.getCenter(features.get(largestFeatureGroup));
 
                     if (mapCenter != null) {
                         double currentZoom = mMapboxMap.getCameraPosition().zoom;
 
-                        if (currentZoom > 15d) {
-                            currentZoom = 14d;
+                        if (currentZoom < 11.8d) {
+                            currentZoom = 11.8d; // Can also be 14d
                         }
 
                         cameraPosition = new CameraPosition.Builder()
-                                .target(new LatLng(mapCenter.latitude(), mapCenter.longitude())).zoom(currentZoom).build();
+                                .target(mapCenter)
+                                .zoom(currentZoom)
+                                .build();
                         mMapboxMap.setCameraPosition(cameraPosition);
                     }
                 }
