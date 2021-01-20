@@ -10,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 
 import com.mapbox.geojson.Feature;
 import com.mapbox.mapboxsdk.annotations.BubbleLayout;
@@ -205,29 +206,30 @@ public class KujakuFeatureCalloutPlugin implements MapCalloutFeature.Plugin, Map
                 String priority = feature.getStringProperty(TaskingConstants.Properties.TASK_PRIORITY);
                 BubbleLayout bubbleLayout = view.findViewById(R.id.calloutLayout);
 
-                int bubbleColor = -1;
+                int bubbleColorRes = -1;
 
                 if (priority != null) {
                     switch (priority) {
                         case "0":
-                            bubbleColor = R.color.map_tasking_red;
+                            bubbleColorRes = R.color.map_tasking_red;
                             break;
 
                         case "1":
-                            bubbleColor = R.color.map_tasking_orange;
+                            bubbleColorRes = R.color.map_tasking_orange;
                             break;
 
                         case "2":
-                            bubbleColor = R.color.map_tasking_blue;
+                            bubbleColorRes = R.color.map_tasking_blue;
                             break;
 
                         case "3":
-                            bubbleColor = R.color.map_tasking_blue;
+                            bubbleColorRes = R.color.map_tasking_blue;
                             break;
                     }
                 }
 
-                if (bubbleColor != -1) {
+                if (bubbleColorRes != -1) {
+                    int bubbleColor = ContextCompat.getColor(getMapView().getContext(), bubbleColorRes);
                     bubbleLayout.setBubbleColor(bubbleColor);
                 }
 
