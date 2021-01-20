@@ -69,6 +69,7 @@
                 android:layout_margin="@dimen/hamburger_margin"
                 app:backgroundTint="@color/white"
                 app:icon="@drawable/ic_action_eye"
+                app:iconTint="@color/map_tasking_btn_color"
                 app:elevation="6dp"
                 android:textColor="@color/map_tasking_btn_color"
                 android:textAppearance="@android:style/TextAppearance.DeviceDefault.Widget.Button"
