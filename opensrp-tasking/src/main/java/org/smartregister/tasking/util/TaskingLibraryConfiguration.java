@@ -35,6 +35,7 @@ import org.smartregister.tasking.model.CardDetails;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.tasking.repository.TaskingMappingHelper;
+import org.smartregister.tasking.view.TaskingMapView;
 import org.smartregister.util.AppExecutors;
 
 import java.util.List;
@@ -221,10 +222,22 @@ public abstract class TaskingLibraryConfiguration {
         return taskRegisterConfiguration;
     }
 
+    @Nullable
+    public abstract MapConfiguration getMapConfiguration();
+
     public interface TaskRegisterConfiguration {
 
         boolean isV2Design();
 
         boolean showGroupedTasks();
+    }
+
+    public interface MapConfiguration {
+
+        void onPriorityTasksToggle(@NonNull TaskingMapView taskingMapView, boolean on);
+
+        String[] getAllTasksLayerIds();
+
+        String[] getPriorityTasksLayerIds();
     }
 }

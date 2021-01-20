@@ -213,4 +213,5 @@
     <string name="archive_family_failed">Archiving family %1s failed</string>
     <string name="exit_map">Exit Map</string>
     <string name="show_priority_tasks_only">Show priority tasks only</string>
+    <string name="show_all_tasks">Show all tasks</string>
 </resources>

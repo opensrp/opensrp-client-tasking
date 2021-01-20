@@ -44,7 +44,13 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.UiSettings;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
+import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
+import com.mapbox.mapboxsdk.style.layers.Property;
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
+import com.mapbox.mapboxsdk.style.layers.PropertyValue;
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.pluginscalebar.ScaleBarOptions;
 import com.mapbox.pluginscalebar.ScaleBarPlugin;
@@ -175,6 +181,7 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
 
     private TaskingHomeActivityContract.Presenter presenter;
     private KujakuFeatureCalloutPlugin kujakuFeatureCalloutPlugin;
+    private boolean priorityTasksFilterEnabled;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -200,13 +207,32 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
             }
 
             ExtendedFloatingActionButton filterPriorityTasksBtn = findViewById(R.id.filter_priority_tasks);
-            if (filterPriorityTasksBtn != null) {
+            TaskingLibraryConfiguration.MapConfiguration mapConfiguration = TaskingLibrary.getInstance()
+                    .getTaskingLibraryConfiguration()
+                    .getMapConfiguration();
+
+            if (filterPriorityTasksBtn != null && mapConfiguration != null) {
                 filterPriorityTasksBtn.setVisibility(View.VISIBLE);
                 filterPriorityTasksBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // TODO: Filter tasks being shown (priority Vs all tasks)
                         // TODO: Toggle red-eye icon
+                        priorityTasksFilterEnabled = !priorityTasksFilterEnabled;
+
+                        if (priorityTasksFilterEnabled) {
+                            filterPriorityTasksBtn.setIconResource(R.drawable.ic_action_eye_not);
+                            filterPriorityTasksBtn.setText(R.string.show_priority_tasks_only);
+                        } else {
+                            filterPriorityTasksBtn.setIconResource(R.drawable.ic_action_eye);
+                            filterPriorityTasksBtn.setText(R.string.show_all_tasks);
+                        }
+
+                        // Client application should filter out tasks or do nothing
+                        mapConfiguration.onPriorityTasksToggle(kujakuMapView, priorityTasksFilterEnabled);
+
+                        if (kujakuMapView.getMapboxMap() != null && kujakuMapView.getMapboxMap().getStyle() != null) {
+                            updateTasksPriorityFilter(kujakuMapView.getMapboxMap().getStyle());
+                        }
                     }
                 });
             }
@@ -813,6 +839,43 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
         // Load the callouts plugin
         kujakuFeatureCalloutPlugin = new KujakuFeatureCalloutPlugin(this, style);
         kujakuFeatureCalloutPlugin.setupOnMap(geoJsonSource);
+
+        updateTasksPriorityFilter(style);
+    }
+
+    public void updateTasksPriorityFilter(@NonNull Style style) {
+        TaskingLibraryConfiguration.MapConfiguration mapConfiguration = TaskingLibrary.getInstance()
+                .getTaskingLibraryConfiguration()
+                .getMapConfiguration();
+
+        if (mapConfiguration != null) {
+            String[] allTasksLayerIds = mapConfiguration.getAllTasksLayerIds();
+            String[] priorityTasksLayerIds = mapConfiguration.getPriorityTasksLayerIds();
+
+            if (allTasksLayerIds != null && priorityTasksLayerIds != null) {
+
+                PropertyValue<String> propertyValue = priorityTasksFilterEnabled ? PropertyFactory.visibility(Property.NONE)
+                        : PropertyFactory.visibility(Property.VISIBLE);
+                for (String allTaskLayerId: allTasksLayerIds) {
+                    Layer layer = style.getLayer(allTaskLayerId);
+                    if (layer != null) {
+                        layer.setProperties(propertyValue);
+                    }
+                }
+
+                propertyValue = !priorityTasksFilterEnabled ? PropertyFactory.visibility(Property.NONE)
+                        : PropertyFactory.visibility(Property.VISIBLE);
+
+                for (String priorityTasksLayerId: priorityTasksLayerIds) {
+                    Layer layer = style.getLayer(priorityTasksLayerId);
+                    if (layer != null) {
+                        layer.setProperties(propertyValue);
+                    }
+                }
+            }
+
+            mapConfiguration.onPriorityTasksToggle(kujakuMapView, priorityTasksFilterEnabled);
+        }
     }
 
     protected boolean isCompassEnabled() {

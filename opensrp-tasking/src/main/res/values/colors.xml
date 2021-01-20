@@ -29,5 +29,6 @@
     <color name="map_tasking_red">#f12525</color>
     <color name="map_tasking_green">#38b500</color>
     <color name="map_tasking_dark_blue">#103146</color>
+    <color name="map_tasking_btn_color">#005084</color>
 
 </resources>
