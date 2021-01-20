@@ -872,6 +872,15 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
                         layer.setProperties(propertyValue);
                     }
                 }
+
+                SymbolLayer layer = style.getLayerAs(KujakuFeatureCalloutPlugin.CALLOUT_LAYER_ID);
+                if (layer != null) {
+                    if (priorityTasksFilterEnabled) {
+                        layer.withFilter(new Expression("in", Expression.literal("taskPriority"), Expression.literal("0"), Expression.literal("1")));
+                    } else {
+                        layer.setFilter(Expression.all());
+                    }
+                }
             }
 
             mapConfiguration.onPriorityTasksToggle(kujakuMapView, priorityTasksFilterEnabled);
