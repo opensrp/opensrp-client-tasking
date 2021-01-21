@@ -369,8 +369,10 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
             int structuresWithinBuffer = 0;
             for (TaskDetails taskDetails : tasks) {
                 if (!BCC.equals(taskDetails.getTaskCode()) && !CASE_CONFIRMATION.equals(taskDetails.getTaskCode())) {
-                    taskDetails.setDistanceFromUser(taskDetails.getLocation().distanceTo(location));
-                    taskDetails.setDistanceFromCenter(false);
+                    if (taskDetails.getLocation() != null) {
+                        taskDetails.setDistanceFromUser(taskDetails.getLocation().distanceTo(location));
+                        taskDetails.setDistanceFromCenter(false);
+                    }
                 }
 
                 if (taskDetails.getDistanceFromUser() <= locationBuffer) {
