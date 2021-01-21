@@ -52,6 +52,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import io.ona.kujaku.interfaces.ILocationClient;
 import io.ona.kujaku.location.clients.AndroidGpsLocationClient;
 import io.ona.kujaku.utils.Constants;
 import io.ona.kujaku.utils.Permissions;
@@ -383,6 +384,11 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
 
     @Override
     public void onDestroy() {
+        if (locationUtils != null) {
+            locationUtils.destroy();
+            Timber.i("LocationUtils has called destroy in #onDestroy");
+        }
+
         if (getPresenter() != null) {
             getPresenter().onDestroy();
         }
@@ -530,8 +536,15 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
 
     @Override
     public void onPause() {
-        if (getContext() != null)
+        if (getContext() != null) {
             LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(refreshRegisterReceiver);
+            if (locationUtils != null && locationUtils.getLocationClient() != null
+                    && locationUtils.getLocationClient().isMonitoringLocation()) {
+                locationUtils.getLocationClient().stopLocationUpdates();
+                Timber.i("LocationClient has stopped location udpates in #onPause");
+            }
+        }
+
         setViewVisibility(indicatorsCardView, false);
         super.onPause();
     }
@@ -542,6 +555,12 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         if (getContext() != null) {
             IntentFilter filter = new IntentFilter(Action.STRUCTURE_TASK_SYNCED);
             LocalBroadcastManager.getInstance(getContext()).registerReceiver(refreshRegisterReceiver, filter);
+
+            if (locationUtils != null && locationUtils.getLocationClient() != null
+                    && !locationUtils.getLocationClient().isMonitoringLocation()) {
+                locationUtils.getLocationClient().requestLocationUpdates(getPresenter());
+                Timber.i("LocationClient has requested for location udpates in #onResume");
+            }
         }
     }
 
