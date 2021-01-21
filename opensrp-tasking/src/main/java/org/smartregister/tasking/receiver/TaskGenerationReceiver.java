@@ -19,8 +19,15 @@ public class TaskGenerationReceiver extends BroadcastReceiver {
 
     private final TaskGenerationCallBack taskGenerationCallBack;
 
+    private int numberOfCallsExpected = 1;
+
     public TaskGenerationReceiver(TaskGenerationCallBack taskGenerationCallBack) {
         this.taskGenerationCallBack = taskGenerationCallBack;
+    }
+
+    public TaskGenerationReceiver(TaskGenerationCallBack taskGenerationCallBack, int numberOfCallsExpected) {
+        this.taskGenerationCallBack = taskGenerationCallBack;
+        this.numberOfCallsExpected = numberOfCallsExpected;
     }
 
     public interface TaskGenerationCallBack {
@@ -29,6 +36,7 @@ public class TaskGenerationReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        numberOfCallsExpected--;
         Bundle extras = intent.getExtras();
         if (AllConstants.INTENT_KEY.TASK_GENERATED_EVENT.equals(intent.getAction())) {
             Task task = extras != null ? (Task) extras.getSerializable(AllConstants.INTENT_KEY.TASK_GENERATED) : null;
@@ -37,6 +45,8 @@ public class TaskGenerationReceiver extends BroadcastReceiver {
                 taskGenerationCallBack.onTaskCreatedOrUpdated(task);
             }
         }
-        LocalBroadcastManager.getInstance(context).unregisterReceiver(this);
+        if (numberOfCallsExpected == 0) {
+            LocalBroadcastManager.getInstance(context).unregisterReceiver(this);
+        }
     }
 }

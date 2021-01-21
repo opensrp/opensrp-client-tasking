@@ -92,9 +92,9 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.1.0'
 
-    api 'org.smartregister:opensrp-client-core:3.2.1-SNAPSHOT'
+    api 'org.smartregister:opensrp-client-core:4.1.6-SNAPSHOT'
 
-    api ('org.smartregister:opensrp-client-native-form:1.13.2-SNAPSHOT') {
+    api ('org.smartregister:opensrp-client-native-form:1.14.8.0-SNAPSHOT') {
         transitive = true
         exclude group: 'org.smartregister', module: 'opensrp-client-simprints'
         exclude group: 'com.ibm.fhir', module: 'fhir-model'

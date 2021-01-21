@@ -8,23 +8,25 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.powermock.reflect.Whitebox;
+import org.robolectric.util.ReflectionHelpers;
 import org.smartregister.domain.Location;
-import org.smartregister.repository.LocationRepository;
 import org.smartregister.tasking.BaseUnitTest;
+import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.AvailableOfflineMapsContract;
 import org.smartregister.tasking.model.OfflineMapModel;
+import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
 
 /**
  * Created by Richard Kareko on 1/24/20.
@@ -38,17 +40,13 @@ public class AvailableOfflineMapsInteractorTest extends BaseUnitTest {
     @Mock
     private AvailableOfflineMapsContract.Presenter presenter;
 
-    @Mock
-    private LocationRepository locationRepository;
-
     @Captor
     private ArgumentCaptor<List<String>> locationIdsCaptor;
 
     @Captor
     private ArgumentCaptor<List<OfflineMapModel>> offlineMapModelListArgumentCaptor;
 
-    @Captor
-    private ArgumentCaptor<Boolean> booleanArgumentCaptor;
+    private TaskingLibraryConfiguration taskingLibraryConfiguration;
 
     private AvailableOfflineMapsInteractor interactor;
 
@@ -56,8 +54,9 @@ public class AvailableOfflineMapsInteractorTest extends BaseUnitTest {
 
     @Before
     public void setUp() {
+        taskingLibraryConfiguration = spy(TaskingLibrary.getInstance().getTaskingLibraryConfiguration());
+        ReflectionHelpers.setField(TaskingLibrary.getInstance(), "taskingLibraryConfiguration", taskingLibraryConfiguration);
         interactor = new AvailableOfflineMapsInteractor(presenter);
-        Whitebox.setInternalState(interactor, "locationRepository", locationRepository);
         locationId = "location_1";
     }
 
@@ -66,15 +65,13 @@ public class AvailableOfflineMapsInteractorTest extends BaseUnitTest {
         List<String> locationIds = Collections.singletonList(locationId);
         List<Location> locations = Collections.singletonList(initLocation());
 
-        when(locationRepository.getLocationsByIds(locationIds, false)).thenReturn(locations);
+        doReturn(locations).when(taskingLibraryConfiguration).getLocationsIdsForDownload(anyList());
 
         interactor.fetchAvailableOAsForMapDownLoad(locationIds);
-        verify(locationRepository, timeout(ASYNC_TIMEOUT)).getLocationsByIds(locationIdsCaptor.capture(), booleanArgumentCaptor.capture());
+        verify(taskingLibraryConfiguration, timeout(ASYNC_TIMEOUT)).getLocationsIdsForDownload(locationIdsCaptor.capture());
         verify(presenter, timeout(ASYNC_TIMEOUT)).onFetchAvailableOAsForMapDownLoad(offlineMapModelListArgumentCaptor.capture());
         verifyNoMoreInteractions(presenter);
-        verifyNoMoreInteractions(locationRepository);
 
-        assertFalse(booleanArgumentCaptor.getValue().booleanValue());
         assertNotNull(offlineMapModelListArgumentCaptor.getValue());
         assertNotNull(offlineMapModelListArgumentCaptor.getValue().get(0));
         assertNotNull(offlineMapModelListArgumentCaptor.getValue().get(0).getLocation());
