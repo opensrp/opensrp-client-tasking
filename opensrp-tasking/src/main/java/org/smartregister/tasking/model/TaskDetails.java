@@ -5,6 +5,8 @@ import android.location.Location;
 import androidx.annotation.NonNull;
 
 import org.apache.commons.lang3.StringUtils;
+import org.smartregister.clientandeventmodel.Client;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.tasking.util.Utils;
 
 import java.io.Serializable;
@@ -75,6 +77,8 @@ public class TaskDetails extends BaseTaskDetails implements Comparable<TaskDetai
     private boolean notEligible;
 
     private String aggregateBusinessStatus;
+
+    private CommonPersonObjectClient client;
 
     public TaskDetails(@NonNull String taskId) {
         super(taskId);
@@ -366,5 +370,13 @@ public class TaskDetails extends BaseTaskDetails implements Comparable<TaskDetai
 
     public void setAggregateBusinessStatus(String aggregateBusinessStatus) {
         this.aggregateBusinessStatus = aggregateBusinessStatus;
+    }
+
+    public CommonPersonObjectClient getClient() {
+        return client;
+    }
+
+    public void setClient(CommonPersonObjectClient client) {
+        this.client = client;
     }
 }

@@ -215,7 +215,7 @@ public class TestRevealApplication extends DrishtiApplication {
         }
 
         @Override
-        public String mainSelect(String mainCondition) {
+        public String generateTaskRegisterSelectQuery(String mainCondition) {
             return null;
         }
 

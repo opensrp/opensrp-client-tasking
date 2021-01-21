@@ -57,7 +57,7 @@ public interface TaskRegisterFragmentContract {
 
         Location getLastLocation();
 
-        void initializeAdapter(Set<org.smartregister.configurableviews.model.View> visibleColumns);
+        //void initializeAdapter(Set<org.smartregister.configurableviews.model.View> visibleColumns);
 
         void setTotalTasks(int structuresWithinBuffer);
 

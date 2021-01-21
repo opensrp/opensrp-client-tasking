@@ -104,4 +104,5 @@
     <string name="map">Map</string>
     <string name="download">Download</string>
     <string name="clear">Clear</string>
+    <string name="overdue_tasks_count">Overdue: %d</string>
 </resources>

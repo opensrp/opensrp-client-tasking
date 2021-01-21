@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
+import androidx.recyclerview.widget.RecyclerView;
 
 import net.sqlcipher.database.SQLiteDatabase;
 
@@ -18,6 +19,7 @@ import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.Task;
 import org.smartregister.tasking.adapter.TaskRegisterAdapter;
+import org.smartregister.tasking.configuration.TaskRegisterV1Configuration;
 import org.smartregister.tasking.contract.BaseContract;
 import org.smartregister.tasking.contract.BaseDrawerContract;
 import org.smartregister.tasking.contract.BaseFormFragmentContract;
@@ -35,6 +37,8 @@ import java.util.Map;
  * Created by Ephraim Kigamba - nek.eam@gmail.com on 06-08-2020.
  */
 public abstract class TaskingLibraryConfiguration {
+
+    private TaskRegisterConfiguration taskRegisterConfiguration;
 
     @NonNull
     public abstract Pair<Drawable, String> getActionDrawable(Context context, TaskDetails task);
@@ -93,7 +97,7 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract void onLocationValidated(@NonNull Context context, @NonNull BaseFormFragmentContract.View view, @NonNull BaseFormFragmentContract.Interactor interactor, @NonNull BaseTaskDetails baseTaskDetails, @NonNull Location structure);
 
-    public abstract String mainSelect(String mainCondition);
+    public abstract String generateTaskRegisterSelectQuery(String mainCondition);
 
     public abstract String nonRegisteredStructureTasksSelect(String mainCondition);
 
@@ -133,14 +137,32 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract void startMapActivity(Activity activity, String searchViewText, TaskFilterParams taskFilterParams);
 
-    public abstract void onTaskRegisterBindViewHolder(@NonNull Context context, @NonNull TaskRegisterViewHolder viewHolder, @NonNull View.OnClickListener registerActionHandler, @NonNull TaskDetails taskDetails, int position);
+    public abstract void onTaskRegisterBindViewHolder(@NonNull Context context, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull View.OnClickListener registerActionHandler, @NonNull TaskDetails taskDetails, int position);
+
+    public abstract void onTaskRegisterItemClicked(@NonNull Activity activity, @NonNull TaskDetails taskDetails);
 
     @NonNull
     public abstract AppExecutors getAppExecutors();
 
+    @Nullable
     public abstract BaseDrawerContract.View getDrawerMenuView(BaseDrawerContract.DrawerActivity activity);
 
     public abstract void showTasksCompleteActionView(TextView actionView);
 
     public abstract Map<String, Object> getServerConfigs();
+
+    public TaskRegisterConfiguration getTasksRegisterConfiguration(){
+        if (taskRegisterConfiguration == null) {
+            taskRegisterConfiguration = new TaskRegisterV1Configuration();
+        }
+
+        return taskRegisterConfiguration;
+    }
+
+    public interface TaskRegisterConfiguration {
+
+        boolean isV2Design();
+
+        boolean showGroupedTasks();
+    }
 }
