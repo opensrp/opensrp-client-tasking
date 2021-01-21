@@ -1,6 +1,5 @@
 package org.smartregister.tasking.fragment;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -21,7 +20,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
@@ -52,10 +50,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import io.ona.kujaku.interfaces.ILocationClient;
 import io.ona.kujaku.location.clients.AndroidGpsLocationClient;
 import io.ona.kujaku.utils.Constants;
-import io.ona.kujaku.utils.Permissions;
 import timber.log.Timber;
 
 import static android.app.Activity.RESULT_CANCELED;
