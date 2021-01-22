@@ -121,7 +121,7 @@ public class TaskingRepository extends BaseRepository {
         HashMap<String, Client> locationToClientMap = new HashMap<>();
         try {
             String[] params = personIds.toArray(new String[0]);
-            cursor = getReadableDatabase().rawQuery(String.format("SELECT ec_family.structure_uuid, client.json FROM ec_family INNER JOIN ec_family_member ON ec_family.base_entity_id = ec_family_member.relational_id INNER JOIN client ON ec_family_member.base_entity_id = client.baseEntityId WHERE ec_family_member.base_entity_id IN (%s)"
+            cursor = getReadableDatabase().rawQuery(String.format("SELECT structure_family_relationship.structure_uuid, client.json FROM structure_family_relationship INNER JOIN ec_family_member ON structure_family_relationship.family_base_entity_id = ec_family_member.relational_id INNER JOIN client ON ec_family_member.base_entity_id = client.baseEntityId WHERE ec_family_member.base_entity_id IN (%s)"
                     , TextUtils.join(",", Collections.nCopies(personIds.size(), "?")))
                     , params);
             while (cursor.moveToNext()) {

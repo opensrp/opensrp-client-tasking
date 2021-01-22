@@ -234,6 +234,7 @@ public interface TaskingConstants {
         String STRUCTURE_TABLE = "structure";
         String LOCATION_TABLE = "location";
         String EC_EVENT = "ec_events";
+        String STRUCTURE_FAMILY_RELATIONSHIP = "structure_family_relationship";
     }
 
     interface BusinessStatus {
