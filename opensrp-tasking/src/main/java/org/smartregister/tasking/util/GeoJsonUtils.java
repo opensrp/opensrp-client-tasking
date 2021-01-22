@@ -128,6 +128,11 @@ public class GeoJsonUtils {
                 locationCustomProperties.put(TASK_STATUS, task.getStatus().name());
                 locationCustomProperties.put(TaskingConstants.Properties.TASK_CODE, task.getCode());
                 locationCustomProperties.put(TaskingConstants.Properties.TASK_PRIORITY, String.valueOf(task.getPriority()));
+                locationCustomProperties.put(TaskingConstants.Properties.BASE_ENTITY_ID, client.getBaseEntityId());
+
+                if (client.getRelationships() != null && client.getRelationships("mother") != null && client.getRelationships("mother").size() > 0) {
+                    locationCustomProperties.put(TaskingConstants.Properties.MOTHER_ID, client.getRelationships("mother").get(0));
+                }
 
                 locationCustomProperties.put(TaskingConstants.Properties.LOCATION_UUID, structure.getProperties().getUid());
                 locationCustomProperties.put(TaskingConstants.Properties.LOCATION_VERSION, structure.getProperties().getVersion() + "");
