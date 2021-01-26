@@ -107,7 +107,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'appcompat-v7'
     }
 
-    implementation 'org.smartregister:opensrp-client-reporting:0.1.0-SNAPSHOT@aar'
+    implementation 'org.smartregister:opensrp-client-reporting:0.1.0-PREVIEW-SNAPSHOT@aar'
 
     implementation ('io.ona.kujaku:library:0.9.0') {
         transitive = true
