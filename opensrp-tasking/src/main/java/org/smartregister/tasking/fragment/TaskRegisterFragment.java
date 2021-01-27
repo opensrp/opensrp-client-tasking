@@ -238,8 +238,13 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
     @Override
     protected void initializePresenter() {
         presenter = new TaskRegisterFragmentPresenter(this, TaskRegister.VIEW_IDENTIFIER);
-        locationUtils = new LocationUtils(new AndroidGpsLocationClient(getContext()));
-        locationUtils.requestLocationUpdates(getPresenter());
+        if (locationUtils == null) {
+            locationUtils = new LocationUtils(new AndroidGpsLocationClient(getContext()));
+        }
+
+        if (locationUtils.getLocationClient() != null && !locationUtils.getLocationClient().isMonitoringLocation()) {
+            locationUtils.requestLocationUpdates(getPresenter());
+        }
     }
 
     @Override
