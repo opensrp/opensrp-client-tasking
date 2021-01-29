@@ -9,7 +9,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.0'
+        classpath 'com.android.tools.build:gradle:4.0.2'
     }
 }
 
@@ -32,6 +32,9 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
         multiDexEnabled true
+
+        buildConfigField "String[]", "LOCATION_LEVELS", '{"Country", "Province", "Region", "District", "Sub-district","Operational Area"}'
+        buildConfigField "String[]", "HEALTH_FACILITY_LEVELS", '{"Country", "Province", "Region", "District", "Sub-district","Operational Area"}'
     }
 
     buildTypes {
@@ -81,12 +84,9 @@ allprojects {
     repositories {
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
         maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
+        maven { url "http://dl.bintray.com/ona/kujaku" }
         mavenLocal()
     }
-}
-
-tasks.withType(Test) {
-    jacoco.includeNoLocationClasses = true
 }
 
 dependencies {
@@ -117,14 +117,17 @@ dependencies {
     implementation 'xerces:xercesImpl:2.12.0'
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.5'
-    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-turf:5.1.0'
 
+    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-turf:5.1.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-scalebar-v8:0.3.0'
 
     implementation 'com.google.android:flexbox:1.0.0'
     implementation 'com.google.android.material:material:1.0.0'
 
+    compileOnly 'org.projectlombok:lombok:1.18.12'
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
 
-    // Test dependencices
+    // Test dependencies
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'

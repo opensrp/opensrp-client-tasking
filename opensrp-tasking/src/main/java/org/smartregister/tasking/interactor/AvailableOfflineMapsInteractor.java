@@ -21,7 +21,7 @@ public class AvailableOfflineMapsInteractor implements AvailableOfflineMapsContr
 
     public AvailableOfflineMapsInteractor(AvailableOfflineMapsContract.Presenter presenter) {
         this.presenter = presenter;
-        appExecutors = TaskingLibrary.getInstance().getAppExecutors();
+        appExecutors = TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getAppExecutors();
         locationRepository = DrishtiApplication.getInstance().getContext().getLocationRepository();
     }
 

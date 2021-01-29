@@ -9,7 +9,6 @@ import org.smartregister.clientandeventmodel.Client;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.tasking.util.Utils;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +33,7 @@ import static org.smartregister.tasking.util.Constants.Intervention.REGISTER_FAM
 /**
  * Created by samuelgithengi on 3/20/19.
  */
-public class TaskDetails extends BaseTaskDetails implements Comparable<TaskDetails>, Serializable {
+public class TaskDetails extends BaseTaskDetails implements Comparable<TaskDetails> {
 
     private Location location;
 

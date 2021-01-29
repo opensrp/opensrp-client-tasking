@@ -1,4 +1,4 @@
-package org.smartregister.tasking.sample;
+package org.smartregister.tasking.sample.activity;
 
 import android.os.Bundle;
 import android.view.View;

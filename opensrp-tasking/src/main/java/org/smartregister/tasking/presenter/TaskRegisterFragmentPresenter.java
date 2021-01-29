@@ -106,8 +106,6 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
         this.interactor = interactor;
         viewsHelper = ConfigurableViewsLibrary.getInstance().getConfigurableViewsHelper();
         prefsUtil = PreferencesUtil.getInstance();
-
-
     }
 
 

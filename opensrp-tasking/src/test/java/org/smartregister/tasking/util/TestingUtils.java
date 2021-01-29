@@ -39,15 +39,18 @@ import java.util.UUID;
 import io.ona.kujaku.data.realm.objects.MapBoxOfflineQueueTask;
 
 import static io.ona.kujaku.downloaders.MapBoxOfflineResourcesDownloader.METADATA_JSON_FIELD_REGION_NAME;
-import static org.smartregister.tasking.util.Constants.DatabaseKeys;
 import static org.smartregister.tasking.model.OfflineMapModel.OfflineMapStatus.DOWNLOADED;
 import static org.smartregister.tasking.util.Constants.BusinessStatus.NOT_VISITED;
+import static org.smartregister.tasking.util.Constants.DatabaseKeys;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.BUSINESS_STATUS;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.CODE;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.FOR;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.GROUPID;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.STATUS;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.STRUCTURE_ID;
+import static org.smartregister.tasking.util.TaskingConstants.BusinessStatus.NOT_ELIGIBLE;
+import static org.smartregister.tasking.util.TaskingConstants.BusinessStatus.NOT_SPRAYED;
+import static org.smartregister.tasking.util.TaskingConstants.BusinessStatus.SPRAYED;
 
 /**
  * Created by samuelgithengi on 3/27/19.
@@ -74,6 +77,8 @@ public class TestingUtils {
 
     public static final String DUMMY_OPERATIONAL_AREA = "Akros_1";
 
+    public static String AddStructureFormJson = "{\"count\":\"1\",\"encounter_type\":\"Register_Structure\",\"form_version\":\"0.0.1\",\"entity_id\":\"\",\"metadata\":{\"start\":{\"openmrs_entity_parent\":\"\",\"openmrs_entity\":\"concept\",\"openmrs_data_type\":\"start\",\"openmrs_entity_id\":\"163137AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"},\"end\":{\"openmrs_entity_parent\":\"\",\"openmrs_entity\":\"concept\",\"openmrs_data_type\":\"end\",\"openmrs_entity_id\":\"163138AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"},\"today\":{\"openmrs_entity_parent\":\"\",\"openmrs_entity\":\"encounter\",\"openmrs_entity_id\":\"encounter_date\"},\"deviceid\":{\"openmrs_entity_parent\":\"\",\"openmrs_entity\":\"concept\",\"openmrs_data_type\":\"deviceid\",\"openmrs_entity_id\":\"163149AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"},\"subscriberid\":{\"openmrs_entity_parent\":\"\",\"openmrs_entity\":\"concept\",\"openmrs_data_type\":\"subscriberid\",\"openmrs_entity_id\":\"163150AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"},\"simserial\":{\"openmrs_entity_parent\":\"\",\"openmrs_entity\":\"concept\",\"openmrs_data_type\":\"simserial\",\"openmrs_entity_id\":\"163151AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"},\"phonenumber\":{\"openmrs_entity_parent\":\"\",\"openmrs_entity\":\"concept\",\"openmrs_data_type\":\"phonenumber\",\"openmrs_entity_id\":\"163152AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\"},\"encounter_location\":\"\"},\"step1\":{\"title\":\"Register Structure\",\"display_back_button\":true,\"no_padding\":true,\"fields\":[{\"key\":\"structure\",\"type\":\"geowidget\",\"v_zoom_max\":{\"value\":\"16.5\",\"err\":\"Please zoom in to add a point\"}},{\"key\":\"selectedOpAreaLabel\",\"type\":\"label\",\"text\":\"Selected Operational Area\",\"read_only\":false,\"hint_on_text\":false,\"text_color\":\"#000000\",\"openmrs_entity_parent\":\"\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\"},{\"key\":\"selectedOpAreaName\",\"type\":\"label\",\"text\":\"\",\"read_only\":false,\"hint_on_text\":true,\"text_color\":\"#000000\",\"openmrs_entity_parent\":\"\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\"},{\"key\":\"structureType\",\"openmrs_entity_parent\":\"\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\",\"type\":\"native_radio\",\"label\":\"Type of Structure\",\"options\":[{\"key\":\"Residential Structure\",\"text\":\"Residential Structure\"},{\"key\":\"Mosquito Collection Point\",\"text\":\"Mosquito Collection Point\"},{\"key\":\"Larval Breeding Site\",\"text\":\"Larval Breeding Site\"},{\"key\":\"Potential Area of Transmission\",\"text\":\"Potential Area of Transmission\"}],\"value\":\"Residential Structure\",\"v_required\":{\"value\":true,\"err\":\"Please specify Type of structure\"}},{\"key\":\"physicalType\",\"openmrs_entity_parent\":\"\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\",\"type\":\"native_radio\",\"label\":\"Location Physical Type\",\"options\":[{\"key\":\"Home\",\"text\":\"Home\"},{\"key\":\"Hut\",\"text\":\"Hut\"}],\"value\":\"Home\",\"relevance\":{\"step1:structureType\":{\"type\":\"string\",\"ex\":\"equalTo(., \\\"Residential Structure\\\")\"}}},{\"key\":\"structureName\",\"openmrs_entity_parent\":\"\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\",\"type\":\"edit_text\",\"hint\":\"Name of structure\",\"edit_type\":\"name\"},{\"key\":\"zoom_level\",\"type\":\"hidden\",\"openmrs_entity_parent\":\"\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\"},{\"key\":\"valid_operational_area\",\"type\":\"hidden\",\"openmrs_entity_parent\":\"\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\"},{\"key\":\"my_location_active\",\"type\":\"hidden\",\"openmrs_entity_parent\":\"\",\"openmrs_entity\":\"\",\"openmrs_entity_id\":\"\"}]}}";
+
     public static TaskDetails getTaskDetails() {
         TaskDetails taskDetails = new TaskDetails(UUID.randomUUID().toString());
         taskDetails.setDistanceFromUser(25.5f);
@@ -85,7 +90,6 @@ public class TestingUtils {
         taskDetails.setLocation(new Location("Test"));
         return taskDetails;
     }
-
 
 
     public static CommonPersonObjectClient getCommonPersonObjectClient() {
@@ -113,8 +117,8 @@ public class TestingUtils {
         return task;
     }
 
-    public static MatrixCursor getTaskCursor(Task task ) {
-        String[] COLUMNS = {"_id", STATUS, BUSINESS_STATUS,  CODE, FOR, GROUPID, STRUCTURE_ID};
+    public static MatrixCursor getTaskCursor(Task task) {
+        String[] COLUMNS = {"_id", STATUS, BUSINESS_STATUS, CODE, FOR, GROUPID, STRUCTURE_ID};
 
         MatrixCursor cursor = new MatrixCursor(COLUMNS);
 
@@ -129,6 +133,7 @@ public class TestingUtils {
         model.setLocation(TestingUtils.gson.fromJson(TestingUtils.operationalAreaGeoJSON, org.smartregister.domain.Location.class));
         return model;
     }
+
     public static Feature getStructure() {
         return Feature.fromJson(structureJSON);
     }
@@ -185,7 +190,7 @@ public class TestingUtils {
 
         MapBoxOfflineQueueTask offlineQueueTask = getMapBoxOfflineQueueTask();
         offlineQueueTask.setDateCreated(new Date());
-        offlineQueueTaskMap.put("location_1",offlineQueueTask);
+        offlineQueueTaskMap.put("location_1", offlineQueueTask);
         return offlineQueueTaskMap;
     }
 
@@ -203,13 +208,115 @@ public class TestingUtils {
         ArrayList<FormLocation> districtFormLocations = new ArrayList<>();
         districtFormLocations.add(facilityFormLocation);
         provinceFormLocation.nodes = districtFormLocations;
-        FormLocation countryFormLocation= new FormLocation();
+        FormLocation countryFormLocation = new FormLocation();
         countryFormLocation.name = "Zambia";
         ArrayList<FormLocation> provinceFormLocations = new ArrayList<>();
         provinceFormLocations.add(facilityFormLocation);
         countryFormLocation.nodes = provinceFormLocations;
 
         return countryFormLocation;
+    }
+
+    public static Set<Task> createTasks() {
+
+        Set<Task> tasks = new HashSet<>();
+
+        Task task = new Task();
+        task.setStructureId("struct-id-1");
+        task.setAuthoredOn(new DateTime());
+        task.setBusinessStatus(SPRAYED);
+        task.setCode(Constants.Intervention.IRS);
+        task.setDescription("random descriptions");
+        task.setPlanIdentifier("plan-id-1");
+        task.setStatus(Task.TaskStatus.COMPLETED);
+        task.setForEntity("my-base-entity-id");
+        tasks.add(task);
+
+
+        task = new Task();
+        task.setStructureId("struct-id-1");
+        task.setAuthoredOn(new DateTime());
+        task.setBusinessStatus(NOT_ELIGIBLE);
+        task.setCode(Constants.Intervention.FI);
+        task.setDescription("random descriptions 2");
+        task.setPlanIdentifier("plan-id-1");
+        task.setStatus(Task.TaskStatus.CANCELLED);
+        task.setForEntity("my-base-entity-id");
+        tasks.add(task);
+
+
+        task = new Task();
+        task.setStructureId("struct-id-2");
+        task.setAuthoredOn(new DateTime());
+        task.setBusinessStatus(NOT_VISITED);
+        task.setCode(Constants.Intervention.IRS);
+        task.setDescription("random descriptions xx");
+        task.setPlanIdentifier("plan-id-1");
+        task.setStatus(Task.TaskStatus.READY);
+        task.setForEntity("my-base-entity-id");
+        tasks.add(task);
+
+
+        task = new Task();
+        task.setStructureId("struct-id-3");
+        task.setAuthoredOn(new DateTime());
+        task.setBusinessStatus(SPRAYED);
+        task.setCode(Constants.Intervention.IRS);
+        task.setDescription("random descriptions 3");
+        task.setPlanIdentifier("plan-id-1");
+        task.setStatus(Task.TaskStatus.COMPLETED);
+        task.setForEntity("my-base-entity-id");
+        tasks.add(task);
+
+
+        task = new Task();
+        task.setStructureId("struct-id-4");
+        task.setAuthoredOn(new DateTime());
+        task.setBusinessStatus(NOT_SPRAYED);
+        task.setCode(Constants.Intervention.IRS);
+        task.setDescription("random descriptions 4");
+        task.setPlanIdentifier("plan-id-1");
+        task.setStatus(Task.TaskStatus.READY);
+        task.setForEntity("my-base-entity-id");
+        tasks.add(task);
+
+
+        task = new Task();
+        task.setStructureId("struct-id-5");
+        task.setAuthoredOn(new DateTime());
+        task.setBusinessStatus(SPRAYED);
+        task.setCode(Constants.Intervention.IRS);
+        task.setDescription("random descriptions");
+        task.setStatus(Task.TaskStatus.COMPLETED);
+        task.setForEntity("my-base-entity-id");
+        task.setPlanIdentifier("plan-id-1");
+        tasks.add(task);
+
+
+        task = new Task();
+        task.setStructureId("struct-id-6");
+        task.setAuthoredOn(new DateTime());
+        task.setBusinessStatus(NOT_VISITED);
+        task.setCode(Constants.Intervention.IRS);
+        task.setDescription("random descriptions 5");
+        task.setPlanIdentifier("plan-id-1");
+        task.setStatus(Task.TaskStatus.READY);
+        task.setForEntity("my-base-entity-id");
+        tasks.add(task);
+
+
+        task = new Task();
+        task.setStructureId("struct-id-7");
+        task.setAuthoredOn(new DateTime());
+        task.setBusinessStatus(NOT_ELIGIBLE);
+        task.setCode(Constants.Intervention.IRS);
+        task.setDescription("random descriptions 7");
+        task.setPlanIdentifier("plan-id-1");
+        task.setStatus(Task.TaskStatus.READY);
+        task.setForEntity("my-base-entity-id");
+        tasks.add(task);
+        return tasks;
+
     }
 
 }

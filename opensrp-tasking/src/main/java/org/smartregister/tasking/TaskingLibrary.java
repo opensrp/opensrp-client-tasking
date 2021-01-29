@@ -8,10 +8,12 @@ import androidx.annotation.Nullable;
 import org.smartregister.CoreLibrary;
 import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.repository.EventClientRepository;
+import org.smartregister.repository.PlanDefinitionSearchRepository;
 import org.smartregister.repository.Repository;
 import org.smartregister.repository.StructureRepository;
 import org.smartregister.repository.TaskNotesRepository;
 import org.smartregister.repository.TaskRepository;
+import org.smartregister.tasking.repository.TaskingRepository;
 import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 import org.smartregister.util.AppExecutors;
 import org.smartregister.view.activity.DrishtiApplication;
@@ -29,6 +31,7 @@ public class TaskingLibrary {
     private TaskNotesRepository taskNotesRepository;
     private StructureRepository structureRepository;
     private EventClientRepository eventClientRepository;
+    private PlanDefinitionSearchRepository planDefinitionSearchRepository;
     private AllSharedPreferences allSharedPreferences;
 
     private String digitalGlobeConnectId;
@@ -36,17 +39,26 @@ public class TaskingLibrary {
 
     private RealmDatabase realmDatabase;
     private TaskingLibraryConfiguration taskingLibraryConfiguration;
+    private TaskingRepository taskingRepository;
 
     public static void init(@NonNull TaskingLibraryConfiguration taskingLibraryConfiguration) {
-        instance = new TaskingLibrary(taskingLibraryConfiguration);
+        instance = new TaskingLibrary(taskingLibraryConfiguration, null, null);
+    }
+
+    public static void init(@NonNull TaskingLibraryConfiguration taskingLibraryConfiguration,
+                            @Nullable TaskingRepository taskingRepository, @Nullable StructureRepository structureRepository) {
+        instance = new TaskingLibrary(taskingLibraryConfiguration, taskingRepository, structureRepository);
     }
 
     public static TaskingLibrary getInstance() {
         return instance;
     }
 
-    public TaskingLibrary(@NonNull TaskingLibraryConfiguration taskingLibraryConfiguration) {
+    public TaskingLibrary(@NonNull TaskingLibraryConfiguration taskingLibraryConfiguration,
+                          @Nullable TaskingRepository taskingRepository, @Nullable StructureRepository structureRepository) {
         this.taskingLibraryConfiguration = taskingLibraryConfiguration;
+        this.taskingRepository = taskingRepository;
+        this.structureRepository = structureRepository;
     }
 
     @NonNull
@@ -86,8 +98,23 @@ public class TaskingLibrary {
         if (structureRepository == null) {
             structureRepository = new StructureRepository();
         }
-
         return structureRepository;
+    }
+
+    @NonNull
+    public PlanDefinitionSearchRepository getPlanDefinitionSearchRepository() {
+        if (planDefinitionSearchRepository == null) {
+            planDefinitionSearchRepository = new PlanDefinitionSearchRepository();
+        }
+        return planDefinitionSearchRepository;
+    }
+
+    @NonNull
+    public TaskingRepository getTaskingRepository() {
+        if (taskingRepository == null) {
+            taskingRepository = new TaskingRepository();
+        }
+        return taskingRepository;
     }
 
     @NonNull
