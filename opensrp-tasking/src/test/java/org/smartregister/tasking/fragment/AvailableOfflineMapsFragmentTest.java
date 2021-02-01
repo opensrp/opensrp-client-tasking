@@ -184,10 +184,6 @@ public class AvailableOfflineMapsFragmentTest extends BaseUnitTest {
 
         fragment.moveDownloadedOAToDownloadedList(originalOfflineMapModelList.get(0).getDownloadAreaId());
 
-        List<OfflineMapModel> actualOfflineMapModelList = (Whitebox.getInternalState(fragment, "offlineMapModelList"));
-        assertNotNull(actualOfflineMapModelList);
-        assertTrue(actualOfflineMapModelList.isEmpty());
-
         List<Location> actualOAsToDownload = (Whitebox.getInternalState(fragment, "operationalAreasToDownload"));
         assertNotNull(actualOAsToDownload);
         assertTrue(actualOAsToDownload.isEmpty());

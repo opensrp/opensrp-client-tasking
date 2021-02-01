@@ -109,7 +109,7 @@ public abstract class OfflineMapsActivity extends AppCompatActivity implements O
 
     @Override
     public void onMapDownloaded(OfflineMapModel offlineMapModel) {
-        getOfflineDownloadedRegions(true);
+        getOfflineDownloadedRegions(false);
     }
 
     @Override

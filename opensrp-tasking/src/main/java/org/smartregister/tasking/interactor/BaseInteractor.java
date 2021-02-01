@@ -21,7 +21,6 @@ import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.commonregistry.CommonRepository;
-import org.smartregister.cursoradapter.SmartRegisterQueryBuilder;
 import org.smartregister.domain.Client;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.LocationProperty;
@@ -50,9 +49,7 @@ import org.smartregister.view.activity.DrishtiApplication;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import timber.log.Timber;
@@ -397,7 +394,6 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
         });*/
         TaskingLibrary.getInstance().getTaskingLibraryConfiguration().saveCaseConfirmation(this, presenterCallBack, jsonForm, eventType);
     }
-
 
 
     public void fetchFamilyDetails(String structureId) {

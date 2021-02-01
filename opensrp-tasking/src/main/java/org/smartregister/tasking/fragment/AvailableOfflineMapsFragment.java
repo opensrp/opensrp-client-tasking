@@ -175,10 +175,7 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
                 break;
             }
         }
-
-        offlineMapModelList.removeAll(toRemoveFromAvailableList);
         operationalAreasToDownload.removeAll(toRemoveFromDownloadList);
-
     }
 
     @Override

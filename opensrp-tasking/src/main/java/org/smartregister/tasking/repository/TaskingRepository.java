@@ -29,22 +29,17 @@ import static org.smartregister.tasking.util.TaskingConstants.Tables.STRUCTURE_T
 public class TaskingRepository extends BaseRepository {
 
     public Map<String, StructureDetails> getStructureName(String parentId) {
-        Cursor cursor = null;
         Map<String, StructureDetails> structureNames = new HashMap<>();
-        try {
-            String query = getStructureNamesSelect(String.format("%s=?",
-                    Constants.DatabaseKeys.PARENT_ID)).concat(String.format(" GROUP BY %s.%s", STRUCTURES_TABLE, ID));
-            Timber.d(query);
-            cursor = getReadableDatabase().rawQuery(query, new String[]{parentId});
+        String query = getStructureNamesSelect(String.format("%s=?",
+                Constants.DatabaseKeys.PARENT_ID)).concat(String.format(" GROUP BY %s.%s", STRUCTURES_TABLE, ID));
+        Timber.d(query);
+
+        try (Cursor cursor = getReadableDatabase().rawQuery(query, new String[]{parentId})) {
             while (cursor.moveToNext()) {
                 structureNames.put(cursor.getString(0), new StructureDetails(cursor.getString(1), cursor.getString(2)));
             }
-        } catch (Exception e) {
+        } catch (SQLiteException e) {
             Timber.e(e);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
         }
         return structureNames;
     }
@@ -55,22 +50,16 @@ public class TaskingRepository extends BaseRepository {
 
 
     public String getIndexCaseStructure(String planId) {
-        Cursor cursor = null;
         String structureId = null;
-        try {
-            String query = getMemberTasksSelect(String.format("%s=? AND %s=? ",
-                    PLAN_ID, CODE), new String[]{});
-            Timber.d(query);
-            cursor = getReadableDatabase().rawQuery(query, new String[]{planId, CASE_CONFIRMATION});
+        String query = getMemberTasksSelect(String.format("%s=? AND %s=? ",
+                PLAN_ID, CODE), new String[]{});
+        Timber.d(query);
+        try (Cursor cursor = getReadableDatabase().rawQuery(query, new String[]{planId, CASE_CONFIRMATION})) {
             if (cursor.moveToNext()) {
                 structureId = cursor.getString(0);
             }
-        } catch (Exception e) {
+        } catch (SQLiteException e) {
             Timber.e(e);
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
         }
         return structureId;
     }
