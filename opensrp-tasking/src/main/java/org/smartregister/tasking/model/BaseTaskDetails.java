@@ -30,7 +30,7 @@ public class BaseTaskDetails implements Serializable {
 
     private long authoredOn;
 
-    private int priority;
+    private Task.TaskPriority priority;
 
     public BaseTaskDetails(@NonNull String taskId) {
         this.taskId = taskId;
@@ -100,11 +100,11 @@ public class BaseTaskDetails implements Serializable {
         this.authoredOn = authoredOn;
     }
 
-    public int getPriority() {
+    public Task.TaskPriority getPriority() {
         return priority;
     }
 
-    public void setPriority(int priority) {
+    public void setPriority(Task.TaskPriority priority) {
         this.priority = priority;
     }
 

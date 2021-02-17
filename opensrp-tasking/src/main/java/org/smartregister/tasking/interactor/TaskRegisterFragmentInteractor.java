@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.smartregister.CoreLibrary;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
+import org.smartregister.domain.Task;
 import org.smartregister.repository.EventClientRepository.event_column;
 import org.smartregister.repository.LocationRepository;
 import org.smartregister.tasking.TaskingLibrary;
@@ -330,7 +331,7 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
 
         int colIndex = cursor.getColumnIndex(PRIORITY);
         if (colIndex != -1) {
-            task.setPriority(cursor.getInt(colIndex));
+            task.setPriority(Task.TaskPriority.get(cursor.getString(colIndex)));
         }
 
 
