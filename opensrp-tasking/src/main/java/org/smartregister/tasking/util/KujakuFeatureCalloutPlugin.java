@@ -210,19 +210,19 @@ public class KujakuFeatureCalloutPlugin implements MapCalloutFeature.Plugin, Map
 
                 if (priority != null) {
                     switch (priority) {
-                        case "0":
+                        case "START":
                             bubbleColorRes = R.color.map_tasking_red;
                             break;
 
-                        case "1":
+                        case "ASAP":
                             bubbleColorRes = R.color.map_tasking_orange;
                             break;
 
-                        case "2":
+                        case "URGENT":
                             bubbleColorRes = R.color.map_tasking_blue;
                             break;
 
-                        case "3":
+                        case "ROUTINE":
                             bubbleColorRes = R.color.map_tasking_blue;
                             break;
                     }
