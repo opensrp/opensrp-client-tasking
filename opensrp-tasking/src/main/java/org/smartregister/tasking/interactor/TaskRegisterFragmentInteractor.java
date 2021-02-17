@@ -331,7 +331,7 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
 
         int colIndex = cursor.getColumnIndex(PRIORITY);
         if (colIndex != -1) {
-            task.setPriority(Task.TaskPriority.get(cursor.getString(colIndex)));
+            task.setPriority(Task.TaskPriority.get(cursor.getString(colIndex).toLowerCase()));
         }
 
 
