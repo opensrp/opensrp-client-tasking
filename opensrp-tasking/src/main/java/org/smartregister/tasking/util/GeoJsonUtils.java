@@ -127,7 +127,7 @@ public class GeoJsonUtils {
                 locationCustomProperties.put(TaskingConstants.Properties.FEATURE_SELECT_TASK_BUSINESS_STATUS, task.getBusinessStatus()); // used to determine action to take when a feature is selected
                 locationCustomProperties.put(TASK_STATUS, task.getStatus().name());
                 locationCustomProperties.put(TaskingConstants.Properties.TASK_CODE, task.getCode());
-                locationCustomProperties.put(TaskingConstants.Properties.TASK_PRIORITY, String.valueOf(task.getPriority()));
+                locationCustomProperties.put(TaskingConstants.Properties.TASK_PRIORITY, task.getPriority().name());
                 locationCustomProperties.put(TaskingConstants.Properties.BASE_ENTITY_ID, client.getBaseEntityId());
 
                 if (client.getRelationships() != null && client.getRelationships("mother") != null && client.getRelationships("mother").size() > 0) {
