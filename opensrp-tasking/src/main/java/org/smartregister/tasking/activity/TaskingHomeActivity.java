@@ -515,7 +515,9 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
             }
 
             // Calculate the camera position to the area with most features
-            if (cameraPosition == null && TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design()) {
+            if (cameraPosition == null && TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design()
+                    && featureCollection != null && featureCollection.features() != null
+                    && featureCollection.features().size() > 0) {
                 List<Feature> featureList = featureCollection.features();
                 HashMap<Feature, List<Feature>> features = new HashMap<>();
                 Feature largestFeatureGroup = null;
