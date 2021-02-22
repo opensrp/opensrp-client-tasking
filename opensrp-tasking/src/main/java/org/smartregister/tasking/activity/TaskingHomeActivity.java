@@ -595,6 +595,12 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
                 }
             }
 
+            if (cameraPosition == null && TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design()) {
+                if (kujakuMapView != null) {
+                    kujakuMapView.focusOnUserLocation(true);
+                }
+            }
+
             if (featureCollection != null && featureCollection.features() != null && featureCollection.features().size() > 0) {
                 kujakuFeatureCalloutPlugin.setupOnMap(featureCollection.features(), geoJsonSource.getId());
             }
