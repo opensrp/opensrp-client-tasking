@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
@@ -329,7 +330,12 @@ public class TestRevealApplication extends DrishtiApplication {
         }
 
         @Override
-        public void onTaskRegisterBindViewHolder(@NonNull android.content.Context context, @NonNull TaskRegisterViewHolder viewHolder, @NonNull View.OnClickListener registerActionHandler, @NonNull TaskDetails taskDetails, int position) {
+        public void onTaskRegisterBindViewHolder(@NonNull android.content.Context context, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull View.OnClickListener registerActionHandler, @NonNull TaskDetails taskDetails, int position) {
+
+        }
+
+        @Override
+        public void onTaskRegisterItemClicked(@NonNull Activity activity, @NonNull TaskDetails taskDetails) {
 
         }
 
@@ -430,7 +436,7 @@ public class TestRevealApplication extends DrishtiApplication {
         }
 
         @Override
-        public Boolean getDrawOperationalAreaBoundaryAndLabel() {
+        public boolean getDrawOperationalAreaBoundaryAndLabel() {
             return true;
         }
 
@@ -487,6 +493,12 @@ public class TestRevealApplication extends DrishtiApplication {
         @Override
         public void openFilterTaskActivity(TaskFilterParams filterParams, TaskingHomeActivity activity) {
 
+        }
+
+        @Nullable
+        @Override
+        public MapConfiguration getMapConfiguration() {
+            return null;
         }
     }
 }

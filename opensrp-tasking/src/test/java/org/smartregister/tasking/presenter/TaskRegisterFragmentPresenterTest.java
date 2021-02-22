@@ -44,6 +44,7 @@ import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 import org.smartregister.tasking.util.TestingUtils;
 import org.smartregister.tasking.util.Utils;
 import org.smartregister.util.Cache;
+import org.smartregister.view.contract.IView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -117,7 +118,7 @@ public class TaskRegisterFragmentPresenterTest extends BaseUnitTest {
 
     private TaskRegisterFragmentPresenter presenter;
 
-    private Set<View> visibleColumns;
+    private Set<IView> visibleColumns;
 
     private Location location;
 
