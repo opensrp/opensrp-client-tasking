@@ -8,6 +8,7 @@ import androidx.core.util.Pair;
 
 import com.mapbox.mapboxsdk.offline.OfflineRegion;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -19,6 +20,7 @@ import org.mockito.junit.MockitoRule;
 import org.powermock.reflect.Whitebox;
 import org.robolectric.Robolectric;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.android.controller.ActivityController;
 import org.smartregister.domain.Location;
 import org.smartregister.tasking.BaseUnitTest;
 import org.smartregister.tasking.R;
@@ -71,11 +73,16 @@ public class DownloadedOfflineMapsFragmentTest extends BaseUnitTest {
 
     private Context context = RuntimeEnvironment.application;
 
+    private ActivityController<AppCompatActivity> controller;
+
     @Before
     public void setUp() {
         org.smartregister.Context.bindtypes= new ArrayList<>();
         fragment = new DownloadedOfflineMapsFragment();
-        AppCompatActivity activity = Robolectric.buildActivity(AppCompatActivity.class).create().start().get();
+
+        controller = Robolectric.buildActivity(AppCompatActivity.class).create().start();
+        AppCompatActivity activity = controller.get();
+
         activity.setContentView(R.layout.activity_offline_maps);
         activity.getSupportFragmentManager().beginTransaction().add(fragment, "Downloaded").commit();
     }
@@ -197,6 +204,17 @@ public class DownloadedOfflineMapsFragmentTest extends BaseUnitTest {
         fragment.setOfflineDownloadedMapNames(offlineRegionInfo);
 
         verify(presenter).fetchOAsWithOfflineDownloads(anyObject());
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        try {
+            controller.pause().stop().destroy();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        System.gc();
     }
 
 }
