@@ -115,7 +115,7 @@ public class TestRevealApplication extends DrishtiApplication {
 
         @Override
         public int getInterventionLabel() {
-            return 0;
+            return R.string.anc_label;
         }
 
         @NonNull
