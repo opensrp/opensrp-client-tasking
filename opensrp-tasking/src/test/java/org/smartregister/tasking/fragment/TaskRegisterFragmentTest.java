@@ -91,7 +91,6 @@ public class TaskRegisterFragmentTest extends BaseUnitTest {
 
     private TaskRegisterActivity activity;
 
-    @Mock
     private TaskRegisterFragmentPresenter presenter;
 
     @Mock
@@ -119,10 +118,13 @@ public class TaskRegisterFragmentTest extends BaseUnitTest {
     public void setUp() {
         org.smartregister.Context.bindtypes = new ArrayList<>();
         fragment = new TaskRegisterFragment();
-        Whitebox.setInternalState(fragment, "presenter", presenter);
+
         activity = Robolectric.buildActivity(TestTaskRegisterActivity.class).create().start().get();
         activity.setContentView(R.layout.activity_base_register);
         activity.getSupportFragmentManager().beginTransaction().add(0, fragment).commit();
+
+        presenter = (TaskRegisterFragmentPresenter) Mockito.spy(fragment.presenter());
+        Whitebox.setInternalState(fragment, "presenter", presenter);
 
         taskingLibraryConfiguration = Mockito.spy(TaskingLibrary.getInstance().getTaskingLibraryConfiguration());
         ReflectionHelpers.setField(TaskingLibrary.getInstance(), "taskingLibraryConfiguration", taskingLibraryConfiguration);
@@ -420,7 +422,11 @@ public class TaskRegisterFragmentTest extends BaseUnitTest {
         Intent intent = new Intent();
         TaskFilterParams params = new TaskFilterParams("");
         intent.putExtra(FILTER_SORT_PARAMS, params);
+
+        // Call the method under test
         fragment.onActivityResult(REQUEST_CODE_FILTER_TASKS, RESULT_OK, intent);
+
+        // Verifications
         verify(presenter).filterTasks(params);
     }
 
