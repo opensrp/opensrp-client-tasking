@@ -601,7 +601,9 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
                 }
             }
 
-            if (featureCollection != null && featureCollection.features() != null && featureCollection.features().size() > 0) {
+            if (TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design()
+                    && kujakuFeatureCalloutPlugin != null && featureCollection != null
+                    && featureCollection.features() != null && featureCollection.features().size() > 0) {
                 kujakuFeatureCalloutPlugin.setupOnMap(featureCollection.features(), geoJsonSource.getId());
             }
         }
