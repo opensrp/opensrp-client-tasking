@@ -46,6 +46,7 @@ import org.smartregister.tasking.util.Utils;
 import org.smartregister.util.Cache;
 import org.smartregister.view.contract.IView;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -66,7 +67,6 @@ import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -221,13 +221,40 @@ public class TaskRegisterFragmentPresenterTest extends BaseUnitTest {
     @Test
     public void testOnTasksFoundWithEmptyTasks() {
         presenter.onTasksFound(new ArrayList<>(), 0);
+        verify(view, Mockito.never()).displayNotification(eq(R.string.fetching_structure_title), eq(R.string.no_structures_found));
+        verify(view).setTaskDetails(eq(new ArrayList<>()));
+        verify(view).hideProgressDialog();
+        verify(view).hideProgressView();
+        verify(view).setTotalTasks(eq(0));
+        verify(view, Mockito.times(2)).getContext();
+        verifyNoMoreInteractions(view);
+    }
+
+    @Test
+    public void testOnTasksFoundWithEmptyTasksShouldShowDialogWhenAppIsReveal() {
+        TaskRegisterFragmentContract.View originalView = presenter.getView();
+        android.content.Context context =  Mockito.spy(view.getContext());
+
+        Mockito.doReturn(context).when(view).getContext();
+        Mockito.doReturn(context).when(context).getApplicationContext();
+
+        ReflectionHelpers.setField(presenter, "view", new WeakReference<>(view));
+        Mockito.doReturn("org.smartregister.reveal.test").when(context).getPackageName();
+
+        // Call the method under test
+        presenter.onTasksFound(new ArrayList<>(), 0);
+
+        // Perform verifications
         verify(view).displayNotification(eq(R.string.fetching_structure_title), eq(R.string.no_structures_found));
         verify(view).setTaskDetails(eq(new ArrayList<>()));
         verify(view).hideProgressDialog();
         verify(view).hideProgressView();
         verify(view).setTotalTasks(eq(0));
-        verify(view).getContext();
+        // Called 2 times in this method
+        verify(view, Mockito.times(3)).getContext();
         verifyNoMoreInteractions(view);
+
+        ReflectionHelpers.setField(presenter, "view", new WeakReference<TaskRegisterFragmentContract.View>(originalView));
     }
 
     @Test
@@ -280,9 +307,13 @@ public class TaskRegisterFragmentPresenterTest extends BaseUnitTest {
         presenter.onLocationChanged(location);
         when(preferencesUtil.getCurrentOperationalArea()).thenReturn("MTI_84");
         Location updateLocation = Whitebox.invokeMethod(presenter, "getOperationalAreaCenter");
+
+        // call the method under test
         presenter.onLocationChanged(updateLocation);
+
+        // Verifications
         assertEquals(updateLocation, Whitebox.getInternalState(presenter, "lastLocation"));
-        verify(interactor).calculateDistanceFromUser(null, updateLocation);
+        verify(interactor).calculateDistanceFromUser(Mockito.anyList(), Mockito.eq(updateLocation));
     }
 
     @Test
