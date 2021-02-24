@@ -6,6 +6,7 @@ import android.app.IntentService;
 import android.content.Intent;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.jetbrains.annotations.NotNull;
@@ -102,7 +103,8 @@ public class LocationTaskIntentService extends IntentService {
     }
 
 
-    private void doSync() {
+    @VisibleForTesting
+    protected void doSync() {
         sendSyncStatusBroadcastMessage(FetchStatus.fetchStarted);
 
         LocationServiceHelper locationServiceHelper = new LocationServiceHelper(
