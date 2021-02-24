@@ -113,6 +113,7 @@ public class TaskRegisterFragmentInteractorTest extends BaseUnitTest {
     private String bccSelectQuery;
     private String indexSelectQuery;
     private TaskingLibraryConfiguration taskingLibraryConfiguration;
+    private TaskingLibraryConfiguration.TaskRegisterConfiguration taskingRegisterConfiguration;
 
     @Before
     public void setUp() {
@@ -129,6 +130,9 @@ public class TaskRegisterFragmentInteractorTest extends BaseUnitTest {
         indexSelectQuery = "SELECT * FROM task WHERE group_id = ? AND plan_id = ? AND status NOT IN (?,?) AND code = ? ";
 
         taskingLibraryConfiguration = Mockito.spy(TaskingLibrary.getInstance().getTaskingLibraryConfiguration());
+        taskingRegisterConfiguration = Mockito.spy(taskingLibraryConfiguration.getTasksRegisterConfiguration());
+        Mockito.doReturn(taskingRegisterConfiguration).when(taskingLibraryConfiguration).getTasksRegisterConfiguration();
+
         ReflectionHelpers.setField(TaskingLibrary.getInstance(), "taskingLibraryConfiguration", taskingLibraryConfiguration);
     }
 
@@ -142,7 +146,7 @@ public class TaskRegisterFragmentInteractorTest extends BaseUnitTest {
 
 
     @Test
-    public void testFindTasksWithOperationalAreaLocation() {
+    public void testFindTasksWithOperationalAreaLocationWhenUsingGroupedTasksEnabled() {
         PreferencesUtil.getInstance().setCurrentPlan("FI_2019_TV01_IRS");
         Pair<String, String[]> pair = new Pair<>("task.group_id = ? AND task.plan_id = ? AND status NOT IN (?,?)", new String[]{groupId, planId, CANCELLED.name(), ARCHIVED.name()});
         Location center = new Location("Test");
@@ -155,6 +159,7 @@ public class TaskRegisterFragmentInteractorTest extends BaseUnitTest {
         when(database.rawQuery(indexSelectQuery, new String[]{groupId, planId, CANCELLED.name(), Intervention.CASE_CONFIRMATION})).thenReturn(createEmptyCursor());
 
         doReturn(mainSelectQuery).when(taskingLibraryConfiguration).generateTaskRegisterSelectQuery(pair.first);
+        doReturn(true).when(taskingRegisterConfiguration).showGroupedTasks();
 
         // Run the method
         interactor.findTasks(pair, null, center, "House");

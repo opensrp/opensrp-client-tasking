@@ -8,6 +8,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -51,6 +52,7 @@ import org.smartregister.view.activity.DrishtiApplication;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import io.ona.kujaku.data.realm.RealmDatabase;
@@ -83,7 +85,8 @@ public class TestRevealApplication extends DrishtiApplication {
     }
 
     public AppExecutors getAppExecutors() {
-        return new AppExecutors(Executors.newSingleThreadExecutor(), Executors.newSingleThreadExecutor(), Executors.newSingleThreadExecutor());
+        Executor mainThreadExecutor = ContextCompat.getMainExecutor(this);
+        return new AppExecutors(mainThreadExecutor, mainThreadExecutor, mainThreadExecutor);
     }
 
     @Override

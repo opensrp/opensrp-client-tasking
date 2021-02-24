@@ -244,7 +244,7 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
             cursor = getDatabase().rawQuery(query, params);
             while (cursor != null && cursor.moveToNext()) {
                 TaskDetails taskDetails = readTaskDetails(cursor, lastLocation, operationalAreaCenter, houseLabel, groupedTasks);
-                if (taskDetails == null || taskDetails.getClient() == null) {
+                if (taskDetails == null || (taskDetails.getClient() == null && !TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().showGroupedTasks())) {
                     continue;
                 }
 
@@ -271,8 +271,9 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
         task.setTaskEntity(cursor.getString(cursor.getColumnIndex(FOR)));
         task.setBusinessStatus(cursor.getString(cursor.getColumnIndex(BUSINESS_STATUS)));
         task.setTaskStatus(cursor.getString(cursor.getColumnIndex(STATUS)));
-        task.setAuthoredOn(cursor.getLong(cursor.getColumnIndex(AUTHORED_ON)));
+
         if (isGroupedTasks) {
+            task.setAuthoredOn(cursor.getLong(cursor.getColumnIndex(AUTHORED_ON)));
             task.setTaskCount(cursor.getInt(cursor.getColumnIndex(TASK_COUNT)));
             task.setCompleteTaskCount(cursor.getInt(cursor.getColumnIndex(COMPLETED_TASK_COUNT)));
             task.setGroupedTaskCodeStatus(cursor.getString(cursor.getColumnIndex(GROUPED_STRUCTURE_TASK_CODE_AND_STATUS)));
