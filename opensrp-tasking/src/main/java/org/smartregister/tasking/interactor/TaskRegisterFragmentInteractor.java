@@ -328,6 +328,13 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
             // Get the client related to the task
             CommonPersonObjectClient client = CoreLibrary.getInstance().context().getEventClientRepository().fetchCommonPersonObjectClientByBaseEntityId(task.getTaskEntity());
             if (client != null && !TextUtils.isEmpty(client.getDetails().get("birthdate"))) {
+                if (cursor.getColumnIndex("missed_task_code") != -1) {
+                    client.getDetails().put("parent_task_code", cursor.getString(cursor.getColumnIndex("missed_task_code")));
+                    client.getColumnmaps().put("parent_task_code", cursor.getString(cursor.getColumnIndex("missed_task_code")));
+                    client.getDetails().put("chw_username", cursor.getString(cursor.getColumnIndex("chw_username")));
+                    client.getColumnmaps().put("chw_username", cursor.getString(cursor.getColumnIndex("chw_username")));
+                }
+
                 task.setClient(client);
                 // TODO -> Uncomment above lines
             }
