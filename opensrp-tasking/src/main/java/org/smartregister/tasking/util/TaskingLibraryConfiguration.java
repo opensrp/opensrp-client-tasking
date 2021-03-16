@@ -222,6 +222,10 @@ public abstract class TaskingLibraryConfiguration {
         return taskRegisterConfiguration;
     }
 
+    public boolean isSupervisor() {
+        return false;
+    }
+
     @Nullable
     public abstract MapConfiguration getMapConfiguration();
 
