@@ -30,7 +30,9 @@ import org.smartregister.tasking.util.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import timber.log.Timber;
 
@@ -327,16 +329,34 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
             // TODO: Check if the client details from below query can be outdated/stale due to client edit registrations
             // Get the client related to the task
             CommonPersonObjectClient client = CoreLibrary.getInstance().context().getEventClientRepository().fetchCommonPersonObjectClientByBaseEntityId(task.getTaskEntity());
-            if (client != null && !TextUtils.isEmpty(client.getDetails().get("birthdate"))) {
-                if (cursor.getColumnIndex("missed_task_code") != -1) {
-                    client.getDetails().put("parent_task_code", cursor.getString(cursor.getColumnIndex("missed_task_code")));
-                    client.getColumnmaps().put("parent_task_code", cursor.getString(cursor.getColumnIndex("missed_task_code")));
-                    client.getDetails().put("chw_username", cursor.getString(cursor.getColumnIndex("chw_username")));
-                    client.getColumnmaps().put("chw_username", cursor.getString(cursor.getColumnIndex("chw_username")));
-                }
 
-                task.setClient(client);
-                // TODO -> Uncomment above lines
+            if (TaskingLibrary.getInstance().getTaskingLibraryConfiguration().isSupervisor()) {
+                Map<String, String> details = new HashMap<>();
+                if (cursor.getColumnIndex("chw_username") != -1) {
+                    String chwUsername = cursor.getString(cursor.getColumnIndex("chw_username"));
+
+                    if (client == null) {
+                        client = new CommonPersonObjectClient(null, details, chwUsername);
+                        client.setDetails(details);
+                        client.setColumnmaps(details);
+                    } else {
+                        details = client.getDetails();
+                    }
+
+                    details.put("firstName", "CHW");
+                    details.put("lastName", chwUsername);
+
+                    if (cursor.getColumnIndex("missed_task_code") != -1) {
+                        details.put("parent_task_code", cursor.getString(cursor.getColumnIndex("missed_task_code")));
+                        details.put("chw_username", chwUsername);
+                    }
+                }
+            } else {
+                if (client != null && !TextUtils.isEmpty(client.getDetails().get("birthdate"))) {
+
+                    task.setClient(client);
+                    // TODO -> Uncomment above lines
+                }
             }
         }
 
