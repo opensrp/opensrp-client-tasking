@@ -1,11 +1,13 @@
 package org.smartregister.tasking.util;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -22,6 +24,8 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.apache.commons.lang3.StringUtils;
+import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -29,9 +33,11 @@ import org.smartregister.CoreLibrary;
 import org.smartregister.clientandeventmodel.Client;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.domain.Location;
+import org.smartregister.domain.SyncEntity;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.job.DocumentConfigurationServiceJob;
 import org.smartregister.job.PullUniqueIdsServiceJob;
+import org.smartregister.location.helper.LocationHelper;
 import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.tasking.BuildConfig;
 import org.smartregister.tasking.R;
@@ -48,6 +54,7 @@ import org.smartregister.view.activity.DrishtiApplication;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -68,7 +75,7 @@ import static org.smartregister.tasking.util.Constants.Intervention.MDA;
 import static org.smartregister.tasking.util.Constants.Intervention.MOSQUITO_COLLECTION;
 import static org.smartregister.tasking.util.Constants.Intervention.PAOT;
 
-public class Utils {
+public class Utils extends org.smartregister.util.Utils {
 
     public static final ArrayList<String> ALLOWED_LEVELS;
     public static final String DEFAULT_LOCATION_LEVEL = Tags.HEALTH_CENTER;
@@ -391,6 +398,68 @@ public class Utils {
     public static Boolean displayDistanceScale() {
         //return Boolean.valueOf(getGlobalConfig(CONFIGURATION.DISPLAY_DISTANCE_SCALE, BuildConfig.DISPLAY_DISTANCE_SCALE + ""));
         return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().displayDistanceScale();
+    }
+
+    public static String getRelativeDateTimeString(Calendar fromTime) {
+
+        SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("MMM dd, yyyy");
+        SimpleDateFormat TIME_FORMAT = new SimpleDateFormat(" 'at' h:mm aa");
+        if (fromTime == null) return null;
+
+        DateTime startDate = new DateTime(fromTime.getTimeInMillis());
+        DateTime today = new DateTime();
+        int days = Days.daysBetween(today.withTimeAtStartOfDay(), startDate.withTimeAtStartOfDay()).getDays();
+
+        String date;
+        switch (days) {
+            case -1:
+                date = "yesterday";
+                break;
+            case 0:
+                date = "today";
+                break;
+            case 1:
+                date = "tomorrow";
+                break;
+            default:
+                date = DATE_FORMAT.format(fromTime.getTime());
+                break;
+        }
+        String time = TIME_FORMAT.format(fromTime.getTime());
+        return date + time;
+    }
+
+    public static void setCurrentOperationalAreaAndLocality() {
+        PreferencesUtil prefsUtil = PreferencesUtil.getInstance();
+        String operationalAreaName = prefsUtil.getCurrentOperationalArea();
+
+        if (!TextUtils.isEmpty(CoreLibrary.getInstance().context().allSharedPreferences().fetchRegisteredANM())
+                && TextUtils.isEmpty(operationalAreaName)) {
+            AllSharedPreferences allSharedPreferences = DrishtiApplication.getInstance().getContext().allSharedPreferences();
+            operationalAreaName = LocationHelper.getInstance().getDefaultLocation();
+
+            if (!TextUtils.isEmpty(operationalAreaName)) {
+                allSharedPreferences.saveCurrentLocality(operationalAreaName);
+                prefsUtil.setCurrentOperationalArea(operationalAreaName);
+            }
+        }
+    }
+    public static String getSyncEntityString(SyncEntity syncEntity) {
+        Context context = DrishtiApplication.getInstance().getContext().applicationContext();
+        switch (syncEntity) {
+            case EVENTS:
+                return context.getString(R.string.events);
+            case LOCATIONS:
+                return context.getString(R.string.locations);
+            case PLANS:
+                return context.getString(R.string.plans);
+            case STRUCTURES:
+                return context.getString(R.string.structures);
+            case TASKS:
+                return context.getString(R.string.tasks_text);
+            default:
+                throw new IllegalStateException("Invalid Sync Entity");
+        }
     }
 
 }

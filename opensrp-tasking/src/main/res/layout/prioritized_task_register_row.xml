@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:paddingStart="2dp"
+    android:layout_marginStart="@dimen/task_register_padding">
+
+    <ImageView
+        android:id="@+id/prioritized_register_row_task_icon"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:contentDescription="@string/task_icon"
+        android:visibility="visible"
+        tools:src="@drawable/ic_action_goldsmith_gold_placeholder_back"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/prioritized_register_row_task_details_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginLeft="10dp"
+        app:layout_constraintStart_toEndOf="@id/prioritized_register_row_task_icon"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:id="@+id/prioritized_register_row_task_name_or_person"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scrollHorizontally="false"
+            android:textColor="@color/goldsmith_blue"
+            android:textStyle="bold"
+            tools:text="Doreen Makena, 19"
+            android:textSize="@dimen/prioritized_task_register_task_entity_text_size" />
+
+
+        <TextView
+            android:id="@+id/prioritized_register_row_task_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scrollHorizontally="false"
+            android:textColor="@color/goldsmith_blue"
+            tools:text="Referral follow-up call"
+            android:textSize="@dimen/prioritized_task_register_task_type_text_size"/>
+
+
+
+        <TextView
+            android:id="@+id/prioritized_register_row_task_assigned_relative_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:scrollHorizontally="false"
+            android:textColor="@color/dark_grey"
+            tools:text="Assigned today"
+            android:textSize="@dimen/prioritized_task_register_task_time_text_size"/>
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginRight="10dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintRight_toRightOf="parent">
+
+        <ImageView
+            android:id="@+id/prioritized_register_row_iv_row_action"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/prioritized_register_row_txt_action_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textSize="@dimen/prioritized_task_register_task_action_description_text_size"
+            tools:text="3 km"/>
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

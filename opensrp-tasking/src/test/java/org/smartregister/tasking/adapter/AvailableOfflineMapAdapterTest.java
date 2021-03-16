@@ -6,6 +6,8 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -144,4 +146,8 @@ public class AvailableOfflineMapAdapterTest extends BaseUnitTest {
 
     }
 
+    @After
+    public void tearDown() throws Exception {
+        System.gc();
+    }
 }

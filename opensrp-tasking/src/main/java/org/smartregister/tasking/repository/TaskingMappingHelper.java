@@ -14,7 +14,7 @@ import org.smartregister.repository.helper.MappingHelper;
 /**
  * Created by samuelgithengi on 3/19/19.
  */
-public class RevealMappingHelper implements MappingHelper {
+public class TaskingMappingHelper implements MappingHelper {
     /**
      * Generates the center from the {@link Geometry} of a given {@link Feature} for {@link Geometry}
      * of types {@link com.mapbox.geojson.MultiPolygon}, {@link com.mapbox.geojson.Polygon} and

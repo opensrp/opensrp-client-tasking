@@ -9,23 +9,33 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
 
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.json.JSONObject;
-import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.clientandeventmodel.Event;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.Task;
+import org.smartregister.tasking.TaskingLibrary;
+import org.smartregister.tasking.activity.TaskingHomeActivity;
 import org.smartregister.tasking.adapter.TaskRegisterAdapter;
+import org.smartregister.tasking.configuration.TaskRegisterV1Configuration;
 import org.smartregister.tasking.contract.BaseContract;
 import org.smartregister.tasking.contract.BaseDrawerContract;
 import org.smartregister.tasking.contract.BaseFormFragmentContract;
+import org.smartregister.tasking.contract.TaskingHomeActivityContract;
+import org.smartregister.tasking.layer.DigitalGlobeLayer;
 import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.model.CardDetails;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
-import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
+import org.smartregister.tasking.repository.TaskingMappingHelper;
+import org.smartregister.tasking.view.TaskingMapView;
 import org.smartregister.util.AppExecutors;
 
 import java.util.List;
@@ -35,6 +45,8 @@ import java.util.Map;
  * Created by Ephraim Kigamba - nek.eam@gmail.com on 06-08-2020.
  */
 public abstract class TaskingLibraryConfiguration {
+
+    private TaskRegisterConfiguration taskRegisterConfiguration;
 
     @NonNull
     public abstract Pair<Drawable, String> getActionDrawable(Context context, TaskDetails task);
@@ -51,7 +63,6 @@ public abstract class TaskingLibraryConfiguration {
     public abstract int getResolveLocationTimeoutInSeconds();
 
     public abstract String getAdminPasswordNotNearStructures();
-
 
     public abstract boolean isFocusInvestigation();
 
@@ -93,7 +104,7 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract void onLocationValidated(@NonNull Context context, @NonNull BaseFormFragmentContract.View view, @NonNull BaseFormFragmentContract.Interactor interactor, @NonNull BaseTaskDetails baseTaskDetails, @NonNull Location structure);
 
-    public abstract String mainSelect(String mainCondition);
+    public abstract String generateTaskRegisterSelectQuery(String mainCondition);
 
     public abstract String nonRegisteredStructureTasksSelect(String mainCondition);
 
@@ -123,7 +134,7 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract void saveJsonForm(BaseContract.BaseInteractor baseInteractor, String json);
 
-    public abstract  void openFilterActivity(Activity activity, TaskFilterParams filterParams);
+    public abstract void openFilterActivity(Activity activity, TaskFilterParams filterParams);
 
     public abstract void openFamilyProfile(Activity activity, CommonPersonObjectClient family, BaseTaskDetails taskDetails);
 
@@ -133,14 +144,104 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract void startMapActivity(Activity activity, String searchViewText, TaskFilterParams taskFilterParams);
 
-    public abstract void onTaskRegisterBindViewHolder(@NonNull Context context, @NonNull TaskRegisterViewHolder viewHolder, @NonNull View.OnClickListener registerActionHandler, @NonNull TaskDetails taskDetails, int position);
+    public abstract void onTaskRegisterBindViewHolder(@NonNull Context context, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull View.OnClickListener registerActionHandler, @NonNull TaskDetails taskDetails, int position);
+
+    public abstract void onTaskRegisterItemClicked(@NonNull Activity activity, @NonNull TaskDetails taskDetails);
 
     @NonNull
     public abstract AppExecutors getAppExecutors();
 
+    @Nullable
     public abstract BaseDrawerContract.View getDrawerMenuView(BaseDrawerContract.DrawerActivity activity);
 
     public abstract void showTasksCompleteActionView(TextView actionView);
 
     public abstract Map<String, Object> getServerConfigs();
+
+    public abstract TaskingJsonFormUtils getJsonFormUtils();
+
+    public abstract TaskingMappingHelper getMappingHelper();
+
+    public abstract TaskingMapHelper getMapHelper();
+
+    public abstract boolean isRefreshMapOnEventSaved();
+
+    public abstract void setRefreshMapOnEventSaved(boolean isRefreshMapOnEventSaved);
+
+    public abstract void setFeatureCollection(FeatureCollection featureCollection);
+
+    public abstract DigitalGlobeLayer getDigitalGlobeLayer();
+
+    public abstract List<String> getFacilityLevels();
+
+    public abstract List<String> getLocationLevels();
+
+    public abstract ActivityConfiguration getActivityConfiguration();
+
+    public abstract void registerFamily(Feature selectedFeature);
+
+    public abstract void openTaskRegister(TaskFilterParams filterParams, TaskingHomeActivity taskingHomeActivity);
+
+    public abstract boolean isCompassEnabled();
+
+    public boolean showCurrentLocationButton() {
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design();
+    }
+
+    public abstract boolean disableMyLocationOnMapMove();
+
+    public abstract boolean getDrawOperationalAreaBoundaryAndLabel();
+
+    public abstract GeoJsonUtils getGeoJsonUtils();
+
+    public abstract String getProvinceFromTreeDialogValue(List<String> name);
+
+    public abstract String getDistrictFromTreeDialogValue(List<String> name);
+
+    public abstract void onShowFilledForms();
+
+    public abstract void onFeatureSelectedByLongClick(Feature feature, TaskingHomeActivityContract.Presenter taskingHomePresenter);
+
+    public abstract void onFeatureSelectedByClick(Feature feature, TaskingHomeActivityContract.Presenter taskingHomePresenter);
+
+    public abstract double getOnClickMaxZoomLevel();
+
+    public abstract void fetchPlans(String jurisdictionName, BaseDrawerContract.Presenter presenter);
+
+    public abstract void validateCurrentPlan(String selectedOperationalArea, String currentPlanId, BaseDrawerContract.Presenter presenter);
+
+    public abstract void setFacility(List<String> defaultLocation, BaseDrawerContract.View view);
+
+    public abstract void openFilterTaskActivity(TaskFilterParams filterParams, TaskingHomeActivity activity);
+
+    public TaskRegisterConfiguration getTasksRegisterConfiguration(){
+        if (taskRegisterConfiguration == null) {
+            taskRegisterConfiguration = new TaskRegisterV1Configuration();
+        }
+
+        return taskRegisterConfiguration;
+    }
+
+    public boolean isSupervisor() {
+        return false;
+    }
+
+    @Nullable
+    public abstract MapConfiguration getMapConfiguration();
+
+    public interface TaskRegisterConfiguration {
+
+        boolean isV2Design();
+
+        boolean showGroupedTasks();
+    }
+
+    public interface MapConfiguration {
+
+        void onPriorityTasksToggle(@NonNull TaskingMapView taskingMapView, boolean on);
+
+        String[] getAllTasksLayerIds();
+
+        String[] getPriorityTasksLayerIds();
+    }
 }

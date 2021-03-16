@@ -9,6 +9,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.Task;
+import org.smartregister.tasking.model.TaskFilterParams;
 
 /**
  * Created by samuelgithengi on 3/25/19.
@@ -25,6 +26,10 @@ public interface BaseContract {
         void onFormSaveFailure(String eventType);
 
         void onFamilyFound(CommonPersonObjectClient finalFamily);
+
+        void filterTasks(TaskFilterParams filterParams);
+
+        UserLocationContract.UserLocationPresenter getLocationPresenter();
     }
 
     interface BaseInteractor {

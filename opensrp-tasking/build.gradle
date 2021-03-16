@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'jacoco'
 apply plugin: 'com.github.kt3k.coveralls'
+apply plugin: 'maven-publish'
 
 buildscript {
     repositories {
@@ -8,7 +9,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.0.0'
+        classpath 'com.android.tools.build:gradle:4.0.2'
     }
 }
 
@@ -25,12 +26,15 @@ android {
     defaultConfig {
         minSdkVersion androidMinSdkVersion
         targetSdkVersion androidTargetSdkVersion
-        versionCode Integer.parseInt(project.VERSION_CODE)
-        versionName project.VERSION_NAME
+        versionCode 1//Integer.parseInt(project.VERSION_CODE)
+        versionName "1.0"//project.VERSION_NAME
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
         multiDexEnabled true
+
+        buildConfigField "String[]", "LOCATION_LEVELS", '{"Country", "Province", "Region", "District", "Sub-district","Operational Area"}'
+        buildConfigField "String[]", "HEALTH_FACILITY_LEVELS", '{"Country", "Province", "Region", "District", "Sub-district","Operational Area"}'
     }
 
     buildTypes {
@@ -74,25 +78,23 @@ android {
 
 tasks.withType(Test) {
     jacoco.includeNoLocationClasses = true
+    maxHeapSize = "4g"
 }
 
 allprojects {
     repositories {
         maven { url 'https://oss.sonatype.org/content/repositories/snapshots/' }
         maven { url "https://s3.amazonaws.com/repo.commonsware.com" }
+        maven { url "http://dl.bintray.com/ona/kujaku" }
         mavenLocal()
     }
-}
-
-tasks.withType(Test) {
-    jacoco.includeNoLocationClasses = true
 }
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.1.0'
 
-    api 'org.smartregister:opensrp-client-core:1.15.3-SNAPSHOT'
+    api 'org.smartregister:opensrp-client-core:4.2.4.1-GS-PREVIEW-SNAPSHOT'
     api ('org.smartregister:opensrp-client-native-form:1.13.2-SNAPSHOT') {
         transitive = true
         exclude group: 'org.smartregister', module: 'opensrp-client-simprints'
@@ -100,15 +102,15 @@ dependencies {
         exclude group: 'org.smartregister', module: 'opensrp-client-core'
     }
 
-    implementation('org.smartregister:opensrp-client-configurable-views:1.1.5-SNAPSHOT@aar') {
+    implementation('org.smartregister:opensrp-client-configurable-views:1.2.0-GS-PREVIEW-SNAPSHOT@aar') {
         transitive = true
         exclude group: 'org.smartregister', module: 'opensrp-client-core'
         exclude group: 'com.android.support', module: 'appcompat-v7'
     }
 
-    implementation 'org.smartregister:opensrp-client-reporting:0.0.6-RVL-SNAPSHOT@aar'
+    implementation 'org.smartregister:opensrp-client-reporting:0.1.0-PREVIEW-SNAPSHOT@aar'
 
-    implementation ('io.ona.kujaku:library:0.8.3') {
+    implementation ('io.ona.kujaku:library:0.9.0') {
         transitive = true
         exclude group: 'com.android.volley'
         exclude group: 'stax', module: 'stax-api'
@@ -116,14 +118,17 @@ dependencies {
     implementation 'xerces:xercesImpl:2.12.0'
 
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.5'
-    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-turf:5.1.0'
 
+    implementation 'com.mapbox.mapboxsdk:mapbox-sdk-turf:5.1.0'
+    implementation 'com.mapbox.mapboxsdk:mapbox-android-plugin-scalebar-v8:0.3.0'
 
     implementation 'com.google.android:flexbox:1.0.0'
     implementation 'com.google.android.material:material:1.0.0'
 
+    compileOnly 'org.projectlombok:lombok:1.18.12'
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
 
-    // Test dependencices
+    // Test dependencies
     testImplementation 'junit:junit:4.13'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'

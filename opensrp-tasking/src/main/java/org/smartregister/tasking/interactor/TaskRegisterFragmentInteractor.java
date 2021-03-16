@@ -4,6 +4,7 @@ import android.content.Context;
 import android.location.Location;
 import android.text.TextUtils;
 
+import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -14,6 +15,8 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.smartregister.CoreLibrary;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
+import org.smartregister.domain.Task;
 import org.smartregister.repository.EventClientRepository.event_column;
 import org.smartregister.repository.LocationRepository;
 import org.smartregister.tasking.TaskingLibrary;
@@ -27,12 +30,15 @@ import org.smartregister.tasking.util.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import timber.log.Timber;
 
 import static org.smartregister.domain.Task.INACTIVE_TASK_STATUS;
 import static org.smartregister.repository.EventClientRepository.Table.event;
+import static org.smartregister.tasking.util.Constants.DatabaseKeys.AUTHORED_ON;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.BUSINESS_STATUS;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.CODE;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.COMPLETED_TASK_COUNT;
@@ -50,6 +56,7 @@ import static org.smartregister.tasking.util.Constants.DatabaseKeys.NOT_SRAYED_O
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.NOT_SRAYED_REASON;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.OTHER;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.PLAN_ID;
+import static org.smartregister.tasking.util.Constants.DatabaseKeys.PRIORITY;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.REFERENCE_REASON;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.SPRAY_STATUS;
 import static org.smartregister.tasking.util.Constants.DatabaseKeys.STATUS;
@@ -85,7 +92,7 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
         interactorUtils = new InteractorUtils(TaskingLibrary.getInstance().getTaskRepository(), eventClientRepository, clientProcessor);
     }
 
-    private String mainSelect(String mainCondition) {
+    private String generateTaskRegisterSelectQuery(String mainCondition) {
         /*String tableName = TASK_TABLE;
         SmartRegisterQueryBuilder queryBuilder = new SmartRegisterQueryBuilder();
         queryBuilder.selectInitiateMainTable(tableName, mainColumns(tableName), ID);
@@ -96,7 +103,7 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
         queryBuilder.customJoin(String.format(" LEFT JOIN %s ON %s.%s = %s.%s ",
                 FAMILY, STRUCTURES_TABLE, ID, FAMILY, STRUCTURE_ID));
         return queryBuilder.mainCondition(mainCondition);*/
-        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().mainSelect(mainCondition);
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().generateTaskRegisterSelectQuery(mainCondition);
     }
 
     private String nonRegisteredStructureTasksSelect(String mainCondition) {
@@ -178,8 +185,16 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
     }
 
 
-    public void findTasks(Pair<String, String[]> mainCondition, Location lastLocation, Location operationalAreaCenter, String houseLabel) {
-        if (mainCondition == null || mainCondition.second == null || mainCondition.second.length < 3 || mainCondition.second[0] == null) {
+    /**
+     * The mainConditionAndParams param contains the mainCondition which is a conditional clause eg.
+     *
+     * @param mainConditionAndParams
+     * @param lastLocation
+     * @param operationalAreaCenter
+     * @param houseLabel
+     */
+    public void findTasks(Pair<String, String[]> mainConditionAndParams, Location lastLocation, Location operationalAreaCenter, String houseLabel) {
+        if (mainConditionAndParams == null || mainConditionAndParams.second == null || mainConditionAndParams.second.length < 3 || mainConditionAndParams.second[0] == null) {
             getPresenter().onTasksFound(null, 0);
             return;
         }
@@ -187,31 +202,32 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
         List<TaskDetails> tasks = new ArrayList<>();
         appExecutors.diskIO().execute(() -> {
             structuresWithinBuffer = 0;
-            if (Utils.isFocusInvestigationOrMDA()) { // perform task grouping
+            if (TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().showGroupedTasks()) {
 
-                tasks.addAll(queryTaskDetails(groupedRegisteredStructureTasksSelect(mainCondition.first),
-                        mainCondition.second, lastLocation, operationalAreaCenter, houseLabel, true));
+                if (Utils.isFocusInvestigationOrMDA()) { // perform task grouping
+                    tasks.addAll(queryTaskDetails(groupedRegisteredStructureTasksSelect(mainConditionAndParams.first),
+                            mainConditionAndParams.second, lastLocation, operationalAreaCenter, houseLabel, true));
+
+                    tasks.addAll(queryTaskDetails(nonRegisteredStructureTasksSelect(mainConditionAndParams.first),
+                            mainConditionAndParams.second, lastLocation, operationalAreaCenter, houseLabel, false));
+                } else {
+                    tasks.addAll(queryTaskDetails(generateTaskRegisterSelectQuery(mainConditionAndParams.first), mainConditionAndParams.second,
+                            lastLocation, operationalAreaCenter, houseLabel, false));
+                }
+
+                // Query BCC task
+                tasks.addAll(queryTaskDetails(bccSelect(), mainConditionAndParams.second, lastLocation,
+                        operationalAreaCenter, houseLabel, false));
 
 
-                tasks.addAll(queryTaskDetails(nonRegisteredStructureTasksSelect(mainCondition.first),
-                        mainCondition.second, lastLocation, operationalAreaCenter, houseLabel, false));
-
+                // Query Case Confirmation task
+                String[] params = ArrayUtils.add(mainConditionAndParams.second, CASE_CONFIRMATION);
+                tasks.addAll(queryTaskDetails(indexCaseSelect(), params, lastLocation,
+                        operationalAreaCenter, houseLabel, false));
             } else {
-
-                tasks.addAll(queryTaskDetails(mainSelect(mainCondition.first), mainCondition.second,
+                tasks.addAll(queryTaskDetails(generateTaskRegisterSelectQuery(mainConditionAndParams.first), mainConditionAndParams.second,
                         lastLocation, operationalAreaCenter, houseLabel, false));
-
             }
-
-            // Query BCC task
-            tasks.addAll(queryTaskDetails(bccSelect(), mainCondition.second, lastLocation,
-                    operationalAreaCenter, houseLabel, false));
-
-
-            // Query Case Confirmation task
-            String[] params = ArrayUtils.add(mainCondition.second, CASE_CONFIRMATION);
-            tasks.addAll(queryTaskDetails(indexCaseSelect(), params, lastLocation,
-                    operationalAreaCenter, houseLabel, false));
 
             Collections.sort(tasks);
             appExecutors.mainThread().execute(() -> {
@@ -230,12 +246,18 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
             cursor = getDatabase().rawQuery(query, params);
             while (cursor != null && cursor.moveToNext()) {
                 TaskDetails taskDetails = readTaskDetails(cursor, lastLocation, operationalAreaCenter, houseLabel, groupedTasks);
+                if (taskDetails == null || (taskDetails.getClient() == null && !TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().showGroupedTasks())) {
+                    continue;
+                }
+
                 //skip BCC and Case confirmation tasks in tracking tasks within buffer
                 if (taskDetails.getDistanceFromUser() <= locationBuffer && taskDetails.getDistanceFromUser() >= 0) {
                     structuresWithinBuffer += 1;
                 }
                 tasks.add(taskDetails);
             }
+        } catch (Exception ex) {
+            Timber.e(ex);
         } finally {
             if (cursor != null) {
                 cursor.close();
@@ -251,6 +273,12 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
         task.setTaskEntity(cursor.getString(cursor.getColumnIndex(FOR)));
         task.setBusinessStatus(cursor.getString(cursor.getColumnIndex(BUSINESS_STATUS)));
         task.setTaskStatus(cursor.getString(cursor.getColumnIndex(STATUS)));
+
+        int colIndex = cursor.getColumnIndex(AUTHORED_ON);
+        if (colIndex != -1) {
+            task.setAuthoredOn(cursor.getLong(cursor.getColumnIndex(AUTHORED_ON)));
+        }
+
         if (isGroupedTasks) {
             task.setTaskCount(cursor.getInt(cursor.getColumnIndex(TASK_COUNT)));
             task.setCompleteTaskCount(cursor.getInt(cursor.getColumnIndex(COMPLETED_TASK_COUNT)));
@@ -258,38 +286,86 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
             task.setHouseNumber(cursor.getString(cursor.getColumnIndex(HOUSE_NUMBER)));
             task.setFamilyMemberNames(cursor.getString(cursor.getColumnIndex(Properties.FAMILY_MEMBER_NAMES)));
         }
+
         Location location = new Location((String) null);
 
         if (CASE_CONFIRMATION.equals(task.getTaskCode())) {
             task.setReasonReference(cursor.getString(cursor.getColumnIndex(REFERENCE_REASON)));
         } else if (!BCC.equals(task.getTaskCode())) {
-            location.setLatitude(cursor.getDouble(cursor.getColumnIndex(LATITUDE)));
-            location.setLongitude(cursor.getDouble(cursor.getColumnIndex(LONGITUDE)));
-            task.setLocation(location);
-            task.setStructureName(cursor.getString(cursor.getColumnIndex(NAME)));
-            if (StringUtils.isBlank(task.getStructureName())) {
-                task.setStructureName(cursor.getString(cursor.getColumnIndex(STRUCTURE_NAME)));
-            }
 
-            task.setFamilyName(cursor.getString(cursor.getColumnIndex(FIRST_NAME)));
-            if (task.getFamilyName() == null) {
-                task.setFamilyName(cursor.getString(cursor.getColumnIndex(FAMILY_NAME)));
-            }
+            if (cursor.getColumnIndex(LATITUDE) > -1) {
+                location.setLatitude(cursor.getDouble(cursor.getColumnIndex(LATITUDE)));
+                location.setLongitude(cursor.getDouble(cursor.getColumnIndex(LONGITUDE)));
+                task.setLocation(location);
 
-            if (task.getFamilyName() != null)
-                task.setFamilyName(task.getFamilyName() + " " + houseLabel);
-
-            task.setSprayStatus(cursor.getString(cursor.getColumnIndex(SPRAY_STATUS)));
-
-            if (Constants.BusinessStatus.NOT_SPRAYED.equals(task.getBusinessStatus())) {
-                String reason = cursor.getString(cursor.getColumnIndex(NOT_SRAYED_REASON));
-                if (OTHER.equals(reason)) {
-                    reason = cursor.getString(cursor.getColumnIndex(NOT_SRAYED_OTHER_REASON));
+                task.setStructureName(cursor.getString(cursor.getColumnIndex(NAME)));
+                if (StringUtils.isBlank(task.getStructureName())) {
+                    task.setStructureName(cursor.getString(cursor.getColumnIndex(STRUCTURE_NAME)));
                 }
-                task.setTaskDetails(reason);
+
+                task.setFamilyName(cursor.getString(cursor.getColumnIndex(FIRST_NAME)));
+                if (task.getFamilyName() == null) {
+                    task.setFamilyName(cursor.getString(cursor.getColumnIndex(FAMILY_NAME)));
+                }
+
+                if (task.getFamilyName() != null)
+                    task.setFamilyName(task.getFamilyName() + " " + houseLabel);
+
+                task.setSprayStatus(cursor.getString(cursor.getColumnIndex(SPRAY_STATUS)));
+
+                if (Constants.BusinessStatus.NOT_SPRAYED.equals(task.getBusinessStatus())) {
+                    String reason = cursor.getString(cursor.getColumnIndex(NOT_SRAYED_REASON));
+                    if (OTHER.equals(reason)) {
+                        reason = cursor.getString(cursor.getColumnIndex(NOT_SRAYED_OTHER_REASON));
+                    }
+                    task.setTaskDetails(reason);
+                }
             }
         }
+
         task.setStructureId(cursor.getString(cursor.getColumnIndex(STRUCTURE_ID)));
+
+        if (!TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().showGroupedTasks()) {
+            // TODO: Check if the client details from below query can be outdated/stale due to client edit registrations
+            // Get the client related to the task
+            CommonPersonObjectClient client = CoreLibrary.getInstance().context().getEventClientRepository().fetchCommonPersonObjectClientByBaseEntityId(task.getTaskEntity());
+
+            if (TaskingLibrary.getInstance().getTaskingLibraryConfiguration().isSupervisor()) {
+                Map<String, String> details = new HashMap<>();
+                if (cursor.getColumnIndex("chw_username") != -1) {
+                    String chwUsername = cursor.getString(cursor.getColumnIndex("chw_username"));
+
+                    if (client == null) {
+                        client = new CommonPersonObjectClient(null, details, chwUsername);
+                        client.setDetails(details);
+                        client.setColumnmaps(details);
+                    } else {
+                        details = client.getDetails();
+                    }
+
+                    details.put("firstName", "CHW");
+                    details.put("lastName", chwUsername);
+
+                    if (cursor.getColumnIndex("missed_task_code") != -1) {
+                        details.put("parent_task_code", cursor.getString(cursor.getColumnIndex("missed_task_code")));
+                        details.put("chw_username", chwUsername);
+                    }
+                }
+            } else {
+                if (client != null && !TextUtils.isEmpty(client.getDetails().get("birthdate"))) {
+
+                    task.setClient(client);
+                    // TODO -> Uncomment above lines
+                }
+            }
+        }
+
+
+        colIndex = cursor.getColumnIndex(PRIORITY);
+        if (colIndex != -1) {
+            task.setPriority(Task.TaskPriority.get(cursor.getString(colIndex).toLowerCase()));
+        }
+
 
         calculateDistance(task, location, lastLocation, operationalAreaCenter);
 
@@ -297,6 +373,11 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
     }
 
     private void calculateDistance(TaskDetails task, Location location, Location lastLocation, Location operationalAreaCenter) {
+        if (location == null) {
+            task.setDistanceFromUser(-1);
+            return;
+        }
+
         if (BCC.equals(task.getTaskCode())) {
             //set distance to -2 to always display on top of register
             task.setDistanceFromUser(-2);
@@ -306,22 +387,27 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
         } else if (lastLocation != null) {
             task.setDistanceFromUser(location.distanceTo(lastLocation));
         } else {
-            task.setDistanceFromUser(location.distanceTo(operationalAreaCenter));
-            task.setDistanceFromCenter(true);
+            if (operationalAreaCenter != null) {
+                task.setDistanceFromUser(location.distanceTo(operationalAreaCenter));
+                task.setDistanceFromCenter(true);
+            }
         }
     }
 
 
-    public void calculateDistanceFromUser(List<TaskDetails> tasks, Location location) {
+    public void calculateDistanceFromUser(List<TaskDetails> tasks, @Nullable Location location) {
         if (tasks == null)
             return;
         appExecutors.diskIO().execute(() -> {
             int structuresWithinBuffer = 0;
             for (TaskDetails taskDetails : tasks) {
                 if (!BCC.equals(taskDetails.getTaskCode()) && !CASE_CONFIRMATION.equals(taskDetails.getTaskCode())) {
-                    taskDetails.setDistanceFromUser(taskDetails.getLocation().distanceTo(location));
-                    taskDetails.setDistanceFromCenter(false);
+                    if (taskDetails.getLocation() != null) {
+                        taskDetails.setDistanceFromUser(taskDetails.getLocation().distanceTo(location));
+                        taskDetails.setDistanceFromCenter(false);
+                    }
                 }
+
                 if (taskDetails.getDistanceFromUser() <= locationBuffer) {
                     structuresWithinBuffer += 1;
                 }

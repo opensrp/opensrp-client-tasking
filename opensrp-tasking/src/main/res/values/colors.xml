@@ -8,4 +8,27 @@
 
     <color name="delete_map">#EE0427</color>
     <color name="download_map">#68BB0C</color>
+
+    <color name="goldsmith_blue">#004984</color>
+
+    <color name="text_gray">#A4A4A4</color>
+    <color name="button_blue">#2D75DE</color>
+
+    <color name="transluscent_white">#80FFFFFF</color>
+    <color name="distance_scale_text">@color/white</color>
+
+    <color name="search_textfield_background_grey">@color/white</color>
+    <color name="background_alert_red">#FFBDBD</color>
+    <color name="background_alert_green">#B3EDC3</color>
+
+    <color name="outside_area_mask">#313131</color>
+    <color name="red">#ff0000</color>
+
+    <color name="map_tasking_orange">#ff8800</color>
+    <color name="map_tasking_blue">#0074bf</color>
+    <color name="map_tasking_red">#f12525</color>
+    <color name="map_tasking_green">#38b500</color>
+    <color name="map_tasking_dark_blue">#103146</color>
+    <color name="map_tasking_btn_color">#005084</color>
+
 </resources>

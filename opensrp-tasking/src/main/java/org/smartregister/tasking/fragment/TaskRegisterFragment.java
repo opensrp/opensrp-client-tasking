@@ -10,14 +10,19 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.cardview.widget.CardView;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.json.JSONObject;
@@ -38,13 +43,16 @@ import org.smartregister.tasking.util.Constants.TaskRegister;
 import org.smartregister.tasking.util.LocationUtils;
 import org.smartregister.tasking.util.RevealJsonFormUtils;
 import org.smartregister.tasking.util.Utils;
+import org.smartregister.view.contract.IView;
 import org.smartregister.view.fragment.BaseRegisterFragment;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import io.ona.kujaku.location.clients.AndroidGpsLocationClient;
 import io.ona.kujaku.utils.Constants;
+import timber.log.Timber;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -91,7 +99,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         return R.layout.fragment_task_register;
     }
 
-    public void initializeAdapter(Set<org.smartregister.configurableviews.model.View> visibleColumns) {
+    public void initializeAdapter(Set<IView> visibleColumns) {
         taskAdapter = new TaskRegisterAdapter(getActivity(), registerActionHandler);
         clientsView.setAdapter(taskAdapter);
     }
@@ -106,9 +114,12 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         }
 
         view.findViewById(R.id.txt_map_label).setOnClickListener(v -> getPresenter().onOpenMapClicked());
-        drawerView.initializeDrawerLayout();
-        view.findViewById(R.id.drawerMenu).setOnClickListener(v -> drawerView.openDrawerLayout());
-        drawerView.onResume();
+
+        if (drawerView != null) {
+            drawerView.initializeDrawerLayout();
+            view.findViewById(R.id.drawerMenu).setOnClickListener(v -> drawerView.openDrawerLayout());
+            drawerView.onResume();
+        }
 
         initializeProgressIndicatorViews(view);
 
@@ -121,7 +132,73 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         if (filterParams != null) {
             getPresenter().setTaskFilterParams(filterParams);
         }
+
+        initRegisterDesign(view);
     }
+
+
+    private void initRegisterDesign(@NonNull View view) {
+        if (TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design()) {
+            disableView(view.findViewById(R.id.search_bar_layout));
+            disableView(view.findViewById(R.id.progressIndicatorsGroupView));
+            disableView(view.findViewById(R.id.filter_display_view));
+            headerTextDisplay.setText("");
+            interventionTypeTv.setText("My Tasks");
+
+            // The menu icon OR image
+            ImageView drawerMenuLogo = (ImageView) view.findViewById(R.id.drawerMenu);
+            drawerMenuLogo.setImageResource(R.drawable.ic_action_goldsmith_gold_placeholder_back);
+            // Fix the G logo position
+
+            // 1.
+            ConstraintSet constraintSet = new ConstraintSet();
+            ConstraintLayout parent = (ConstraintLayout) view.findViewById(R.id.drawerMenu).getParent();
+            constraintSet.clone(parent);
+            constraintSet.connect(R.id.drawerMenu, ConstraintSet.BOTTOM, parent.getId(), ConstraintSet.BOTTOM);
+            constraintSet.applyTo(parent);
+
+
+            ImageView backBtn = (ImageView) view.findViewById(R.id.drawerMenuArrow);
+            backBtn.setImageResource(R.drawable.ic_action_goldsmith_menu_arrow);
+            disableView(view.findViewById(R.id.menu_label));
+
+            // Center the overdue text
+            LinearLayout.LayoutParams params = ((LinearLayout.LayoutParams) headerTextDisplay.getLayoutParams());
+            //params.gravity = Gravity.CENTER;
+            params.width = LinearLayout.LayoutParams.MATCH_PARENT;
+            headerTextDisplay.setGravity(Gravity.CENTER);
+            headerTextDisplay.setLayoutParams(params);
+            headerTextDisplay.requestLayout();
+
+            ((View) view.findViewById(R.id.register_nav_bar_container)).setBackgroundResource(R.color.goldsmith_blue);
+
+            setListenersForV2MenuBtn(backBtn, drawerMenuLogo);
+        } else {
+            disableView(view.findViewById(R.id.imv_map_icon));
+        }
+    }
+
+    private void setListenersForV2MenuBtn(View backBtn, View logo) {
+        View.OnClickListener onClickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getActivity().finish();
+            }
+        };
+
+        backBtn.setOnClickListener(onClickListener);
+        logo.setOnClickListener(onClickListener);
+    }
+
+    private boolean disableView(@Nullable View view) {
+        if (view != null) {
+            view.setVisibility(View.GONE);
+            return true;
+        }
+
+        return false;
+    }
+
 
     @Override
     public void filter(String filterString, String joinTableString, String mainConditionString, boolean qrCode) {
@@ -161,8 +238,13 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
     @Override
     protected void initializePresenter() {
         presenter = new TaskRegisterFragmentPresenter(this, TaskRegister.VIEW_IDENTIFIER);
-        locationUtils = new LocationUtils(getContext());
-        locationUtils.requestLocationUpdates(getPresenter());
+        if (locationUtils == null) {
+            locationUtils = new LocationUtils(new AndroidGpsLocationClient(getContext()));
+        }
+
+        if (locationUtils.getLocationClient() != null && !locationUtils.getLocationClient().isMonitoringLocation()) {
+            locationUtils.requestLocationUpdates(getPresenter());
+        }
     }
 
     @Override
@@ -194,9 +276,15 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
     protected void onViewClicked(View view) {
         TaskDetails details = (TaskDetails) view.getTag(R.id.task_details);
 
-        if (TASK_RESET_INTERVENTIONS.contains(details.getTaskCode())
+        if (details != null && TASK_RESET_INTERVENTIONS.contains(details.getTaskCode())
                 && Task.TaskStatus.COMPLETED.name().equals(details.getTaskStatus())) {
             displayTaskActionDialog(details, view);
+        } else if (TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design()) {
+            if (details != null) {
+                TaskingLibrary.getInstance().getTaskingLibraryConfiguration().onTaskRegisterItemClicked(getActivity(), details);
+            } else {
+                Timber.e("View does not have the task details attached");
+            }
         } else {
             getPresenter().onTaskSelected(details, view.getId() == R.id.task_action);
         }
@@ -208,7 +296,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
                 R.string.choose_action, R.string.view_details, R.string.undo, new Dialog.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        switch (which){
+                        switch (which) {
                             case BUTTON_POSITIVE:
                                 getPresenter().onTaskSelected(details, view.getId() == R.id.task_action);
                                 break;
@@ -221,7 +309,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
                         dialog.dismiss();
                     }
 
-         } );
+                });
     }
 
     public void displayResetTaskInfoDialog(TaskDetails details) {
@@ -258,10 +346,14 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
     @Override
     public void setTotalTasks(int structuresWithinBuffer) {
         if (isAdded() && headerTextDisplay != null) {
-            headerTextDisplay.setText(getResources().getQuantityString(R.plurals.structures,
-                    taskAdapter.getItemCount(), structuresWithinBuffer, Utils.getLocationBuffer(), taskAdapter.getItemCount()));
 
-            filterRelativeLayout.setVisibility(View.GONE);
+            if (!TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design()) {
+                headerTextDisplay.setText(getResources().getQuantityString(R.plurals.structures,
+                        taskAdapter.getItemCount(), structuresWithinBuffer, Utils.getLocationBuffer(), taskAdapter.getItemCount()));
+                filterRelativeLayout.setVisibility(View.GONE);
+            } else {
+                headerTextDisplay.setText(String.format(getString(R.string.overdue_tasks_count), taskAdapter.getOverdueTasksCount()));
+            }
         }
     }
 
@@ -270,6 +362,7 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         if (BuildConfig.BUILD_COUNTRY == Country.ZAMBIA) {
             new IndicatorsCalculatorTask(getActivity(), tasks).execute();
         }*/
+        taskAdapter.setTaskDetails(tasks);
 
         TaskingLibrary.getInstance().getTaskingLibraryConfiguration().setTaskDetails(getActivity(), taskAdapter, tasks);
     }
@@ -292,14 +385,22 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
 
     @Override
     public void onDestroy() {
-        getPresenter().onDestroy();
+        if (locationUtils != null) {
+            locationUtils.destroy();
+            Timber.i("LocationUtils has called destroy in #onDestroy");
+        }
+
+        if (getPresenter() != null) {
+            getPresenter().onDestroy();
+        }
         super.onDestroy();
     }
 
     @Override
     public void onDrawerClosed() {
-        getPresenter().onDrawerClosed();
-
+        if (getPresenter() != null) {
+            getPresenter().onDrawerClosed();
+        }
     }
 
     @Override
@@ -436,8 +537,15 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
 
     @Override
     public void onPause() {
-        if (getContext() != null)
+        if (getContext() != null) {
             LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(refreshRegisterReceiver);
+            if (locationUtils != null && locationUtils.getLocationClient() != null
+                    && locationUtils.getLocationClient().isMonitoringLocation()) {
+                locationUtils.getLocationClient().stopLocationUpdates();
+                Timber.i("LocationClient has stopped location udpates in #onPause");
+            }
+        }
+
         setViewVisibility(indicatorsCardView, false);
         super.onPause();
     }
@@ -448,6 +556,12 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         if (getContext() != null) {
             IntentFilter filter = new IntentFilter(Action.STRUCTURE_TASK_SYNCED);
             LocalBroadcastManager.getInstance(getContext()).registerReceiver(refreshRegisterReceiver, filter);
+
+            if (locationUtils != null && locationUtils.getLocationClient() != null
+                    && !locationUtils.getLocationClient().isMonitoringLocation()) {
+                locationUtils.getLocationClient().requestLocationUpdates(getPresenter());
+                Timber.i("LocationClient has requested for location udpates in #onResume");
+            }
         }
     }
 
@@ -478,13 +592,12 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
     }
 
     private void openIndicatorsCardView() {
-
         setViewVisibility(indicatorsCardView, true);
     }
 
-
     private void setViewVisibility(View view, boolean isVisible) {
-        view.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+        if (view != null) {
+            view.setVisibility(isVisible ? View.VISIBLE : View.GONE);
+        }
     }
-
 }

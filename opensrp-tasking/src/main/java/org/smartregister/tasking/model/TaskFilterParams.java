@@ -5,9 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.Builder;
+
 /**
  * Created by samuelgithengi on 12/17/19.
  */
+
 public class TaskFilterParams implements Serializable {
 
     private String sortBy;

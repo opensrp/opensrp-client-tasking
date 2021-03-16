@@ -520,6 +520,8 @@ public interface Constants {
 
         String REFERENCE_REASON = "reason_reference";
 
+        String PRIORITY = "priority";
+
         String FAMILY_NAME = "family_head_name";
 
         String SPRAY_STATUS = "spray_status";

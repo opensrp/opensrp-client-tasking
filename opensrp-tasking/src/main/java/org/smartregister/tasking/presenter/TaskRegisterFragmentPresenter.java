@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.core.util.Pair;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import com.mapbox.geojson.Feature;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -20,7 +21,10 @@ import org.smartregister.configurableviews.model.View;
 import org.smartregister.configurableviews.model.ViewConfiguration;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.Task;
+import org.smartregister.location.helper.LocationHelper;
+import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.tasking.R;
+import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.TaskRegisterFragmentContract;
 import org.smartregister.tasking.interactor.TaskRegisterFragmentInteractor;
 import org.smartregister.tasking.model.BaseTaskDetails;
@@ -29,12 +33,16 @@ import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.tasking.util.Constants;
 import org.smartregister.tasking.util.PreferencesUtil;
 import org.smartregister.tasking.util.Utils;
+import org.smartregister.view.activity.DrishtiApplication;
+import org.smartregister.view.contract.IView;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -58,11 +66,11 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
 
     private ConfigurableViewsHelper viewsHelper;
 
-    private Set<View> visibleColumns;
+    private Set<? extends IView> visibleColumns;
 
     private TaskRegisterFragmentInteractor interactor;
 
-    private List<TaskDetails> tasks;
+    private List<TaskDetails> tasks = new ArrayList<>();
 
     private android.location.Location lastLocation;
 
@@ -98,8 +106,6 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
         this.interactor = interactor;
         viewsHelper = ConfigurableViewsLibrary.getInstance().getConfigurableViewsHelper();
         prefsUtil = PreferencesUtil.getInstance();
-
-
     }
 
 
@@ -117,6 +123,12 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
     public void initializeQueries(String mainCondition) {
 
         if (getView().getAdapter() == null) {
+            Set<IView> visibleColumns = new HashSet<>();
+
+            if (this.visibleColumns != null) {
+                visibleColumns.addAll(this.visibleColumns);
+            }
+
             getView().initializeAdapter(visibleColumns);
         }
         lastLocation = getView().getLocationUtils().getLastLocation();
@@ -126,14 +138,14 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
 
         if (!isTasksFiltered) {
             getView().showProgressView();
-            interactor.findTasks(getMainCondition(), lastLocation, getOperationalAreaCenter(), getView().getContext().getString(R.string.house));
+            interactor.findTasks(getMainConditionAndParams(), lastLocation, getOperationalAreaCenter(), getView().getContext().getString(R.string.house));
         }
 
     }
 
     private android.location.Location getOperationalAreaCenter() {
         Location operationalAreaLocation = Utils.getOperationalAreaLocation(prefsUtil.getCurrentOperationalArea());
-        if (operationalAreaLocation == null)
+        if (operationalAreaLocation == null || operationalAreaLocation.getGeometry() == null)
             return null;
         return mappingHelper.getCenter(gson.toJson(operationalAreaLocation.getGeometry()));
     }
@@ -152,14 +164,25 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
      *
      * @return pair of filter clause and values for filter
      */
-    private Pair<String, String[]> getMainCondition() {
+    // TODO: Rename this to getMainConditionAndParams. The params returned are operational-area-id, plan-id, inactive-task-status
+    public Pair<String, String[]> getMainConditionAndParams() {
         Location operationalArea = Utils.getOperationalAreaLocation(prefsUtil.getCurrentOperationalArea());
-        String whereClause = String.format("%s.%s = ? AND %s.%s = ? AND %s.%s NOT IN (%s)",
-                Constants.DatabaseKeys.TASK_TABLE, Constants.DatabaseKeys.GROUPID, Constants.DatabaseKeys.TASK_TABLE, Constants.DatabaseKeys.PLAN_ID,
-                Constants.DatabaseKeys.TASK_TABLE, Constants.DatabaseKeys.STATUS,
-                TextUtils.join(",", Collections.nCopies(INACTIVE_TASK_STATUS.length, "?")));
-        return new Pair<>(whereClause, ArrayUtils.addAll(new String[]{operationalArea == null ?
-                null : operationalArea.getId(), prefsUtil.getCurrentPlanId()}, INACTIVE_TASK_STATUS));
+        if (TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design()) {
+            String whereClause = String.format("%s.%s = ? AND %s.%s = ? AND %s.%s NOT IN (%s)",
+                    Constants.DatabaseKeys.TASK_TABLE, Constants.DatabaseKeys.GROUPID, Constants.DatabaseKeys.TASK_TABLE, Constants.DatabaseKeys.PLAN_ID,
+                    Constants.DatabaseKeys.TASK_TABLE, Constants.DatabaseKeys.STATUS,
+                    TextUtils.join(",", Collections.nCopies(INACTIVE_TASK_STATUS.length + 1, "?")));
+            return new Pair<>(whereClause, ArrayUtils.addAll(new String[]{operationalArea == null ?
+                    null : operationalArea.getId(), prefsUtil.getCurrentPlanId()}, ArrayUtils.addAll(INACTIVE_TASK_STATUS, Task.TaskStatus.COMPLETED.name())));
+        } else {
+            String whereClause = String.format("%s.%s = ? AND %s.%s = ? AND %s.%s NOT IN (%s)",
+                    Constants.DatabaseKeys.TASK_TABLE, Constants.DatabaseKeys.GROUPID, Constants.DatabaseKeys.TASK_TABLE, Constants.DatabaseKeys.PLAN_ID,
+                    Constants.DatabaseKeys.TASK_TABLE, Constants.DatabaseKeys.STATUS,
+                    TextUtils.join(",", Collections.nCopies(INACTIVE_TASK_STATUS.length, "?")));
+            return new Pair<>(whereClause, ArrayUtils.addAll(new String[]{operationalArea == null ?
+                    null : operationalArea.getId(), prefsUtil.getCurrentPlanId()}, INACTIVE_TASK_STATUS));
+
+        }
     }
 
     @Override
@@ -174,12 +197,33 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
             recalculateDistance = false;
         } else {
             this.tasks = tasks;
+
+            // TODO: Remove this static data
+            /*if (tasks == null || tasks.isEmpty()) {
+                TaskDetails taskDetails = new TaskDetails("3459-sdfa23-sdqasdf");
+
+                //Map<String, String> map = ImmutableMap.of("first_name", "Martin", "last_name", "Bull", "birthdate", "1970-01-10", "phone_number", "07246738839", "gender", "Male");
+                Map<String, String> map = ImmutableMap.of("firstName", "John", "lastName", "Doe", "birthdate", "1970-01-10", "phone_number", "07246738839", "gender", "Male");
+                CommonPersonObjectClient commonPersonObjectClient = new CommonPersonObjectClient("dfh45453483-34dfd893-394343cds3", map, "Marchello");
+
+                taskDetails.setClient(commonPersonObjectClient);
+                taskDetails.setTaskCode("pnc_visit");
+                tasks = new ArrayList<>();
+                tasks.add(taskDetails);
+                this.tasks = tasks;
+            }*/
+
             if (tasks == null) {
+
                 getView().displayNotification(R.string.fetching_structure_title,
                         R.string.fetch_location_and_structures_failed, prefsUtil.getCurrentOperationalArea());
                 getView().setTaskDetails(new ArrayList<>());
+                this.tasks = tasks;
             } else if (tasks.isEmpty()) {
-                getView().displayNotification(R.string.fetching_structure_title, R.string.no_structures_found);
+                if (getView().getContext().getApplicationContext().getPackageName().contains("reveal")) {
+                    getView().displayNotification(R.string.fetching_structure_title, R.string.no_structures_found);
+                }
+
                 getView().setTaskDetails(tasks);
             } else if (applyFilterOnTasksFound) {
                 filterTasks(filterParams);
@@ -188,6 +232,7 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
             } else {
                 getView().setTaskDetails(tasks);
             }
+
             getView().setTotalTasks(structuresWithinBuffer);
             getView().hideProgressDialog();
             getView().hideProgressView();
@@ -199,7 +244,7 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
     @Override
     public void onLocationChanged(android.location.Location location) {
         if (!location.equals(lastLocation)) {
-            if (lastLocation == null && tasks == null) {//tasks not yet retrieved from db
+            if (lastLocation == null && (tasks == null || tasks.isEmpty())) {//tasks not yet retrieved from db
                 recalculateDistance = true;
             } else if (lastLocation == null ||
                     location.distanceTo(lastLocation) >= Constants.REFRESH_MAP_MINIMUM_DISTANCE) {
@@ -218,7 +263,7 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
     @Override
     public void onDrawerClosed() {
         getView().showProgressDialog(R.string.fetching_structures_title, R.string.fetching_structures_message);
-        interactor.findTasks(getMainCondition(), lastLocation, getOperationalAreaCenter(), getView().getContext().getString(R.string.house));
+        interactor.findTasks(getMainConditionAndParams(), lastLocation, getOperationalAreaCenter(), getView().getContext().getString(R.string.house));
         getView().setInventionType(getInterventionLabel());
     }
 
@@ -394,7 +439,7 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
     public void onTaskInfoReset() {
         // refresh task list
         getView().showProgressView();
-        interactor.findTasks(getMainCondition(), lastLocation, getOperationalAreaCenter(), getView().getContext().getString(R.string.house));
+        interactor.findTasks(getMainConditionAndParams(), lastLocation, getOperationalAreaCenter(), getView().getContext().getString(R.string.house));
     }
 
     private boolean matchesTaskCodeFilterList(String value, Set<String> filterList, Pattern pattern) {

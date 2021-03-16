@@ -9,24 +9,22 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
-import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.domain.Location;
-import org.smartregister.tasking.R;
 import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.BaseFormFragmentContract;
 import org.smartregister.tasking.interactor.BaseFormFragmentInteractor;
 import org.smartregister.tasking.model.BaseTaskDetails;
-import org.smartregister.tasking.repository.RevealMappingHelper;
-import org.smartregister.tasking.util.Constants.Intervention;
+import org.smartregister.tasking.repository.TaskingMappingHelper;
 import org.smartregister.tasking.util.Constants.JsonForm;
 import org.smartregister.tasking.util.PasswordDialogUtils;
 import org.smartregister.tasking.util.PreferencesUtil;
-import org.smartregister.tasking.util.RevealJsonFormUtils;
+import org.smartregister.tasking.util.TaskingJsonFormUtils;
+import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 import org.smartregister.tasking.util.Utils;
 import org.smartregister.util.DateTimeTypeConverter;
 import org.smartregister.util.JsonFormUtils;
@@ -51,11 +49,12 @@ import static org.smartregister.tasking.util.Constants.Intervention.REGISTER_FAM
 public class BaseFormFragmentPresenter extends BaseLocationListener implements BaseFormFragmentContract.Presenter {
 
     private final WeakReference<BaseFormFragmentContract.View> view;
+
     private AlertDialog passwordDialog;
 
     private ValidateUserLocationPresenter locationPresenter;
 
-    protected RevealMappingHelper mappingHelper;
+    protected TaskingMappingHelper mappingHelper;
 
     private Location structure;
 
@@ -67,19 +66,23 @@ public class BaseFormFragmentPresenter extends BaseLocationListener implements B
 
     private PreferencesUtil prefsUtil;
 
+    private TaskingLibraryConfiguration libraryConfiguration;
+
     protected Gson gson = new GsonBuilder().setDateFormat(EVENT_DATE_FORMAT_Z)
             .registerTypeAdapter(DateTime.class, new DateTimeTypeConverter()).create();
 
-    private RevealJsonFormUtils jsonFormUtils = new RevealJsonFormUtils();
+    private TaskingJsonFormUtils jsonFormUtils;
 
     protected BaseFormFragmentPresenter(BaseFormFragmentContract.View view, Context context) {
         this.context = context;
         this.view = new WeakReference<>(view);
+        libraryConfiguration = TaskingLibrary.getInstance().getTaskingLibraryConfiguration();
         passwordDialog = PasswordDialogUtils.initPasswordDialog(context, this);
         locationPresenter = new ValidateUserLocationPresenter(view, this);
-        mappingHelper = new RevealMappingHelper();
+        mappingHelper = libraryConfiguration.getMappingHelper();
         interactor = new BaseFormFragmentInteractor(this);
         prefsUtil = PreferencesUtil.getInstance();
+        jsonFormUtils = libraryConfiguration.getJsonFormUtils();
     }
 
     protected boolean validateFarStructures() {

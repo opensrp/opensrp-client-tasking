@@ -1,11 +1,15 @@
 package org.smartregister.tasking.sync;
 
+import android.accounts.AuthenticatorException;
+import android.accounts.OperationCanceledException;
 import android.app.IntentService;
 import android.content.Intent;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import org.jetbrains.annotations.NotNull;
 import org.smartregister.domain.FetchStatus;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.Task;
@@ -19,13 +23,14 @@ import org.smartregister.sync.helper.LocationServiceHelper;
 import org.smartregister.sync.helper.PlanIntentServiceHelper;
 import org.smartregister.sync.helper.TaskServiceHelper;
 import org.smartregister.tasking.TaskingLibrary;
-import org.smartregister.tasking.job.RevealSyncSettingsServiceJob;
+import org.smartregister.tasking.job.TaskingSyncSettingsServiceJob;
 import org.smartregister.tasking.util.PreferencesUtil;
 import org.smartregister.tasking.util.Utils;
 import org.smartregister.util.NetworkUtils;
 import org.smartregister.util.SyncUtils;
 import org.smartregister.view.activity.DrishtiApplication;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -53,7 +58,17 @@ public class LocationTaskIntentService extends IntentService {
             return;
         }
         if (!syncUtils.verifyAuthorization()) {
-            syncUtils.logoutUser();
+            try {
+                syncUtils.logoutUser();
+            } catch (AuthenticatorException e) {
+                Timber.e(e);
+            } catch (OperationCanceledException e) {
+                Timber.e(e);
+            } catch (IOException e) {
+                Timber.e(e);
+            }
+            // TODO: Fix this
+            //syncUtils.logoutUser();
             return;
 
         }
@@ -64,7 +79,7 @@ public class LocationTaskIntentService extends IntentService {
         (TaskingLibrary.getInstance().getAppExecutors()).mainThread().execute(new Runnable() {
             @Override
             public void run() {
-                RevealSyncSettingsServiceJob.scheduleJobImmediately(RevealSyncSettingsServiceJob.TAG);
+                TaskingSyncSettingsServiceJob.scheduleJobImmediately(TaskingSyncSettingsServiceJob.TAG);
             }
         });
     }
@@ -73,6 +88,11 @@ public class LocationTaskIntentService extends IntentService {
         Intent intent = new Intent();
         intent.setAction(SyncStatusBroadcastReceiver.ACTION_SYNC_STATUS);
         intent.putExtra(SyncStatusBroadcastReceiver.EXTRA_FETCH_STATUS, fetchStatus);
+        if (fetchStatus.equals(FetchStatus.fetchedFailed)
+                || fetchStatus.equals(FetchStatus.noConnection)
+                || fetchStatus.equals(FetchStatus.nothingFetched)) {
+            intent.putExtra(SyncStatusBroadcastReceiver.EXTRA_COMPLETE_STATUS, true);
+        }
         sendBroadcast(intent);
     }
 
@@ -83,38 +103,28 @@ public class LocationTaskIntentService extends IntentService {
     }
 
 
-    private void doSync() {
+    @VisibleForTesting
+    protected void doSync() {
         sendSyncStatusBroadcastMessage(FetchStatus.fetchStarted);
+
         LocationServiceHelper locationServiceHelper = new LocationServiceHelper(
                 DrishtiApplication.getInstance().getContext().getLocationRepository(),
                 DrishtiApplication.getInstance().getContext().getLocationTagRepository(),
-                DrishtiApplication.getInstance().getContext().getStructureRepository());
-        TaskServiceHelper taskServiceHelper = TaskServiceHelper.getInstance();
-        PlanIntentServiceHelper planServiceHelper = PlanIntentServiceHelper.getInstance();
+                TaskingLibrary.getInstance().getStructureRepository());
 
 
-        List<Location> syncedStructures = locationServiceHelper.fetchLocationsStructures();
+        List<Location> syncedStructures = syncStructures(locationServiceHelper);
 
-        sendSyncStatusBroadcastMessage(FetchStatus.fetchStarted);
-        planServiceHelper.syncPlans();
+        syncPlans();
 
-        sendSyncStatusBroadcastMessage(FetchStatus.fetchStarted);
-        List<Task> synchedTasks = taskServiceHelper.syncTasks();
+        List<Task> syncedTasks = syncTasks();
 
-        TaskRepository taskRepository = DrishtiApplication.getInstance().getContext().getTaskRepository();
-        taskRepository.updateTaskStructureIdFromStructure(syncedStructures);
-        taskRepository.updateTaskStructureIdsFromExistingStructures();
-        taskRepository.updateTaskStructureIdsFromExistingClients(FAMILY_MEMBER);
+        Set<String> baseEntityIds = getEventBaseEntityIds(syncedStructures, syncedTasks);
 
-        if (hasChangesInCurrentOperationalArea(syncedStructures, synchedTasks)) {
-            Intent intent = new Intent(STRUCTURE_TASK_SYNCED);
-            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
-        }
-
-        clientProcessEvents(extractStructureIds(syncedStructures, synchedTasks));
+        clientProcessEvents(baseEntityIds);
 
         if (!org.smartregister.util.Utils.isEmptyCollection(syncedStructures)
-                || !org.smartregister.util.Utils.isEmptyCollection(synchedTasks)) {
+                || !org.smartregister.util.Utils.isEmptyCollection(syncedTasks)) {
             doSync();
         }
 
@@ -127,14 +137,45 @@ public class LocationTaskIntentService extends IntentService {
 
     }
 
+    @NotNull
+    protected Set<String> getEventBaseEntityIds(List<Location> syncedStructures, List<Task> syncedTasks) {
+        TaskRepository taskRepository = DrishtiApplication.getInstance().getContext().getTaskRepository();
+        taskRepository.updateTaskStructureIdFromStructure(syncedStructures);
+        taskRepository.updateTaskStructureIdsFromExistingStructures();
+        taskRepository.updateTaskStructureIdsFromExistingClients(FAMILY_MEMBER);
+
+        if (hasChangesInCurrentOperationalArea(syncedStructures, syncedTasks)) {
+            Intent intent = new Intent(STRUCTURE_TASK_SYNCED);
+            LocalBroadcastManager.getInstance(getApplicationContext()).sendBroadcast(intent);
+        }
+
+        return extractStructureIds(syncedStructures, syncedTasks);
+    }
+
+    protected List<Location> syncStructures(LocationServiceHelper locationServiceHelper) {
+        return locationServiceHelper.fetchLocationsStructures();
+    }
+
+    protected List<Task> syncTasks() {
+        sendSyncStatusBroadcastMessage(FetchStatus.fetchStarted);
+        TaskServiceHelper taskServiceHelper = TaskServiceHelper.getInstance();
+        return taskServiceHelper.syncTasks();
+    }
+
+    protected void syncPlans() {
+        sendSyncStatusBroadcastMessage(FetchStatus.fetchStarted);
+        PlanIntentServiceHelper planServiceHelper = PlanIntentServiceHelper.getInstance();
+        planServiceHelper.syncPlans();
+    }
+
     /**
-     * Checks if there a synched structure or task on the currently opened operational area
+     * Checks if there a synced structure or task on the currently opened operational area
      *
      * @param syncedStructures the list of synced structures
-     * @param synchedTasks     the list of synced tasks
-     * @return true if there is a synched structure or task on the currently opened operational area; otherwise returns false
+     * @param syncedTasks      the list of synced tasks
+     * @return true if there is a synced structure or task on the currently opened operational area; otherwise returns false
      */
-    private boolean hasChangesInCurrentOperationalArea(List<Location> syncedStructures, List<Task> synchedTasks) {
+    protected boolean hasChangesInCurrentOperationalArea(List<Location> syncedStructures, List<Task> syncedTasks) {
         Location operationalAreaLocation = Utils.getOperationalAreaLocation(PreferencesUtil.getInstance().getCurrentOperationalArea());
         String operationalAreaLocationId;
         if (operationalAreaLocation == null) {
@@ -149,8 +190,8 @@ public class LocationTaskIntentService extends IntentService {
                 }
             }
         }
-        if (synchedTasks != null) {
-            for (Task task : synchedTasks) {
+        if (syncedTasks != null) {
+            for (Task task : syncedTasks) {
                 if (operationalAreaLocationId.equals(task.getGroupIdentifier())) {
                     return true;
                 }
@@ -160,21 +201,21 @@ public class LocationTaskIntentService extends IntentService {
     }
 
     /**
-     * Extracts a set of Structures ids from syched structures and tasks
+     * Extracts a set of Structures ids from synced structures and tasks
      *
      * @param syncedStructures the list of synced structures
-     * @param synchedTasks     the list of synced tasks
+     * @param syncedTasks      the list of synced tasks
      * @return a set of baseEntityIds
      */
-    private Set<String> extractStructureIds(List<Location> syncedStructures, List<Task> synchedTasks) {
+    protected Set<String> extractStructureIds(List<Location> syncedStructures, List<Task> syncedTasks) {
         Set<String> structureIds = new HashSet<>();
         if (!org.smartregister.util.Utils.isEmptyCollection(syncedStructures)) {
             for (Location structure : syncedStructures) {
                 structureIds.add(structure.getId());
             }
         }
-        if (!org.smartregister.util.Utils.isEmptyCollection(synchedTasks)) {
-            for (Task task : synchedTasks) {
+        if (!org.smartregister.util.Utils.isEmptyCollection(syncedTasks)) {
+            for (Task task : syncedTasks) {
                 structureIds.add(task.getForEntity());
             }
         }
@@ -194,7 +235,7 @@ public class LocationTaskIntentService extends IntentService {
         if (!eventClients.isEmpty()) {
 
             try {
-                DrishtiApplication.getInstance().getClientProcessor().getInstance(getApplicationContext()).processClient(eventClients);
+                DrishtiApplication.getInstance().getClientProcessor().processClient(eventClients);
             } catch (Exception ex) {
                 Timber.e(ex);
             }

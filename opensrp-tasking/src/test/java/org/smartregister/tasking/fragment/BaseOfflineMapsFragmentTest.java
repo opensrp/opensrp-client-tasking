@@ -4,6 +4,7 @@ import android.content.Context;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -14,6 +15,7 @@ import org.mockito.junit.MockitoRule;
 import org.powermock.reflect.Whitebox;
 import org.robolectric.Robolectric;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.android.controller.ActivityController;
 import org.robolectric.shadows.ShadowToast;
 import org.smartregister.tasking.BaseUnitTest;
 import org.smartregister.tasking.R;
@@ -42,10 +44,14 @@ public class BaseOfflineMapsFragmentTest extends BaseUnitTest {
 
     private BaseOfflineMapsFragment baseOfflineMapsFragment;
 
+    private ActivityController<AppCompatActivity> controller;
+
     @Before
     public void setUp() {
         baseOfflineMapsFragment = new AvailableOfflineMapsFragment();
-        AppCompatActivity activity = Robolectric.buildActivity(AppCompatActivity.class).create().start().get();
+        controller = Robolectric.buildActivity(AppCompatActivity.class).create().start();
+
+        AppCompatActivity activity = controller.get();
         activity.setContentView(R.layout.activity_offline_maps);
         activity.getSupportFragmentManager().beginTransaction().add(baseOfflineMapsFragment, "Base").commit();
     }
@@ -139,4 +145,14 @@ public class BaseOfflineMapsFragmentTest extends BaseUnitTest {
 
     }
 
+    @After
+    public void tearDown() throws Exception {
+        try {
+            controller.pause().stop().destroy();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        System.gc();
+    }
 }
