@@ -8,7 +8,9 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
@@ -50,6 +52,7 @@ import org.smartregister.view.activity.DrishtiApplication;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 import io.ona.kujaku.data.realm.RealmDatabase;
@@ -82,7 +85,8 @@ public class TestRevealApplication extends DrishtiApplication {
     }
 
     public AppExecutors getAppExecutors() {
-        return new AppExecutors(Executors.newSingleThreadExecutor(), Executors.newSingleThreadExecutor(), Executors.newSingleThreadExecutor());
+        Executor mainThreadExecutor = ContextCompat.getMainExecutor(this);
+        return new AppExecutors(mainThreadExecutor, mainThreadExecutor, mainThreadExecutor);
     }
 
     @Override
@@ -114,7 +118,7 @@ public class TestRevealApplication extends DrishtiApplication {
 
         @Override
         public int getInterventionLabel() {
-            return 0;
+            return R.string.anc_label;
         }
 
         @NonNull
@@ -329,7 +333,12 @@ public class TestRevealApplication extends DrishtiApplication {
         }
 
         @Override
-        public void onTaskRegisterBindViewHolder(@NonNull android.content.Context context, @NonNull TaskRegisterViewHolder viewHolder, @NonNull View.OnClickListener registerActionHandler, @NonNull TaskDetails taskDetails, int position) {
+        public void onTaskRegisterBindViewHolder(@NonNull android.content.Context context, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull View.OnClickListener registerActionHandler, @NonNull TaskDetails taskDetails, int position) {
+
+        }
+
+        @Override
+        public void onTaskRegisterItemClicked(@NonNull Activity activity, @NonNull TaskDetails taskDetails) {
 
         }
 
@@ -430,7 +439,7 @@ public class TestRevealApplication extends DrishtiApplication {
         }
 
         @Override
-        public Boolean getDrawOperationalAreaBoundaryAndLabel() {
+        public boolean getDrawOperationalAreaBoundaryAndLabel() {
             return true;
         }
 
@@ -487,6 +496,12 @@ public class TestRevealApplication extends DrishtiApplication {
         @Override
         public void openFilterTaskActivity(TaskFilterParams filterParams, TaskingHomeActivity activity) {
 
+        }
+
+        @Nullable
+        @Override
+        public MapConfiguration getMapConfiguration() {
+            return null;
         }
     }
 }

@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -13,6 +14,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.powermock.reflect.Whitebox;
 import org.robolectric.Robolectric;
+import org.robolectric.android.controller.ActivityController;
 import org.smartregister.tasking.BaseUnitTest;
 import org.smartregister.tasking.R;
 import org.smartregister.tasking.util.TestingUtils;
@@ -30,10 +32,14 @@ public class CaseClassificationFragmentTest extends BaseUnitTest {
 
     private CaseClassificationFragment fragment;
 
+    private ActivityController<AppCompatActivity> controller;
+
     @Before
     public void setUp() {
         fragment = new CaseClassificationFragment();
-        activity = Robolectric.buildActivity(AppCompatActivity.class).create().start().get();
+        controller = Robolectric.buildActivity(AppCompatActivity.class).create().start();
+        activity = controller.get();
+
         activity.setContentView(R.layout.activity_base_profile);
         activity.getSupportFragmentManager().beginTransaction().add(fragment, "Case Details").commit();
     }
@@ -66,6 +72,17 @@ public class CaseClassificationFragmentTest extends BaseUnitTest {
 
         TextView focusReasonTextView = Whitebox.getInternalState(fragment, "focusReasonTextView");
         assertEquals("Focus Reason: Investigation", focusReasonTextView.getText());
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        try {
+            controller.pause().stop().destroy();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        System.gc();
     }
 
 }

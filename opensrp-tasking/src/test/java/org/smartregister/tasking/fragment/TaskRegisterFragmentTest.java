@@ -12,6 +12,7 @@ import androidx.appcompat.app.AlertDialog;
 import com.vijay.jsonwizard.activities.FormConfigurationJsonFormActivity;
 
 import org.json.JSONObject;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -23,6 +24,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.powermock.reflect.Whitebox;
 import org.robolectric.Robolectric;
+import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowAlertDialog;
 import org.robolectric.shadows.ShadowApplication;
@@ -91,7 +93,6 @@ public class TaskRegisterFragmentTest extends BaseUnitTest {
 
     private TaskRegisterActivity activity;
 
-    @Mock
     private TaskRegisterFragmentPresenter presenter;
 
     @Mock
@@ -114,15 +115,22 @@ public class TaskRegisterFragmentTest extends BaseUnitTest {
 
     private TaskingLibraryConfiguration taskingLibraryConfiguration;
 
+    private ActivityController<TestTaskRegisterActivity> controller;
+
 
     @Before
     public void setUp() {
         org.smartregister.Context.bindtypes = new ArrayList<>();
         fragment = new TaskRegisterFragment();
-        Whitebox.setInternalState(fragment, "presenter", presenter);
-        activity = Robolectric.buildActivity(TestTaskRegisterActivity.class).create().start().get();
+
+        controller = Robolectric.buildActivity(TestTaskRegisterActivity.class).create().start();
+        activity = controller.get();
+
         activity.setContentView(R.layout.activity_base_register);
         activity.getSupportFragmentManager().beginTransaction().add(0, fragment).commit();
+
+        presenter = (TaskRegisterFragmentPresenter) Mockito.spy(fragment.presenter());
+        Whitebox.setInternalState(fragment, "presenter", presenter);
 
         taskingLibraryConfiguration = Mockito.spy(TaskingLibrary.getInstance().getTaskingLibraryConfiguration());
         ReflectionHelpers.setField(TaskingLibrary.getInstance(), "taskingLibraryConfiguration", taskingLibraryConfiguration);
@@ -420,7 +428,11 @@ public class TaskRegisterFragmentTest extends BaseUnitTest {
         Intent intent = new Intent();
         TaskFilterParams params = new TaskFilterParams("");
         intent.putExtra(FILTER_SORT_PARAMS, params);
+
+        // Call the method under test
         fragment.onActivityResult(REQUEST_CODE_FILTER_TASKS, RESULT_OK, intent);
+
+        // Verifications
         verify(presenter).filterTasks(params);
     }
 
@@ -479,4 +491,13 @@ public class TaskRegisterFragmentTest extends BaseUnitTest {
         assertFalse(alertDialog.isShowing());
     }
 
+    @After
+    public void tearDown() throws Exception {
+        try {
+            controller.pause().stop().destroy();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        System.gc();
+    }
 }

@@ -440,4 +440,10 @@ public class DefaultTaskingLibraryConfiguration extends TaskingLibraryConfigurat
     public void openFilterTaskActivity(TaskFilterParams filterParams, TaskingHomeActivity activity) {
 
     }
+
+    @Nullable
+    @Override
+    public MapConfiguration getMapConfiguration() {
+        return null;
+    }
 }

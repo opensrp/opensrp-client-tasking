@@ -21,6 +21,7 @@ import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.Task;
+import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.activity.TaskingHomeActivity;
 import org.smartregister.tasking.adapter.TaskRegisterAdapter;
 import org.smartregister.tasking.configuration.TaskRegisterV1Configuration;
@@ -34,6 +35,7 @@ import org.smartregister.tasking.model.CardDetails;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.tasking.repository.TaskingMappingHelper;
+import org.smartregister.tasking.view.TaskingMapView;
 import org.smartregister.util.AppExecutors;
 
 import java.util.List;
@@ -182,7 +184,9 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract boolean isCompassEnabled();
 
-    public abstract boolean showCurrentLocationButton();
+    public boolean showCurrentLocationButton() {
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design();
+    }
 
     public abstract boolean disableMyLocationOnMapMove();
 
@@ -218,10 +222,26 @@ public abstract class TaskingLibraryConfiguration {
         return taskRegisterConfiguration;
     }
 
+    public boolean isSupervisor() {
+        return false;
+    }
+
+    @Nullable
+    public abstract MapConfiguration getMapConfiguration();
+
     public interface TaskRegisterConfiguration {
 
         boolean isV2Design();
 
         boolean showGroupedTasks();
+    }
+
+    public interface MapConfiguration {
+
+        void onPriorityTasksToggle(@NonNull TaskingMapView taskingMapView, boolean on);
+
+        String[] getAllTasksLayerIds();
+
+        String[] getPriorityTasksLayerIds();
     }
 }

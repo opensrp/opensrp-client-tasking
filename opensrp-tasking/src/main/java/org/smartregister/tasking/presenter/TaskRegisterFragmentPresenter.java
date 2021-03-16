@@ -244,7 +244,7 @@ public class TaskRegisterFragmentPresenter extends BaseFormFragmentPresenter imp
     @Override
     public void onLocationChanged(android.location.Location location) {
         if (!location.equals(lastLocation)) {
-            if (lastLocation == null && tasks == null) {//tasks not yet retrieved from db
+            if (lastLocation == null && (tasks == null || tasks.isEmpty())) {//tasks not yet retrieved from db
                 recalculateDistance = true;
             } else if (lastLocation == null ||
                     location.distanceTo(lastLocation) >= Constants.REFRESH_MAP_MINIMUM_DISTANCE) {

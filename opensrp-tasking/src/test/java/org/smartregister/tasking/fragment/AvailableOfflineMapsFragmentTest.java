@@ -6,6 +6,7 @@ import android.widget.CheckBox;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -17,6 +18,7 @@ import org.mockito.junit.MockitoRule;
 import org.powermock.reflect.Whitebox;
 import org.robolectric.Robolectric;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.android.controller.ActivityController;
 import org.robolectric.shadows.ShadowToast;
 import org.smartregister.domain.Location;
 import org.smartregister.tasking.BaseUnitTest;
@@ -72,11 +74,15 @@ public class AvailableOfflineMapsFragmentTest extends BaseUnitTest {
 
     private Context context = RuntimeEnvironment.application;
 
+    private ActivityController<AppCompatActivity> controller;
+
     @Before
     public void setUp() {
         org.smartregister.Context.bindtypes= new ArrayList<>();
         fragment = new AvailableOfflineMapsFragment();
-        AppCompatActivity activity = Robolectric.buildActivity(AppCompatActivity.class).create().start().get();
+        controller = Robolectric.buildActivity(AppCompatActivity.class).create().start();
+        AppCompatActivity activity = controller.get();
+
         activity.setContentView(R.layout.activity_offline_maps);
         activity.getSupportFragmentManager().beginTransaction().add(fragment, "Available").commit();
     }
@@ -302,4 +308,14 @@ public class AvailableOfflineMapsFragmentTest extends BaseUnitTest {
         assertTrue(updatedOperationalAreasToDownload.isEmpty());
     }
 
+    @After
+    public void tearDown() throws Exception {
+        try {
+            controller.pause().stop().destroy();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+
+        System.gc();
+    }
 }

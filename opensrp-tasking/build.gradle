@@ -78,6 +78,7 @@ android {
 
 tasks.withType(Test) {
     jacoco.includeNoLocationClasses = true
+    maxHeapSize = "4g"
 }
 
 allprojects {
@@ -93,7 +94,7 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.1.0'
 
-    api 'org.smartregister:opensrp-client-core:3.1.0.3-GS-PREVIEW-SNAPSHOT'
+    api 'org.smartregister:opensrp-client-core:4.2.4.1-GS-PREVIEW-SNAPSHOT'
     api ('org.smartregister:opensrp-client-native-form:1.13.2-SNAPSHOT') {
         transitive = true
         exclude group: 'org.smartregister', module: 'opensrp-client-simprints'
@@ -107,7 +108,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'appcompat-v7'
     }
 
-    implementation 'org.smartregister:opensrp-client-reporting:0.0.6-RVL-SNAPSHOT@aar'
+    implementation 'org.smartregister:opensrp-client-reporting:0.1.0-PREVIEW-SNAPSHOT@aar'
 
     implementation ('io.ona.kujaku:library:0.9.0') {
         transitive = true
@@ -168,7 +169,7 @@ coveralls {
     jacocoReportPath = "${buildDir}/reports/jacoco/jacocoRootReport/merged.xml"
 }
 
-//apply from: '../maven.gradle'
+apply from: '../maven.gradle'
 
 task javadoc(type: Javadoc) {
     failOnError false

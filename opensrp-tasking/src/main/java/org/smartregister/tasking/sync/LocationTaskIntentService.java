@@ -6,6 +6,7 @@ import android.app.IntentService;
 import android.content.Intent;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.VisibleForTesting;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 import org.jetbrains.annotations.NotNull;
@@ -87,6 +88,11 @@ public class LocationTaskIntentService extends IntentService {
         Intent intent = new Intent();
         intent.setAction(SyncStatusBroadcastReceiver.ACTION_SYNC_STATUS);
         intent.putExtra(SyncStatusBroadcastReceiver.EXTRA_FETCH_STATUS, fetchStatus);
+        if (fetchStatus.equals(FetchStatus.fetchedFailed)
+                || fetchStatus.equals(FetchStatus.noConnection)
+                || fetchStatus.equals(FetchStatus.nothingFetched)) {
+            intent.putExtra(SyncStatusBroadcastReceiver.EXTRA_COMPLETE_STATUS, true);
+        }
         sendBroadcast(intent);
     }
 
@@ -97,7 +103,8 @@ public class LocationTaskIntentService extends IntentService {
     }
 
 
-    private void doSync() {
+    @VisibleForTesting
+    protected void doSync() {
         sendSyncStatusBroadcastMessage(FetchStatus.fetchStarted);
 
         LocationServiceHelper locationServiceHelper = new LocationServiceHelper(

@@ -31,10 +31,13 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Geometry;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.location.LocationComponent;
@@ -43,10 +46,17 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.UiSettings;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
+import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
+import com.mapbox.mapboxsdk.style.layers.Property;
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
+import com.mapbox.mapboxsdk.style.layers.PropertyValue;
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.pluginscalebar.ScaleBarOptions;
 import com.mapbox.pluginscalebar.ScaleBarPlugin;
+import com.mapbox.turf.TurfMeasurement;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -63,6 +73,7 @@ import org.smartregister.receiver.ValidateAssignmentReceiver;
 import org.smartregister.tasking.R;
 import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.BaseDrawerContract;
+import org.smartregister.tasking.contract.MapCalloutFeature;
 import org.smartregister.tasking.contract.TaskingHomeActivityContract;
 import org.smartregister.tasking.contract.UserLocationContract;
 import org.smartregister.tasking.model.CardDetails;
@@ -71,12 +82,16 @@ import org.smartregister.tasking.presenter.TaskingHomePresenter;
 import org.smartregister.tasking.repository.TaskingMappingHelper;
 import org.smartregister.tasking.util.AlertDialogUtils;
 import org.smartregister.tasking.util.CardDetailsUtil;
+import org.smartregister.tasking.util.KujakuFeatureCalloutPlugin;
 import org.smartregister.tasking.util.TaskingConstants;
+import org.smartregister.tasking.util.TaskingCoordinateUtils;
 import org.smartregister.tasking.util.TaskingJsonFormUtils;
 import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 import org.smartregister.tasking.util.TaskingMapHelper;
 import org.smartregister.tasking.util.Utils;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import io.ona.kujaku.callbacks.OnLocationComponentInitializedCallback;
@@ -108,7 +123,9 @@ import static org.smartregister.tasking.util.Utils.getPixelsPerDPI;
 public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeActivityContract.View,
         View.OnClickListener, SyncStatusBroadcastReceiver.SyncStatusListener, UserLocationContract.UserLocationView,
         OnLocationComponentInitializedCallback, SyncProgressBroadcastReceiver.SyncProgressListener,
-        ValidateAssignmentReceiver.UserAssignmentListener, OnMapReadyCallback, Style.OnStyleLoaded, MapboxMap.OnMapClickListener, MapboxMap.OnMapLongClickListener, View.OnTouchListener {
+        ValidateAssignmentReceiver.UserAssignmentListener, OnMapReadyCallback, Style.OnStyleLoaded,
+        MapboxMap.OnMapClickListener, MapboxMap.OnMapLongClickListener, View.OnTouchListener,
+        MapCalloutFeature.MapView {
 
     protected TaskingHomePresenter taskingHomePresenter;
 
@@ -169,12 +186,63 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
     private LineLayer indexCaseLineLayer;
 
     private TaskingHomeActivityContract.Presenter presenter;
+    private KujakuFeatureCalloutPlugin kujakuFeatureCalloutPlugin;
+    private boolean priorityTasksFilterEnabled;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(getLayoutId());
+
+        if (TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design()) {
+            View toolbar = findViewById(R.id.toolbar_parent_layout);
+            if (toolbar != null) {
+                toolbar.setVisibility(View.GONE);
+            }
+
+            ExtendedFloatingActionButton exitMapBtn = findViewById(R.id.exit_map);
+            if (exitMapBtn != null) {
+                exitMapBtn.setVisibility(View.VISIBLE);
+                exitMapBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        finish();
+                    }
+                });
+            }
+
+            ExtendedFloatingActionButton filterPriorityTasksBtn = findViewById(R.id.filter_priority_tasks);
+            TaskingLibraryConfiguration.MapConfiguration mapConfiguration = TaskingLibrary.getInstance()
+                    .getTaskingLibraryConfiguration()
+                    .getMapConfiguration();
+
+            if (filterPriorityTasksBtn != null && mapConfiguration != null) {
+                filterPriorityTasksBtn.setVisibility(View.VISIBLE);
+                filterPriorityTasksBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // TODO: Toggle red-eye icon
+                        priorityTasksFilterEnabled = !priorityTasksFilterEnabled;
+
+                        if (priorityTasksFilterEnabled) {
+                            filterPriorityTasksBtn.setIconResource(R.drawable.ic_action_eye_not);
+                            filterPriorityTasksBtn.setText(R.string.show_priority_tasks_only);
+                        } else {
+                            filterPriorityTasksBtn.setIconResource(R.drawable.ic_action_eye);
+                            filterPriorityTasksBtn.setText(R.string.show_all_tasks);
+                        }
+
+                        // Client application should filter out tasks or do nothing
+                        mapConfiguration.onPriorityTasksToggle(kujakuMapView, priorityTasksFilterEnabled);
+
+                        if (kujakuMapView.getMapboxMap() != null && kujakuMapView.getMapboxMap().getStyle() != null) {
+                            updateTasksPriorityFilter(kujakuMapView.getMapboxMap().getStyle());
+                        }
+                    }
+                });
+            }
+        }
 
         taskingLibrary = TaskingLibrary.getInstance();
 
@@ -400,8 +468,9 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
     public void setGeoJsonSource(@NonNull FeatureCollection featureCollection, Feature operationalArea, boolean isChangeMapPosition) {
         if (geoJsonSource != null) {
             geoJsonSource.setGeoJson(featureCollection);
+            CameraPosition cameraPosition = null;
+
             if (operationalArea != null) {
-                CameraPosition cameraPosition = null;
                 if (operationalArea.geometry() != null) {
                     cameraPosition = mMapboxMap.getCameraForGeometry(operationalArea.geometry());
                 }
@@ -443,6 +512,99 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
                 } else {
                     mapHelper.updateIndexCaseLayers(mMapboxMap, featureCollection, this);
                 }
+            }
+
+            // Calculate the camera position to the area with most features
+            if (cameraPosition == null && TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design()
+                    && featureCollection != null && featureCollection.features() != null
+                    && featureCollection.features().size() > 0) {
+                List<Feature> featureList = featureCollection.features();
+                HashMap<Feature, List<Feature>> features = new HashMap<>();
+                Feature largestFeatureGroup = null;
+
+                ArrayList<Feature> initialGroupFeatures = new ArrayList<>();
+                initialGroupFeatures.add(featureList.get(0));
+                features.put(featureList.get(0), initialGroupFeatures);
+                largestFeatureGroup = featureList.get(0);
+                int largestFeatureGroupSize = 1;
+
+                for (Feature feature: featureList) {
+                    if (!features.containsKey(feature)) {
+                        Geometry featureGeometry = feature.geometry();
+                        Point featurePoint = null;
+                        if (featureGeometry instanceof Point) {
+                            featurePoint = (Point) featureGeometry;
+                        } else {
+                            continue;
+                        }
+
+                        boolean foundGroup = false;
+                        for (Feature featureGroup: features.keySet()) {
+                            Geometry featureGroupGeometry = featureGroup.geometry();
+                            Point featureGroupPoint = null;
+
+                            if (featureGroupGeometry instanceof Point) {
+                                featureGroupPoint = (Point) featureGroupGeometry;
+                            } else if (featureGeometry.bbox() != null) {
+                                featureGroupPoint = TurfMeasurement.midpoint(featureGroupGeometry.bbox().northeast(), featureGroupGeometry.bbox().southwest());
+                            } else {
+                                continue;
+                            }
+
+                            double distanceInKm = TurfMeasurement.distance(featurePoint, featureGroupPoint);
+
+                            if (distanceInKm <= 13) {
+                                List<Feature> groupFeatures = features.get(featureGroup);
+                                groupFeatures.add(feature);
+
+                                if (groupFeatures.size() > largestFeatureGroupSize) {
+                                    largestFeatureGroupSize = groupFeatures.size();
+                                    largestFeatureGroup = featureGroup;
+                                }
+                                foundGroup = true;
+                                break;
+                            }
+                        }
+
+                        if (!foundGroup) {
+                            ArrayList<Feature> groupFeatures = new ArrayList<>();
+                            groupFeatures.add(feature);
+                            features.put(feature, groupFeatures);
+                        }
+                    }
+                }
+
+                if (largestFeatureGroup != null) {
+                    Geometry largestFeatureGroupGeometry = largestFeatureGroup.geometry();
+
+                    LatLng mapCenter = TaskingCoordinateUtils.getCenter(features.get(largestFeatureGroup));
+
+                    if (mapCenter != null) {
+                        double currentZoom = mMapboxMap.getCameraPosition().zoom;
+
+                        if (currentZoom < 11.8d) {
+                            currentZoom = 11.8d; // Can also be 14d
+                        }
+
+                        cameraPosition = new CameraPosition.Builder()
+                                .target(mapCenter)
+                                .zoom(currentZoom)
+                                .build();
+                        mMapboxMap.setCameraPosition(cameraPosition);
+                    }
+                }
+            }
+
+            if (cameraPosition == null && TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design()) {
+                if (kujakuMapView != null) {
+                    kujakuMapView.focusOnUserLocation(true);
+                }
+            }
+
+            if (TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design()
+                    && kujakuFeatureCalloutPlugin != null && featureCollection != null
+                    && featureCollection.features() != null && featureCollection.features().size() > 0) {
+                kujakuFeatureCalloutPlugin.setupOnMap(featureCollection.features(), geoJsonSource.getId());
             }
         }
     }
@@ -565,8 +727,20 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
     }
 
     @Override
+    public void refreshCalloutSource() {
+        /*if (kujakuMapView != null && featureCollection != null) {
+            kujakuMapView.addFeaturePoints(featureCollection);
+        }*/
+    }
+
+    @Override
     public Context getContext() {
         return this;
+    }
+
+    @Override
+    public MapboxMap getMapboxMap() {
+        return kujakuMapView.getMapboxMap();
     }
 
     @Override
@@ -728,6 +902,7 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
     @Override
     public void onMapReady(@NonNull MapboxMap mapboxMap) {
         mMapboxMap = mapboxMap;
+        kujakuMapView.setMapboxMap(mapboxMap);
 
         mapboxMap.addOnMapClickListener(this);
 
@@ -748,7 +923,8 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
         if (isCompassEnabled()) {
             enableCompass(mMapboxMap);
         }
-        geoJsonSource = style.getSourceAs(getString(R.string.reveal_datasource_name));
+        String dataSourceId = getString(R.string.reveal_datasource_name);
+        geoJsonSource = style.getSourceAs(dataSourceId);
 
         selectedGeoJsonSource = style.getSourceAs(getString(R.string.selected_datasource_name));
 
@@ -757,6 +933,56 @@ public class TaskingHomeActivity extends BaseMapActivity implements TaskingHomeA
         mapHelper.addBaseLayers(kujakuMapView, style, TaskingHomeActivity.this);
 
         initializeScaleBarPlugin(mMapboxMap);
+
+        // Load the callouts plugin
+        kujakuFeatureCalloutPlugin = new KujakuFeatureCalloutPlugin(this, style);
+        kujakuFeatureCalloutPlugin.setupOnMap(geoJsonSource);
+
+        updateTasksPriorityFilter(style);
+    }
+
+    public void updateTasksPriorityFilter(@NonNull Style style) {
+        TaskingLibraryConfiguration.MapConfiguration mapConfiguration = TaskingLibrary.getInstance()
+                .getTaskingLibraryConfiguration()
+                .getMapConfiguration();
+
+        if (mapConfiguration != null) {
+            String[] allTasksLayerIds = mapConfiguration.getAllTasksLayerIds();
+            String[] priorityTasksLayerIds = mapConfiguration.getPriorityTasksLayerIds();
+
+            if (allTasksLayerIds != null && priorityTasksLayerIds != null) {
+
+                PropertyValue<String> propertyValue = priorityTasksFilterEnabled ? PropertyFactory.visibility(Property.NONE)
+                        : PropertyFactory.visibility(Property.VISIBLE);
+                for (String allTaskLayerId: allTasksLayerIds) {
+                    Layer layer = style.getLayer(allTaskLayerId);
+                    if (layer != null) {
+                        layer.setProperties(propertyValue);
+                    }
+                }
+
+                propertyValue = !priorityTasksFilterEnabled ? PropertyFactory.visibility(Property.NONE)
+                        : PropertyFactory.visibility(Property.VISIBLE);
+
+                for (String priorityTasksLayerId: priorityTasksLayerIds) {
+                    Layer layer = style.getLayer(priorityTasksLayerId);
+                    if (layer != null) {
+                        layer.setProperties(propertyValue);
+                    }
+                }
+
+                SymbolLayer layer = style.getLayerAs(KujakuFeatureCalloutPlugin.CALLOUT_LAYER_ID);
+                if (layer != null) {
+                    if (priorityTasksFilterEnabled) {
+                        layer.withFilter(new Expression("in", Expression.literal("taskPriority"), Expression.literal("0"), Expression.literal("1")));
+                    } else {
+                        layer.setFilter(Expression.all());
+                    }
+                }
+            }
+
+            mapConfiguration.onPriorityTasksToggle(kujakuMapView, priorityTasksFilterEnabled);
+        }
     }
 
     protected boolean isCompassEnabled() {

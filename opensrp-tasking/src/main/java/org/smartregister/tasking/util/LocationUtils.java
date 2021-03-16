@@ -96,5 +96,7 @@ public class LocationUtils {
         locationClient = null;
     }
 
-
+    public ILocationClient getLocationClient() {
+        return locationClient;
+    }
 }

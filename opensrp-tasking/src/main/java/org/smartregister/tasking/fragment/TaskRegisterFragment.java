@@ -1,6 +1,5 @@
 package org.smartregister.tasking.fragment;
 
-import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -21,7 +20,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
@@ -54,7 +52,6 @@ import java.util.Set;
 
 import io.ona.kujaku.location.clients.AndroidGpsLocationClient;
 import io.ona.kujaku.utils.Constants;
-import io.ona.kujaku.utils.Permissions;
 import timber.log.Timber;
 
 import static android.app.Activity.RESULT_CANCELED;
@@ -241,8 +238,13 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
     @Override
     protected void initializePresenter() {
         presenter = new TaskRegisterFragmentPresenter(this, TaskRegister.VIEW_IDENTIFIER);
-        locationUtils = new LocationUtils(new AndroidGpsLocationClient(getContext()));
-        locationUtils.requestLocationUpdates(getPresenter());
+        if (locationUtils == null) {
+            locationUtils = new LocationUtils(new AndroidGpsLocationClient(getContext()));
+        }
+
+        if (locationUtils.getLocationClient() != null && !locationUtils.getLocationClient().isMonitoringLocation()) {
+            locationUtils.requestLocationUpdates(getPresenter());
+        }
     }
 
     @Override
@@ -383,6 +385,11 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
 
     @Override
     public void onDestroy() {
+        if (locationUtils != null) {
+            locationUtils.destroy();
+            Timber.i("LocationUtils has called destroy in #onDestroy");
+        }
+
         if (getPresenter() != null) {
             getPresenter().onDestroy();
         }
@@ -530,8 +537,15 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
 
     @Override
     public void onPause() {
-        if (getContext() != null)
+        if (getContext() != null) {
             LocalBroadcastManager.getInstance(getContext()).unregisterReceiver(refreshRegisterReceiver);
+            if (locationUtils != null && locationUtils.getLocationClient() != null
+                    && locationUtils.getLocationClient().isMonitoringLocation()) {
+                locationUtils.getLocationClient().stopLocationUpdates();
+                Timber.i("LocationClient has stopped location udpates in #onPause");
+            }
+        }
+
         setViewVisibility(indicatorsCardView, false);
         super.onPause();
     }
@@ -542,6 +556,12 @@ public class TaskRegisterFragment extends BaseRegisterFragment implements TaskRe
         if (getContext() != null) {
             IntentFilter filter = new IntentFilter(Action.STRUCTURE_TASK_SYNCED);
             LocalBroadcastManager.getInstance(getContext()).registerReceiver(refreshRegisterReceiver, filter);
+
+            if (locationUtils != null && locationUtils.getLocationClient() != null
+                    && !locationUtils.getLocationClient().isMonitoringLocation()) {
+                locationUtils.getLocationClient().requestLocationUpdates(getPresenter());
+                Timber.i("LocationClient has requested for location udpates in #onResume");
+            }
         }
     }
 

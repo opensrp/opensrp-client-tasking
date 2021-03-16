@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 import org.smartregister.CoreLibrary;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
+import org.smartregister.domain.Task;
 import org.smartregister.repository.EventClientRepository.event_column;
 import org.smartregister.repository.LocationRepository;
 import org.smartregister.tasking.TaskingLibrary;
@@ -29,7 +30,9 @@ import org.smartregister.tasking.util.Utils;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import timber.log.Timber;
 
@@ -243,6 +246,10 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
             cursor = getDatabase().rawQuery(query, params);
             while (cursor != null && cursor.moveToNext()) {
                 TaskDetails taskDetails = readTaskDetails(cursor, lastLocation, operationalAreaCenter, houseLabel, groupedTasks);
+                if (taskDetails == null || (taskDetails.getClient() == null && !TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().showGroupedTasks())) {
+                    continue;
+                }
+
                 //skip BCC and Case confirmation tasks in tracking tasks within buffer
                 if (taskDetails.getDistanceFromUser() <= locationBuffer && taskDetails.getDistanceFromUser() >= 0) {
                     structuresWithinBuffer += 1;
@@ -266,7 +273,12 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
         task.setTaskEntity(cursor.getString(cursor.getColumnIndex(FOR)));
         task.setBusinessStatus(cursor.getString(cursor.getColumnIndex(BUSINESS_STATUS)));
         task.setTaskStatus(cursor.getString(cursor.getColumnIndex(STATUS)));
-        task.setAuthoredOn(cursor.getLong(cursor.getColumnIndex(AUTHORED_ON)));
+
+        int colIndex = cursor.getColumnIndex(AUTHORED_ON);
+        if (colIndex != -1) {
+            task.setAuthoredOn(cursor.getLong(cursor.getColumnIndex(AUTHORED_ON)));
+        }
+
         if (isGroupedTasks) {
             task.setTaskCount(cursor.getInt(cursor.getColumnIndex(TASK_COUNT)));
             task.setCompleteTaskCount(cursor.getInt(cursor.getColumnIndex(COMPLETED_TASK_COUNT)));
@@ -317,14 +329,41 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
             // TODO: Check if the client details from below query can be outdated/stale due to client edit registrations
             // Get the client related to the task
             CommonPersonObjectClient client = CoreLibrary.getInstance().context().getEventClientRepository().fetchCommonPersonObjectClientByBaseEntityId(task.getTaskEntity());
-            task.setClient(client);
-            // TODO -> Uncomment above lines
+
+            if (TaskingLibrary.getInstance().getTaskingLibraryConfiguration().isSupervisor()) {
+                Map<String, String> details = new HashMap<>();
+                if (cursor.getColumnIndex("chw_username") != -1) {
+                    String chwUsername = cursor.getString(cursor.getColumnIndex("chw_username"));
+
+                    if (client == null) {
+                        client = new CommonPersonObjectClient(null, details, chwUsername);
+                        client.setDetails(details);
+                        client.setColumnmaps(details);
+                    } else {
+                        details = client.getDetails();
+                    }
+
+                    details.put("firstName", "CHW");
+                    details.put("lastName", chwUsername);
+
+                    if (cursor.getColumnIndex("missed_task_code") != -1) {
+                        details.put("parent_task_code", cursor.getString(cursor.getColumnIndex("missed_task_code")));
+                        details.put("chw_username", chwUsername);
+                    }
+                }
+            } else {
+                if (client != null && !TextUtils.isEmpty(client.getDetails().get("birthdate"))) {
+
+                    task.setClient(client);
+                    // TODO -> Uncomment above lines
+                }
+            }
         }
 
 
-        int colIndex = cursor.getColumnIndex(PRIORITY);
+        colIndex = cursor.getColumnIndex(PRIORITY);
         if (colIndex != -1) {
-            task.setPriority(cursor.getInt(colIndex));
+            task.setPriority(Task.TaskPriority.get(cursor.getString(colIndex).toLowerCase()));
         }
 
 
@@ -334,6 +373,11 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
     }
 
     private void calculateDistance(TaskDetails task, Location location, Location lastLocation, Location operationalAreaCenter) {
+        if (location == null) {
+            task.setDistanceFromUser(-1);
+            return;
+        }
+
         if (BCC.equals(task.getTaskCode())) {
             //set distance to -2 to always display on top of register
             task.setDistanceFromUser(-2);
@@ -343,8 +387,10 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
         } else if (lastLocation != null) {
             task.setDistanceFromUser(location.distanceTo(lastLocation));
         } else {
-            task.setDistanceFromUser(location.distanceTo(operationalAreaCenter));
-            task.setDistanceFromCenter(true);
+            if (operationalAreaCenter != null) {
+                task.setDistanceFromUser(location.distanceTo(operationalAreaCenter));
+                task.setDistanceFromCenter(true);
+            }
         }
     }
 
@@ -356,8 +402,10 @@ public class TaskRegisterFragmentInteractor extends BaseInteractor implements Ta
             int structuresWithinBuffer = 0;
             for (TaskDetails taskDetails : tasks) {
                 if (!BCC.equals(taskDetails.getTaskCode()) && !CASE_CONFIRMATION.equals(taskDetails.getTaskCode())) {
-                    taskDetails.setDistanceFromUser(taskDetails.getLocation().distanceTo(location));
-                    taskDetails.setDistanceFromCenter(false);
+                    if (taskDetails.getLocation() != null) {
+                        taskDetails.setDistanceFromUser(taskDetails.getLocation().distanceTo(location));
+                        taskDetails.setDistanceFromCenter(false);
+                    }
                 }
 
                 if (taskDetails.getDistanceFromUser() <= locationBuffer) {

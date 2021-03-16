@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -106,4 +107,8 @@ public class DownloadedOfflineMapAdapterTest extends BaseUnitTest {
 
     }
 
+    @After
+    public void tearDown() throws Exception {
+        System.gc();
+    }
 }

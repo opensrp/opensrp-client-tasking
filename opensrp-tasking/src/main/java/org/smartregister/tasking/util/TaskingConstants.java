@@ -151,6 +151,8 @@ public interface TaskingConstants {
         String FAMILY_MEMBER_NAMES = "family_member_names";
         String PLAN_IDENTIFIER = "planIdentifier";
         String LOCATION_STATUS = "status";
+        String TASK_PRIORITY = "taskPriority";
+        String MOTHER_ID = "motherId";
     }
 
 
@@ -233,6 +235,7 @@ public interface TaskingConstants {
         String STRUCTURE_TABLE = "structure";
         String LOCATION_TABLE = "location";
         String EC_EVENT = "ec_events";
+        String STRUCTURE_FAMILY_RELATIONSHIP = "structure_family_relationship";
     }
 
     interface BusinessStatus {

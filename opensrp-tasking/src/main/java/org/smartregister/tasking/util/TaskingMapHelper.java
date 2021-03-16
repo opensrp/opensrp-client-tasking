@@ -10,9 +10,11 @@ import androidx.annotation.NonNull;
 
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Geometry;
 import com.mapbox.geojson.MultiPolygon;
 import com.mapbox.geojson.Polygon;
 import com.mapbox.mapboxsdk.geometry.LatLng;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
@@ -21,6 +23,7 @@ import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
+import com.mapbox.turf.TurfMeasurement;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.ona.kujaku.plugin.switcher.BaseLayerSwitcherPlugin;
+import io.ona.kujaku.utils.CoordinateUtils;
 import io.ona.kujaku.views.KujakuMapView;
 import timber.log.Timber;
 
@@ -226,7 +230,10 @@ public class TaskingMapHelper {
         baseLayerSwitcherPlugin.addBaseLayer(digitalGlobeLayer, false);
         baseLayerSwitcherPlugin.addBaseLayer(mapBoxLayer, true);
         kujakuMapView.getMbTilesHelper().setMBTileLayers(context, baseLayerSwitcherPlugin);
-        baseLayerSwitcherPlugin.show();
+
+        if (!TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getTasksRegisterConfiguration().isV2Design()) {
+            baseLayerSwitcherPlugin.show();
+        }
     }
 
 }
