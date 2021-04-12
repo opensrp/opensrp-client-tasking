@@ -31,6 +31,7 @@ import org.smartregister.tasking.contract.TaskingMapActivityContract;
 import org.smartregister.tasking.layer.DigitalGlobeLayer;
 import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.model.CardDetails;
+import org.smartregister.tasking.model.BaseLayerSwitchModel;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.tasking.repository.TaskingMappingHelper;
@@ -445,5 +446,15 @@ public class DefaultTaskingLibraryConfiguration extends TaskingLibraryConfigurat
     @Override
     public Pair<Double, Double> getMinMaxZoomMapDownloadPair() {
         return null;
+    }
+
+    @Override
+    public List<BaseLayerSwitchModel> getBaseLayers() {
+        return null;
+    }
+
+    @Override
+    public boolean showBaseLayerSwitcherPlugin() {
+        return false;
     }
 }

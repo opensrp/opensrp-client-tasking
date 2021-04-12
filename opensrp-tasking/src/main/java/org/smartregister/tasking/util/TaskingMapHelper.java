@@ -27,8 +27,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.tasking.R;
 import org.smartregister.tasking.TaskingLibrary;
-import org.smartregister.tasking.layer.DigitalGlobeLayer;
 import org.smartregister.tasking.layer.MapBoxLayer;
+import org.smartregister.tasking.model.BaseLayerSwitchModel;
 import org.smartregister.tasking.repository.TaskingMappingHelper;
 
 import java.util.ArrayList;
@@ -221,12 +221,19 @@ public class TaskingMapHelper {
 
     public void addBaseLayers(KujakuMapView kujakuMapView, Style style, Context context) {
         BaseLayerSwitcherPlugin baseLayerSwitcherPlugin = new BaseLayerSwitcherPlugin(kujakuMapView, style);
-        DigitalGlobeLayer digitalGlobeLayer = TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getDigitalGlobeLayer();
+        List<BaseLayerSwitchModel> baseLayers = TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getBaseLayers();
         MapBoxLayer mapBoxLayer = new MapBoxLayer();
-        baseLayerSwitcherPlugin.addBaseLayer(digitalGlobeLayer, true);
-        baseLayerSwitcherPlugin.addBaseLayer(mapBoxLayer, false);
+        if (baseLayers == null || baseLayers.isEmpty()) {
+            baseLayerSwitcherPlugin.addBaseLayer(mapBoxLayer, true);
+        } else {
+            for (BaseLayerSwitchModel baseLayerSwitchModel : baseLayers) {
+                baseLayerSwitcherPlugin.addBaseLayer(baseLayerSwitchModel.getBaseLayer(), baseLayerSwitchModel.isDefault());
+            }
+        }
         kujakuMapView.getMbTilesHelper().setMBTileLayers(context, baseLayerSwitcherPlugin);
-        baseLayerSwitcherPlugin.show();
+
+        if (TaskingLibrary.getInstance().getTaskingLibraryConfiguration().showBaseLayerSwitcherPlugin())
+            baseLayerSwitcherPlugin.show();
     }
 
 }

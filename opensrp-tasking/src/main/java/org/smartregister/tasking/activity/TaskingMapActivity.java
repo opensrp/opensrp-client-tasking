@@ -146,7 +146,7 @@ public class TaskingMapActivity extends BaseMapActivity implements TaskingMapAct
 
     private TaskingMapHelper mapHelper;
 
-    private ImageButton myLocationButton;
+    protected ImageButton myLocationButton;
 
     private ImageButton layerSwitcherFab;
 

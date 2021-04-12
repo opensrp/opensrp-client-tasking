@@ -133,7 +133,7 @@ public class Utils extends org.smartregister.util.Utils {
         return cache.get(operationalArea, new CacheableData<Location>() {
             @Override
             public Location fetch() {
-                return CoreLibrary.getInstance().context()
+                return DrishtiApplication.getInstance().getContext()
                         .getLocationRepository().getLocationByName(operationalArea);
             }
         });

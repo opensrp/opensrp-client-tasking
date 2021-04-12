@@ -30,6 +30,7 @@ import org.smartregister.tasking.contract.TaskingMapActivityContract;
 import org.smartregister.tasking.layer.DigitalGlobeLayer;
 import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.model.CardDetails;
+import org.smartregister.tasking.model.BaseLayerSwitchModel;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.tasking.repository.TaskingMappingHelper;
@@ -207,4 +208,8 @@ public abstract class TaskingLibraryConfiguration {
     public abstract List<Location> getLocationsIdsForDownload(List<String> locationIds);
 
     public abstract Pair<Double, Double> getMinMaxZoomMapDownloadPair();
+
+    public abstract List<BaseLayerSwitchModel> getBaseLayers();
+
+    public abstract boolean showBaseLayerSwitcherPlugin();
 }

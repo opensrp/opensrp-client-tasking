@@ -54,7 +54,7 @@ public class DigitalGlobeLayer extends BaseLayer {
     }
 
     public String getDigitalGlobeLayerUrl() {
-        return "https://access.maxar.com/earthservice/tmsaccess/tms/1.0.0/DigitalGlobe:ImageryTileService@EPSG:3857@png/{z}/{x}/{y}.png?connectId=" + getConnectId();
+        return String.format("https://access.maxar.com/earthservice/tmsaccess/tms/1.0.0/DigitalGlobe:ImageryTileService@EPSG:3857@png/{z}/{x}/{y}.png?connectId=%s", getConnectId());
     }
 
     public String getConnectId() {
