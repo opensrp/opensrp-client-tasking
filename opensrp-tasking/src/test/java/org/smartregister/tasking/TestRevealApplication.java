@@ -34,6 +34,7 @@ import org.smartregister.tasking.contract.BaseDrawerContract;
 import org.smartregister.tasking.contract.BaseFormFragmentContract;
 import org.smartregister.tasking.contract.TaskingMapActivityContract;
 import org.smartregister.tasking.layer.DigitalGlobeLayer;
+import org.smartregister.tasking.model.BaseLayerSwitchModel;
 import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.model.CardDetails;
 import org.smartregister.tasking.model.TaskDetails;
@@ -497,6 +498,16 @@ public class TestRevealApplication extends DrishtiApplication {
         @Override
         public Pair<Double, Double> getMinMaxZoomMapDownloadPair() {
             return null;
+        }
+
+        @Override
+        public List<BaseLayerSwitchModel> getBaseLayers() {
+            return null;
+        }
+
+        @Override
+        public boolean showBaseLayerSwitcherPlugin() {
+            return false;
         }
     }
 }
