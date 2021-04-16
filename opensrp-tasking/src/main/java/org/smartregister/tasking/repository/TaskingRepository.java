@@ -5,8 +5,10 @@ import net.sqlcipher.database.SQLiteException;
 
 import org.smartregister.cursoradapter.SmartRegisterQueryBuilder;
 import org.smartregister.repository.BaseRepository;
+import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.model.StructureDetails;
 import org.smartregister.tasking.util.Constants;
+import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +47,7 @@ public class TaskingRepository extends BaseRepository {
     }
 
     protected String getStructureNamesSelect(String mainCondition) {
-        return "";
+        return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().getStructureNamesSelect(mainCondition);
     }
 
 

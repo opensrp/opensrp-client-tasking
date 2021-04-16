@@ -76,16 +76,44 @@
                     android:layout_width="@dimen/my_location_button_dimen"
                     android:layout_height="@dimen/my_location_button_dimen"
                     android:layout_margin="@dimen/my_location_btn_margin"
-                    android:visibility="gone"
                     android:background="@drawable/circle_button_black_border"
                     android:contentDescription="@string/add_structure"
                     android:padding="10dp"
                     android:src="@drawable/ic_add"
-                    android:textColor="@color/white" />
+                    android:textColor="@color/white"
+                    android:visibility="gone" />
 
                 <include
                     android:id="@+id/card_view"
                     layout="@layout/card_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/spray_card_view"
+                    layout="@layout/spray_card_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/mosquito_collection_card_view"
+                    layout="@layout/mosquito_collection_card_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/larval_breeding_card_view"
+                    layout="@layout/larval_breeding_card_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+
+                <include
+                    android:id="@+id/potential_area_of_transmission_card_view"
+                    layout="@layout/potential_area_of_transmission_card_view"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:visibility="gone" />
@@ -101,10 +129,15 @@
                     android:id="@+id/progressIndicatorsGroupView"
                     layout="@layout/progress_indicators_view"
                     android:layout_width="match_parent"
-                    android:visibility="gone"
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom|left" />
 
+                <include
+                    android:id="@+id/irs_verification_card_view"
+                    layout="@layout/irs_verification_card_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
 
             </LinearLayout>
 
@@ -122,8 +155,7 @@
         <androidx.core.widget.NestedScrollView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:fillViewport="true"
-            >
+            android:fillViewport="true">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -136,11 +168,11 @@
                     android:layout_height="wrap_content" />
 
                 <include
-                    android:layout_marginTop="20dp"
                     layout="@layout/operator_details_and_logout"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginBottom="0dp"/>
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="0dp" />
             </LinearLayout>
         </androidx.core.widget.NestedScrollView>
     </com.google.android.material.navigation.NavigationView>

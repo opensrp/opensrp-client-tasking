@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.location.Location;
 import android.view.Gravity;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
@@ -61,6 +62,7 @@ import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.tasking.presenter.TaskingMapPresenter;
 import org.smartregister.tasking.presenter.ValidateUserLocationPresenter;
 import org.smartregister.tasking.util.CardDetailsUtil;
+import org.smartregister.tasking.util.TaskingConstants;
 import org.smartregister.tasking.util.TaskingJsonFormUtils;
 import org.smartregister.tasking.util.TaskingLibraryConfiguration;
 import org.smartregister.tasking.util.TaskingMapHelper;
@@ -190,72 +192,72 @@ public class TaskingMapActivityTest extends BaseUnitTest {
     }
 
 
-//    @Test
-//    public void testCloseSprayCardView() {
-//        View sprayCardView = taskingMapActivity.findViewById(R.id.spray_card_view);
-//        sprayCardView.setVisibility(VISIBLE);
-//        taskingMapActivity.closeCardView(R.id.btn_collapse_spray_card_view);
-//        assertEquals(GONE, sprayCardView.getVisibility());
-//    }
-//
-//    @Test
-//    public void testCloseMosquitoCardView() {
-//        View cardView = taskingMapActivity.findViewById(R.id.mosquito_collection_card_view);
-//        cardView.setVisibility(VISIBLE);
-//        taskingMapActivity.closeCardView(R.id.btn_collapse_mosquito_collection_card_view);
-//        assertEquals(GONE, cardView.getVisibility());
-//    }
-//
-//
-//    @Test
-//    public void testCloseCardLarvalCardView() {
-//        View cardView = taskingMapActivity.findViewById(R.id.larval_breeding_card_view);
-//        cardView.setVisibility(VISIBLE);
-//        taskingMapActivity.closeCardView(R.id.btn_collapse_larval_breeding_card_view);
-//        assertEquals(GONE, cardView.getVisibility());
-//    }
-//
-//    @Test
-//    public void testClosePAOTCardView() {
-//        View cardView = taskingMapActivity.findViewById(R.id.potential_area_of_transmission_card_view);
-//        cardView.setVisibility(VISIBLE);
-//        taskingMapActivity.closeCardView(R.id.btn_collapse_paot_card_view);
-//        assertEquals(GONE, cardView.getVisibility());
-//    }
-//
-//    @Test
-//    public void testCloseIndicatorsCardView() {
-//        View cardView = taskingMapActivity.findViewById(R.id.indicators_card_view);
-//        cardView.setVisibility(VISIBLE);
-//        taskingMapActivity.closeCardView(R.id.btn_collapse_indicators_card_view);
-//        assertEquals(GONE, cardView.getVisibility());
-//    }
-//
-//    @Test
-//    public void testCloseVerificationCardView() {
-//        View cardView = taskingMapActivity.findViewById(R.id.irs_verification_card_view);
-//        cardView.setVisibility(VISIBLE);
-//        taskingMapActivity.closeCardView(R.id.btn_collapse_irs_verification_card_view);
-//        assertEquals(GONE, cardView.getVisibility());
-//    }
-//
-//
-//    @Test
-//    public void testCloseAllCardViews() {
-//        taskingMapActivity.findViewById(R.id.spray_card_view).setVisibility(VISIBLE);
-//        taskingMapActivity.findViewById(R.id.mosquito_collection_card_view).setVisibility(VISIBLE);
-//        taskingMapActivity.findViewById(R.id.larval_breeding_card_view).setVisibility(VISIBLE);
-//        taskingMapActivity.findViewById(R.id.potential_area_of_transmission_card_view).setVisibility(VISIBLE);
-//        taskingMapActivity.findViewById(R.id.indicators_card_view).setVisibility(VISIBLE);
-//        taskingMapActivity.findViewById(R.id.irs_verification_card_view).setVisibility(VISIBLE);
-//        taskingMapActivity.closeAllCardViews();
-//        assertEquals(GONE, taskingMapActivity.findViewById(R.id.spray_card_view).getVisibility());
-//        assertEquals(GONE, taskingMapActivity.findViewById(R.id.mosquito_collection_card_view).getVisibility());
-//        assertEquals(GONE, taskingMapActivity.findViewById(R.id.larval_breeding_card_view).getVisibility());
-//        assertEquals(GONE, taskingMapActivity.findViewById(R.id.potential_area_of_transmission_card_view).getVisibility());
-//        assertEquals(GONE, taskingMapActivity.findViewById(R.id.indicators_card_view).getVisibility());
-//        assertEquals(GONE, taskingMapActivity.findViewById(R.id.irs_verification_card_view).getVisibility());
-//    }
+    @Test
+    public void testCloseSprayCardView() {
+        View sprayCardView = taskingMapActivity.findViewById(R.id.spray_card_view);
+        sprayCardView.setVisibility(VISIBLE);
+        taskingMapActivity.closeCardView(R.id.btn_collapse_spray_card_view);
+        assertEquals(GONE, sprayCardView.getVisibility());
+    }
+
+    @Test
+    public void testCloseMosquitoCardView() {
+        View cardView = taskingMapActivity.findViewById(R.id.mosquito_collection_card_view);
+        cardView.setVisibility(VISIBLE);
+        taskingMapActivity.closeCardView(R.id.btn_collapse_mosquito_collection_card_view);
+        assertEquals(GONE, cardView.getVisibility());
+    }
+
+
+    @Test
+    public void testCloseCardLarvalCardView() {
+        View cardView = taskingMapActivity.findViewById(R.id.larval_breeding_card_view);
+        cardView.setVisibility(VISIBLE);
+        taskingMapActivity.closeCardView(R.id.btn_collapse_larval_breeding_card_view);
+        assertEquals(GONE, cardView.getVisibility());
+    }
+
+    @Test
+    public void testClosePAOTCardView() {
+        View cardView = taskingMapActivity.findViewById(R.id.potential_area_of_transmission_card_view);
+        cardView.setVisibility(VISIBLE);
+        taskingMapActivity.closeCardView(R.id.btn_collapse_paot_card_view);
+        assertEquals(GONE, cardView.getVisibility());
+    }
+
+    @Test
+    public void testCloseIndicatorsCardView() {
+        View cardView = taskingMapActivity.findViewById(R.id.indicators_card_view);
+        cardView.setVisibility(VISIBLE);
+        taskingMapActivity.closeCardView(R.id.btn_collapse_indicators_card_view);
+        assertEquals(GONE, cardView.getVisibility());
+    }
+
+    @Test
+    public void testCloseVerificationCardView() {
+        View cardView = taskingMapActivity.findViewById(R.id.irs_verification_card_view);
+        cardView.setVisibility(VISIBLE);
+        taskingMapActivity.closeCardView(R.id.btn_collapse_irs_verification_card_view);
+        assertEquals(GONE, cardView.getVisibility());
+    }
+
+
+    @Test
+    public void testCloseAllCardViews() {
+        taskingMapActivity.findViewById(R.id.spray_card_view).setVisibility(VISIBLE);
+        taskingMapActivity.findViewById(R.id.mosquito_collection_card_view).setVisibility(VISIBLE);
+        taskingMapActivity.findViewById(R.id.larval_breeding_card_view).setVisibility(VISIBLE);
+        taskingMapActivity.findViewById(R.id.potential_area_of_transmission_card_view).setVisibility(VISIBLE);
+        taskingMapActivity.findViewById(R.id.indicators_card_view).setVisibility(VISIBLE);
+        taskingMapActivity.findViewById(R.id.irs_verification_card_view).setVisibility(VISIBLE);
+        taskingMapActivity.closeAllCardViews();
+        assertEquals(GONE, taskingMapActivity.findViewById(R.id.spray_card_view).getVisibility());
+        assertEquals(GONE, taskingMapActivity.findViewById(R.id.mosquito_collection_card_view).getVisibility());
+        assertEquals(GONE, taskingMapActivity.findViewById(R.id.larval_breeding_card_view).getVisibility());
+        assertEquals(GONE, taskingMapActivity.findViewById(R.id.potential_area_of_transmission_card_view).getVisibility());
+        assertEquals(GONE, taskingMapActivity.findViewById(R.id.indicators_card_view).getVisibility());
+        assertEquals(GONE, taskingMapActivity.findViewById(R.id.irs_verification_card_view).getVisibility());
+    }
 
     @Test
     public void testPositionMyLocation() {
@@ -305,48 +307,48 @@ public class TaskingMapActivityTest extends BaseUnitTest {
         verify(taskingMapHelper).isMyLocationComponentActive(any(), any());
     }
 
-//    @Test
-//    public void testOnChangeSprayStatus() {
-//        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
-//        taskingMapActivity.findViewById(R.id.change_spray_status).performClick();
-//        verify(taskingMapPresenter).onChangeInterventionStatus(Intervention.IRS);
-//    }
-//
-//
-//    @Test
-//    public void testRecordMosquitoCollection() {
-//        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
-//        taskingMapActivity.findViewById(R.id.btn_record_mosquito_collection).performClick();
-//        verify(taskingMapPresenter).onChangeInterventionStatus(Intervention.MOSQUITO_COLLECTION);
-//    }
-//
-//
-//    @Test
-//    public void testRecordLarvalDipping() {
-//        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
-//        taskingMapActivity.findViewById(R.id.btn_record_larval_dipping).performClick();
-//        verify(taskingMapPresenter).onChangeInterventionStatus(Intervention.LARVAL_DIPPING);
-//    }
-//
-//    @Test
-//    public void testEditPAOTDetails() {
-//        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
-//        taskingMapActivity.findViewById(R.id.btn_edit_paot_details).performClick();
-//        verify(taskingMapPresenter).onChangeInterventionStatus(Intervention.PAOT);
-//    }
-//
-//    @Test
-//    public void testCloseCardView() {
-//
-//        taskingMapActivity.findViewById(R.id.btn_collapse_spray_card_view).performClick();
-//        assertEquals(GONE, taskingMapActivity.findViewById(R.id.spray_card_view).getVisibility());
-//    }
-//
-//    @Test
-//    public void testOtherCardView() {
-//        taskingMapActivity.findViewById(R.id.btn_collapse_mosquito_collection_card_view).performClick();
-//        assertEquals(GONE, taskingMapActivity.findViewById(R.id.mosquito_collection_card_view).getVisibility());
-//    }
+    @Test
+    public void testOnChangeSprayStatus() {
+        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
+        taskingMapActivity.findViewById(R.id.change_spray_status).performClick();
+        verify(taskingMapPresenter).onChangeInterventionStatus(TaskingConstants.Intervention.IRS);
+    }
+
+
+    @Test
+    public void testRecordMosquitoCollection() {
+        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
+        taskingMapActivity.findViewById(R.id.btn_record_mosquito_collection).performClick();
+        verify(taskingMapPresenter).onChangeInterventionStatus(TaskingConstants.Intervention.MOSQUITO_COLLECTION);
+    }
+
+
+    @Test
+    public void testRecordLarvalDipping() {
+        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
+        taskingMapActivity.findViewById(R.id.btn_record_larval_dipping).performClick();
+        verify(taskingMapPresenter).onChangeInterventionStatus(TaskingConstants.Intervention.LARVAL_DIPPING);
+    }
+
+    @Test
+    public void testEditPAOTDetails() {
+        Whitebox.setInternalState(taskingMapActivity, "taskingMapPresenter", taskingMapPresenter);
+        taskingMapActivity.findViewById(R.id.btn_edit_paot_details).performClick();
+        verify(taskingMapPresenter).onChangeInterventionStatus(TaskingConstants.Intervention.PAOT);
+    }
+
+    @Test
+    public void testCloseCardView() {
+
+        taskingMapActivity.findViewById(R.id.btn_collapse_spray_card_view).performClick();
+        assertEquals(GONE, taskingMapActivity.findViewById(R.id.spray_card_view).getVisibility());
+    }
+
+    @Test
+    public void testOtherCardView() {
+        taskingMapActivity.findViewById(R.id.btn_collapse_mosquito_collection_card_view).performClick();
+        assertEquals(GONE, taskingMapActivity.findViewById(R.id.mosquito_collection_card_view).getVisibility());
+    }
 
     @Test
     public void testOpenDrawerMenu() {

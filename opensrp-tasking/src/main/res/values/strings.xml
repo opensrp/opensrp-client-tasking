@@ -210,4 +210,35 @@
     <string name="confirm_archive_family">Confirm Household Archival</string>
     <string name="confirm_archive_family_message">Please confirm that you want to archive this household. This will delete all information and can not be undone.</string>
     <string name="archive_family_failed">Archiving family %1s failed</string>
+
+    <string name="fetching_mosquito_collection_points_title">Fetching Mosquito Collection Point Details</string>
+    <string name="fetching_mosquito_collection_points_message">Fetching Mosquito Collection Point Details. Please wait</string>
+
+    <string name="fetching_larval_dipping_points_title">Fetching Larval Dipping Point Details</string>
+    <string name="fetching_larval_dipping_points_message">Fetching Larval Dipping Point Details. Please wait</string>
+
+    <string name="fetching_paot_title">Fetching PAOT Details</string>
+    <string name="fetching_paot_message">Fetching PAOT Details. Please wait</string>
+
+    <string name="change_spray_status">Change Spray Status</string>
+
+    <string name="card_view_record_mosquito_collection">Record mosquito collection</string>
+    <string name="record_larval_dipping">Record larval dipping</string>
+    <string name="card_view_mosquito_collection_point">Mosquito Collection Point</string>
+    <string name="mosquito_breeding_site">Mosquito Breeding Site</string>
+
+    <string name="mosquito_collection_status_test_text">Status: Inactive</string>
+    <string name="mosquito_collection_trap_set_date_test_text">Set Date: DD/MM/YY</string>
+    <string name="mosquito_collection_trap_follow_up_date_test_text">Follow-up Date: DD/MM/YY</string>
+    <string name="mosquito_collection_trap_collected_date_test_text">Collected Date: DD/MM/YY</string>
+
+    <string name="larval_breeding_identified_date_test_text">Identified Date:&#160;</string>
+    <string name="larval_breeding_larvacide_date_test_text">Larvacide Date:&#160;</string>
+    <string name="mosquito_collection_trap_set_date">Set Date:&#160;</string>
+    <string name="mosquito_collection_trap_follow_up_date">Follow-up Date:&#160;</string>
+
+    <string name="paot_last_updated_date_test_text">Last Updated Date:&#160;</string>
+    <string name="card_view_edit_paot_details">Edit PAOT Details</string>
+    <string name="card_view_paot">Potential Area of Transmission</string>
+
 </resources>

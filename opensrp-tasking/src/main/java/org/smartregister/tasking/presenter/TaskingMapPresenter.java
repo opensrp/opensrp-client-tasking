@@ -64,6 +64,9 @@ import static org.smartregister.tasking.util.Constants.JsonForm.STRUCTURE_NAME;
 import static org.smartregister.tasking.util.TaskingConstants.BusinessStatus.NOT_ELIGIBLE;
 import static org.smartregister.tasking.util.TaskingConstants.GeoJSON.FEATURES;
 import static org.smartregister.tasking.util.TaskingConstants.Intervention.IRS;
+import static org.smartregister.tasking.util.TaskingConstants.Intervention.LARVAL_DIPPING;
+import static org.smartregister.tasking.util.TaskingConstants.Intervention.MOSQUITO_COLLECTION;
+import static org.smartregister.tasking.util.TaskingConstants.Intervention.PAOT;
 import static org.smartregister.tasking.util.TaskingConstants.Intervention.REGISTER_FAMILY;
 import static org.smartregister.tasking.util.TaskingConstants.JsonForm.ENCOUNTER_TYPE;
 import static org.smartregister.tasking.util.TaskingConstants.JsonForm.LOCATION_COMPONENT_ACTIVE;
@@ -825,4 +828,18 @@ public class TaskingMapPresenter implements TaskingMapActivityContract.Presenter
     private FeatureCollection getFeatureCollection() {
         return isTasksFiltered && filterFeatureCollection != null ? FeatureCollection.fromFeatures(filterFeatureCollection) : featureCollection;
     }
+
+    public void onChangeInterventionStatus(String interventionType) {
+        if (IRS.equals(interventionType)) {
+            getView().showProgressDialog(R.string.fetching_structure_title, R.string.fetching_structure_message);
+        } else if (MOSQUITO_COLLECTION.equals(interventionType)) {
+            getView().showProgressDialog(R.string.fetching_mosquito_collection_points_title, R.string.fetching_mosquito_collection_points_message);
+        } else if (LARVAL_DIPPING.equals(interventionType)) {
+            getView().showProgressDialog(R.string.fetching_larval_dipping_points_title, R.string.fetching_larval_dipping_points_message);
+        } else if (PAOT.equals(interventionType)) {
+            getView().showProgressDialog(R.string.fetching_paot_title, R.string.fetching_paot_message);
+        }
+        taskingMapInteractor.fetchInterventionDetails(interventionType, selectedFeature.id(), true);
+    }
+
 }

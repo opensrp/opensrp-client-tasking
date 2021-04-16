@@ -31,8 +31,13 @@ import org.smartregister.tasking.layer.DigitalGlobeLayer;
 import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.model.CardDetails;
 import org.smartregister.tasking.model.BaseLayerSwitchModel;
+import org.smartregister.tasking.model.FamilyCardDetails;
+import org.smartregister.tasking.model.IRSVerificationCardDetails;
+import org.smartregister.tasking.model.MosquitoHarvestCardDetails;
+import org.smartregister.tasking.model.SprayCardDetails;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
+import org.smartregister.tasking.presenter.TaskingMapPresenter;
 import org.smartregister.tasking.repository.TaskingMappingHelper;
 import org.smartregister.util.AppExecutors;
 
@@ -212,4 +217,18 @@ public abstract class TaskingLibraryConfiguration {
     public abstract List<BaseLayerSwitchModel> getBaseLayers();
 
     public abstract boolean showBaseLayerSwitcherPlugin();
+
+    public abstract void openStructureProfile(CommonPersonObjectClient family, TaskingMapActivity taskingMapActivity, TaskingMapPresenter taskingMapPresenter);
+
+    public abstract void openCardView(CardDetails cardDetails, TaskingMapActivity taskingMapActivity);
+
+    public abstract void populateFamilyCard(FamilyCardDetails familyCardDetails, Activity activity);
+
+    public abstract void populateAndOpenIRSVerificationCard(IRSVerificationCardDetails cardDetails, Activity activity);
+
+    public abstract void populateAndOpenMosquitoHarvestCard(MosquitoHarvestCardDetails mosquitoHarvestCardDetails, Activity activity);
+
+    public abstract void populateSprayCardTextViews(SprayCardDetails sprayCardDetails, Activity activity);
+
+    public abstract String getStructureNamesSelect(String mainCondition);
 }

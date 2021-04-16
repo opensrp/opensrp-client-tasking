@@ -70,7 +70,6 @@ import org.smartregister.tasking.model.TaskFilterParams;
 import org.smartregister.tasking.presenter.TaskingMapPresenter;
 import org.smartregister.tasking.repository.TaskingMappingHelper;
 import org.smartregister.tasking.util.AlertDialogUtils;
-import org.smartregister.tasking.util.CardDetailsUtil;
 import org.smartregister.tasking.util.TaskingConstants;
 import org.smartregister.tasking.util.TaskingJsonFormUtils;
 import org.smartregister.tasking.util.TaskingLibraryConfiguration;
@@ -92,6 +91,10 @@ import static org.smartregister.tasking.util.TaskingConstants.CONFIGURATION.UPDA
 import static org.smartregister.tasking.util.TaskingConstants.DatabaseKeys.STRUCTURE_ID;
 import static org.smartregister.tasking.util.TaskingConstants.DatabaseKeys.TASK_ID;
 import static org.smartregister.tasking.util.TaskingConstants.Filter.FILTER_SORT_PARAMS;
+import static org.smartregister.tasking.util.TaskingConstants.Intervention.IRS;
+import static org.smartregister.tasking.util.TaskingConstants.Intervention.LARVAL_DIPPING;
+import static org.smartregister.tasking.util.TaskingConstants.Intervention.MOSQUITO_COLLECTION;
+import static org.smartregister.tasking.util.TaskingConstants.Intervention.PAOT;
 import static org.smartregister.tasking.util.TaskingConstants.JSON_FORM_PARAM_JSON;
 import static org.smartregister.tasking.util.TaskingConstants.RequestCode.REQUEST_CODE_FAMILY_PROFILE;
 import static org.smartregister.tasking.util.TaskingConstants.RequestCode.REQUEST_CODE_FILTER_TASKS;
@@ -124,9 +127,15 @@ public class TaskingMapActivity extends BaseMapActivity implements TaskingMapAct
 
     private CardView cardView;
 
-    private TextView tvReason;
+    private CardView sprayCardView;
 
+    private CardView mosquitoCollectionCardView;
+    private CardView larvalBreedingCardView;
+    private CardView potentialAreaOfTransmissionCardView;
     private CardView indicatorsCardView;
+    private CardView irsVerificationCardView;
+
+    private TextView tvReason;
 
     private RefreshGeowidgetReceiver refreshGeowidgetReceiver = new RefreshGeowidgetReceiver();
 
@@ -157,8 +166,6 @@ public class TaskingMapActivity extends BaseMapActivity implements TaskingMapAct
     private TextView filterCountTextView;
 
     private EditText searchView;
-
-    private CardDetailsUtil cardDetailsUtil = new CardDetailsUtil();
 
     private boolean formOpening;
 
@@ -228,25 +235,88 @@ public class TaskingMapActivity extends BaseMapActivity implements TaskingMapAct
     protected void initializeCardViews() {
         cardView = findViewById(R.id.card_view);
 
+        sprayCardView = findViewById(R.id.spray_card_view);
+
+        sprayCardView.setOnTouchListener(this);
+
+        mosquitoCollectionCardView = findViewById(R.id.mosquito_collection_card_view);
+
+        larvalBreedingCardView = findViewById(R.id.larval_breeding_card_view);
+
+        potentialAreaOfTransmissionCardView = findViewById(R.id.potential_area_of_transmission_card_view);
+
+        irsVerificationCardView = findViewById(R.id.irs_verification_card_view);
+
         cardView.setOnTouchListener(this);
 
         findViewById(R.id.btn_add_structure).setOnClickListener(this);
+
+        findViewById(R.id.btn_collapse_spray_card_view).setOnClickListener(this);
+
+        tvReason = findViewById(R.id.reason);
+
+        findViewById(R.id.change_spray_status).setOnClickListener(this);
+
+        findViewById(R.id.btn_undo_spray).setOnClickListener(this);
+
+        findViewById(R.id.btn_collapse_mosquito_collection_card_view).setOnClickListener(this);
+
+        findViewById(R.id.btn_record_mosquito_collection).setOnClickListener(this);
+
+        findViewById(R.id.btn_undo_mosquito_collection).setOnClickListener(this);
+
+        findViewById(R.id.btn_collapse_larval_breeding_card_view).setOnClickListener(this);
+
+        findViewById(R.id.btn_record_larval_dipping).setOnClickListener(this);
+
+        findViewById(R.id.btn_undo_larval_dipping).setOnClickListener(this);
+
+        findViewById(R.id.btn_collapse_paot_card_view).setOnClickListener(this);
+
+        findViewById(R.id.btn_edit_paot_details).setOnClickListener(this);
+
+        findViewById(R.id.btn_undo_paot_details).setOnClickListener(this);
+
+        findViewById(R.id.btn_collapse_irs_verification_card_view).setOnClickListener(this);
 
         indicatorsCardView = findViewById(R.id.indicators_card_view);
 
         indicatorsCardView.setOnClickListener(this);
 
         findViewById(R.id.btn_collapse_indicators_card_view).setOnClickListener(this);
+
+        findViewById(R.id.register_family).setOnClickListener(this);
+
     }
 
     @Override
     public void closeCardView(@IdRes int id) {
-        setViewVisibility(findViewById(id), false);
+        if (id == R.id.btn_collapse_spray_card_view) {
+            setViewVisibility(sprayCardView, false);
+        } else if (id == R.id.btn_collapse_mosquito_collection_card_view) {
+            setViewVisibility(mosquitoCollectionCardView, false);
+        } else if (id == R.id.btn_collapse_larval_breeding_card_view) {
+            setViewVisibility(larvalBreedingCardView, false);
+        } else if (id == R.id.btn_collapse_paot_card_view) {
+            setViewVisibility(potentialAreaOfTransmissionCardView, false);
+        } else if (id == R.id.btn_collapse_indicators_card_view) {
+            setViewVisibility(indicatorsCardView, false);
+        } else if (id == R.id.btn_collapse_irs_verification_card_view) {
+            setViewVisibility(irsVerificationCardView, false);
+        } else {
+            setViewVisibility(findViewById(id), false);
+        }
     }
 
     @Override
     public void closeAllCardViews() {
         setViewVisibility(cardView, false);
+        setViewVisibility(sprayCardView, false);
+        setViewVisibility(mosquitoCollectionCardView, false);
+        setViewVisibility(larvalBreedingCardView, false);
+        setViewVisibility(potentialAreaOfTransmissionCardView, false);
+        setViewVisibility(indicatorsCardView, false);
+        setViewVisibility(irsVerificationCardView, false);
     }
 
     private void setViewVisibility(android.view.View view, boolean isVisible) {
@@ -359,6 +429,32 @@ public class TaskingMapActivity extends BaseMapActivity implements TaskingMapAct
             taskingMapPresenter.onFilterTasksClicked();
         } else if (v.getId() == R.id.btn_add_structure) {
             taskingMapPresenter.onAddStructureClicked(mapHelper.isMyLocationComponentActive(this, myLocationButton));
+        } else if (v.getId() == R.id.change_spray_status) {
+            taskingMapPresenter.onChangeInterventionStatus(IRS);
+        } else if (v.getId() == R.id.btn_undo_spray) {
+            displayResetInterventionTaskDialog(IRS);
+        } else if (v.getId() == R.id.btn_record_mosquito_collection) {
+            taskingMapPresenter.onChangeInterventionStatus(MOSQUITO_COLLECTION);
+        } else if (v.getId() == R.id.btn_undo_mosquito_collection) {
+            displayResetInterventionTaskDialog(MOSQUITO_COLLECTION);
+        } else if (v.getId() == R.id.btn_record_larval_dipping) {
+            taskingMapPresenter.onChangeInterventionStatus(LARVAL_DIPPING);
+        } else if (v.getId() == R.id.btn_undo_larval_dipping) {
+            displayResetInterventionTaskDialog(LARVAL_DIPPING);
+        } else if (v.getId() == R.id.btn_edit_paot_details) {
+            taskingMapPresenter.onChangeInterventionStatus(PAOT);
+        } else if (v.getId() == R.id.btn_collapse_mosquito_collection_card_view
+                || v.getId() == R.id.btn_collapse_larval_breeding_card_view
+                || v.getId() == R.id.btn_collapse_paot_card_view
+                || v.getId() == R.id.btn_collapse_indicators_card_view
+                || v.getId() == R.id.btn_collapse_irs_verification_card_view) {
+            closeCardView(v.getId());
+        } else if (v.getId() == R.id.btn_collapse_spray_card_view) {
+            setViewVisibility(tvReason, false);
+            closeCardView(v.getId());
+        } else if (v.getId() == R.id.register_family) {
+            registerFamily();
+            closeCardView(R.id.btn_collapse_spray_card_view);
         }
     }
 
@@ -378,6 +474,7 @@ public class TaskingMapActivity extends BaseMapActivity implements TaskingMapAct
 
     @Override
     public void openStructureProfile(CommonPersonObjectClient family) {
+        taskingLibraryConfiguration.openStructureProfile(family, this, taskingMapPresenter);
     }
 
     @Override
@@ -472,7 +569,7 @@ public class TaskingMapActivity extends BaseMapActivity implements TaskingMapAct
 
     @Override
     public void openCardView(CardDetails cardDetails) {
-
+        taskingLibraryConfiguration.openCardView(cardDetails, this);
     }
 
     @Override
@@ -820,6 +917,18 @@ public class TaskingMapActivity extends BaseMapActivity implements TaskingMapAct
             localSyncDone = extras != null && extras.getBoolean(LOCAL_SYNC_DONE);
             taskingMapPresenter.refreshStructures(localSyncDone);
         }
+    }
+
+    public void displayResetInterventionTaskDialog(String interventionType) {
+        AlertDialogUtils.displayNotificationWithCallback(this, R.string.undo_task_title,
+                R.string.undo_task_msg, R.string.confirm, R.string.cancel, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == BUTTON_POSITIVE)
+                            taskingMapPresenter.onUndoInterventionStatus(interventionType);
+                        dialog.dismiss();
+                    }
+                });
     }
 }
 
