@@ -141,7 +141,7 @@ public class TaskingMapActivity extends BaseMapActivity implements TaskingMapAct
 
     private SyncProgressBroadcastReceiver syncProgressBroadcastReceiver = new SyncProgressBroadcastReceiver(this);
 
-    private boolean hasRequestedLocation;
+    protected boolean hasRequestedLocation;
 
     private Snackbar syncProgressSnackbar;
 
