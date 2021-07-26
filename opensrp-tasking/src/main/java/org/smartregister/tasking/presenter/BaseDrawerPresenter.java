@@ -2,20 +2,19 @@ package org.smartregister.tasking.presenter;
 
 import android.app.Activity;
 import android.text.TextUtils;
-import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.core.util.Pair;
 
-import com.google.android.material.navigation.NavigationView;
 import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.lang3.StringUtils;
 import org.smartregister.domain.PlanDefinition;
 import org.smartregister.domain.form.FormLocation;
 import org.smartregister.location.helper.LocationHelper;
+import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.tasking.R;
 import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.contract.BaseDrawerContract;
@@ -67,6 +66,8 @@ public class BaseDrawerPresenter implements BaseDrawerContract.Presenter {
 
     private TaskingLibraryConfiguration taskingLibraryConfiguration;
 
+    private AllSharedPreferences allSharedPreferences;
+
     public BaseDrawerPresenter(BaseDrawerContract.View view, BaseDrawerContract.DrawerActivity drawerActivity) {
         this.viewWeakReference = new WeakReference<>(view);
         this.drawerActivity = drawerActivity;
@@ -76,6 +77,7 @@ public class BaseDrawerPresenter implements BaseDrawerContract.Presenter {
         taskingLibraryConfiguration = taskingLibrary.getTaskingLibraryConfiguration();
         interactor = getInteractor();
         drishtiApplication = DrishtiApplication.getInstance();
+        allSharedPreferences = drishtiApplication.getContext().allSharedPreferences();
     }
 
     public BaseDrawerContract.Interactor getInteractor() {
@@ -209,7 +211,12 @@ public class BaseDrawerPresenter implements BaseDrawerContract.Presenter {
             prefsUtil.setCurrentDistrict(getDistrictFromTreeDialogValue(name));
             String operationalArea = name.get(name.size() - 1);
             prefsUtil.setCurrentOperationalArea(operationalArea);
+            final String currentOperationalAreaId = prefsUtil.getCurrentOperationalAreaId();
+            if (StringUtils.isNotBlank(currentOperationalAreaId)) {
+                allSharedPreferences.saveDefaultLocalityId(allSharedPreferences.fetchRegisteredANM(), currentOperationalAreaId);
+            }
             Pair<String, String> facility = getFacilityFromOperationalArea(entireTree);
+
             if (facility != null) {
                 prefsUtil.setCurrentFacility(facility.second);
                 prefsUtil.setCurrentFacilityLevel(facility.first);

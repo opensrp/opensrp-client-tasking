@@ -26,7 +26,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.smartregister.CoreLibrary;
 import org.smartregister.clientandeventmodel.Client;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.domain.Location;
@@ -38,7 +37,6 @@ import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.tasking.BuildConfig;
 import org.smartregister.tasking.R;
 import org.smartregister.tasking.TaskingLibrary;
-import org.smartregister.tasking.util.Constants.CONFIGURATION;
 import org.smartregister.tasking.util.Constants.Properties;
 import org.smartregister.tasking.util.Constants.Tags;
 import org.smartregister.util.Cache;
@@ -63,10 +61,7 @@ import static org.smartregister.tasking.util.Constants.CONFIGURATION.KILOMETERS_
 import static org.smartregister.tasking.util.Constants.CONFIGURATION.KILOMETERS_PER_DEGREE_OF_LONGITUDE_AT_EQUITOR;
 import static org.smartregister.tasking.util.Constants.CONFIGURATION.METERS_PER_KILOMETER;
 import static org.smartregister.tasking.util.Constants.DateFormat.CARD_VIEW_DATE_FORMAT;
-import static org.smartregister.tasking.util.Constants.Intervention.FI;
-import static org.smartregister.tasking.util.Constants.Intervention.IRS;
 import static org.smartregister.tasking.util.Constants.Intervention.LARVAL_DIPPING;
-import static org.smartregister.tasking.util.Constants.Intervention.MDA;
 import static org.smartregister.tasking.util.Constants.Intervention.MOSQUITO_COLLECTION;
 import static org.smartregister.tasking.util.Constants.Intervention.PAOT;
 
