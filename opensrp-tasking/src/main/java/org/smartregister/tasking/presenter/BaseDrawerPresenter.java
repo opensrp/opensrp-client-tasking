@@ -22,13 +22,14 @@ import org.smartregister.tasking.interactor.BaseDrawerInteractor;
 import org.smartregister.tasking.util.PreferencesUtil;
 import org.smartregister.tasking.util.TaskingConstants;
 import org.smartregister.tasking.util.TaskingLibraryConfiguration;
+import org.smartregister.tasking.util.Utils;
 import org.smartregister.util.AssetHandler;
-import org.smartregister.util.Utils;
 import org.smartregister.view.activity.DrishtiApplication;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -200,31 +201,45 @@ public class BaseDrawerPresenter implements BaseDrawerContract.Presenter {
     }
 
     @Override
-    public void onOperationalAreaSelectorClicked(ArrayList<String> name) {
-        Timber.d("Selected Location Hierarchy: " + TextUtils.join(",", name));
-        if (name.size() <= 2)//no operational area was selected, dialog was dismissed
-            return;
-        List<String> operationalAreaLevels = taskingLibraryConfiguration.getFacilityLevels();
-        List<FormLocation> entireTree = locationHelper.generateLocationHierarchyTree(false, operationalAreaLevels);
-        try {
-            prefsUtil.setCurrentProvince(getProvinceFromTreeDialogValue(name));
-            prefsUtil.setCurrentDistrict(getDistrictFromTreeDialogValue(name));
-            String operationalArea = name.get(name.size() - 1);
-            prefsUtil.setCurrentOperationalArea(operationalArea);
-            final String currentOperationalAreaId = prefsUtil.getCurrentOperationalAreaId();
-            if (StringUtils.isNotBlank(currentOperationalAreaId)) {
-                allSharedPreferences.saveDefaultLocalityId(allSharedPreferences.fetchRegisteredANM(), currentOperationalAreaId);
-            }
-            Pair<String, String> facility = getFacilityFromOperationalArea(entireTree);
+    public void onOperationalAreaSelectorClicked(ArrayList<String> names) {
+        Timber.d("Selected Location Hierarchy: " + TextUtils.join(",", names));
+        if (!Utils.allowMultipleOperationalAreas()) {
+            if (names.size() <= 2)//no operational area was selected, dialog was dismissed
+                return;
+            List<String> operationalAreaLevels = taskingLibraryConfiguration.getFacilityLevels();
+            List<FormLocation> entireTree = locationHelper.generateLocationHierarchyTree(false, operationalAreaLevels);
+            try {
+                prefsUtil.setCurrentProvince(getProvinceFromTreeDialogValue(names));
+                prefsUtil.setCurrentDistrict(getDistrictFromTreeDialogValue(names));
+                String operationalArea = names.get(names.size() - 1);
+                prefsUtil.setCurrentOperationalArea(operationalArea);
+                final String currentOperationalAreaId = prefsUtil.getCurrentOperationalAreaId();
+                if (StringUtils.isNotBlank(currentOperationalAreaId)) {
+                    allSharedPreferences.saveDefaultLocalityId(allSharedPreferences.fetchRegisteredANM(), currentOperationalAreaId);
+                }
+                Pair<String, String> facility = getFacilityFromOperationalArea(entireTree);
 
-            if (facility != null) {
-                prefsUtil.setCurrentFacility(facility.second);
-                prefsUtil.setCurrentFacilityLevel(facility.first);
+                if (facility != null) {
+                    prefsUtil.setCurrentFacility(facility.second);
+                    prefsUtil.setCurrentFacilityLevel(facility.first);
+                }
+            } catch (NullPointerException e) {
+                Timber.e(e);
             }
-            validateSelectedPlan(operationalArea);
-        } catch (NullPointerException e) {
-            Timber.e(e);
+        } else {
+            if (names.isEmpty())
+                return;
+
+            prefsUtil.setCurrentOperationalAreas(new HashSet<>(names));
+
+            final Set<String> currentOperationalAreaIds = prefsUtil.getCurrentOperationalAreaIds();
+            if (!currentOperationalAreaIds.isEmpty()) {
+                allSharedPreferences.saveDefaultLocalityId(allSharedPreferences.fetchRegisteredANM(), currentOperationalAreaIds.stream().findFirst().orElse(""));
+            }
         }
+
+        validateSelectedPlan(prefsUtil.getCurrentOperationalArea());
+
         changedCurrentSelection = true;
         populateLocationsFromPreferences();
         unlockDrawerLayout();

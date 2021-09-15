@@ -675,4 +675,8 @@ public interface TaskingConstants {
             String SYNC_STATUS = "sync_status";
         }
     }
+
+    interface AppProperties {
+        String ALLOW_MULTIPLE_OPERATIONAL_AREA_SELECTION = "ALLOW_MULTIPLE_OPERATIONAL_AREA_SELECTION";
+    }
 }

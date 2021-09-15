@@ -5,6 +5,10 @@ import org.smartregister.account.AccountHelper;
 import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.view.activity.DrishtiApplication;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 import static org.smartregister.tasking.util.Constants.Preferences.CURRENT_DISTRICT;
 import static org.smartregister.tasking.util.Constants.Preferences.CURRENT_FACILITY;
 import static org.smartregister.tasking.util.Constants.Preferences.CURRENT_OPERATIONAL_AREA;
@@ -22,6 +26,8 @@ public class PreferencesUtil {
     private AllSharedPreferences allSharedPreferences;
 
     private static PreferencesUtil instance;
+
+    public final static String OPERATIONAL_AREA_SEPARATOR = ",";
 
     private PreferencesUtil(AllSharedPreferences allSharedPreferences) {
         this.allSharedPreferences = allSharedPreferences;
@@ -49,6 +55,39 @@ public class PreferencesUtil {
         if (StringUtils.isNotBlank(operationalArea) && StringUtils.isNotBlank(currentLocationId)) {
             allSharedPreferences.savePreference(CURRENT_OPERATIONAL_AREA_ID, currentLocationId);
         }
+    }
+
+    public void setCurrentOperationalAreas(Set<String> operationalAreas) {
+        if (operationalAreas == null || operationalAreas.isEmpty()) {
+            allSharedPreferences.savePreference(CURRENT_OPERATIONAL_AREA, null);
+        } else {
+            String operationalArea = StringUtils.join(operationalAreas, OPERATIONAL_AREA_SEPARATOR);
+            allSharedPreferences.savePreference(CURRENT_OPERATIONAL_AREA, operationalArea);
+            String currentLocationId = Utils.getCurrentLocationId();
+            if (StringUtils.isNotBlank(operationalArea) && StringUtils.isNotBlank(currentLocationId)) {
+                allSharedPreferences.savePreference(CURRENT_OPERATIONAL_AREA_ID, currentLocationId);
+            }
+        }
+    }
+
+    public Set<String> getCurrentOperationalAreas() {
+        Set<String> operationalAreas = new HashSet<>();
+        String operationalArea = allSharedPreferences.getPreference(CURRENT_OPERATIONAL_AREA);
+        if (StringUtils.isNotBlank(operationalArea)) {
+            String[] operationalAreaArr = operationalArea.split(OPERATIONAL_AREA_SEPARATOR);
+            operationalAreas = new HashSet<>(Arrays.asList(operationalAreaArr));
+        }
+        return operationalAreas;
+    }
+
+    public Set<String> getCurrentOperationalAreaIds() {
+        Set<String> operationalAreaIds = new HashSet<>();
+        String operationalAreaId = allSharedPreferences.getPreference(CURRENT_OPERATIONAL_AREA_ID);
+        if (StringUtils.isNotBlank(operationalAreaId)) {
+            String[] operationalAreaArr = operationalAreaId.split(OPERATIONAL_AREA_SEPARATOR);
+            operationalAreaIds = new HashSet<>(Arrays.asList(operationalAreaArr));
+        }
+        return operationalAreaIds;
     }
 
     public String getCurrentOperationalArea() {

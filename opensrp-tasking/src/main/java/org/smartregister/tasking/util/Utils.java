@@ -407,4 +407,7 @@ public class Utils extends org.smartregister.util.Utils {
         }
     }
 
+    public static boolean allowMultipleOperationalAreas() {
+        return getBooleanProperty(TaskingConstants.AppProperties.ALLOW_MULTIPLE_OPERATIONAL_AREA_SELECTION);
+    }
 }
