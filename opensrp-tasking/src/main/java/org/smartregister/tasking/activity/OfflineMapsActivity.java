@@ -1,4 +1,4 @@
-package org.smartregister.tasking.view;
+package org.smartregister.tasking.activity;
 
 import android.os.Bundle;
 import android.view.View;
@@ -41,8 +41,8 @@ public abstract class OfflineMapsActivity extends AppCompatActivity implements O
 
     private OfflineManager offlineManager;
 
-    public static  final int AVAILABLE_OFFLINE_MAPS_FRAGMENT_INDEX = 0;
-    public static  final int DOWNLOADED_OFFLINE_MAPS_FRAGMENT_INDEX = 1;
+    public static final int AVAILABLE_OFFLINE_MAPS_FRAGMENT_INDEX = 0;
+    public static final int DOWNLOADED_OFFLINE_MAPS_FRAGMENT_INDEX = 1;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -60,11 +60,11 @@ public abstract class OfflineMapsActivity extends AppCompatActivity implements O
     }
 
     protected void setUpToolbar() {
-        Toolbar toolbar= this.findViewById(R.id.offline_maps_toolbar);
+        Toolbar toolbar = this.findViewById(R.id.offline_maps_toolbar);
         toolbar.setTitle(R.string.offline_maps);
         this.setSupportActionBar(toolbar);
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener(){
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
@@ -82,11 +82,11 @@ public abstract class OfflineMapsActivity extends AppCompatActivity implements O
     protected ViewPager setupViewPager() {
         adapter = new ViewPagerAdapter(getSupportFragmentManager());
 
-        availableOfflineMapsFragment = AvailableOfflineMapsFragment.newInstance(this.getIntent().getExtras(), getMapStyleAssetPath());
+        availableOfflineMapsFragment = getAvailableOfflineMapsFragment();
         availableOfflineMapsFragment.setOfflineMapDownloadCallback(this);
         adapter.addFragment(availableOfflineMapsFragment, this.getString(R.string.available).toUpperCase());
 
-        downloadedOfflineMapsFragment = DownloadedOfflineMapsFragment.newInstance(this.getIntent().getExtras(), this );
+        downloadedOfflineMapsFragment = getDownloadedOfflineMapsFragment();
         downloadedOfflineMapsFragment.setOfflineMapDownloadCallback(this);
         adapter.addFragment(downloadedOfflineMapsFragment, this.getString(R.string.downloaded).toUpperCase());
 
@@ -95,18 +95,26 @@ public abstract class OfflineMapsActivity extends AppCompatActivity implements O
         return viewPager;
     }
 
+    protected AvailableOfflineMapsFragment getAvailableOfflineMapsFragment() {
+        return AvailableOfflineMapsFragment.newInstance(this.getIntent().getExtras(), getMapStyleAssetPath());
+    }
+
+    protected DownloadedOfflineMapsFragment getDownloadedOfflineMapsFragment() {
+        return DownloadedOfflineMapsFragment.newInstance(this.getIntent().getExtras(), this);
+    }
+
     public OfflineManager initOfflineManager() {
         return OfflineManager.getInstance(this);
     }
 
     @Override
     public void onMapDownloaded(OfflineMapModel offlineMapModel) {
-        getOfflineDownloadedRegions(true);
+        getOfflineDownloadedRegions(false);
     }
 
     @Override
     public void onOfflineMapDeleted(OfflineMapModel offlineMapModel) {
-        availableOfflineMapsFragment = (AvailableOfflineMapsFragment)  adapter.getItem(AVAILABLE_OFFLINE_MAPS_FRAGMENT_INDEX);
+        availableOfflineMapsFragment = (AvailableOfflineMapsFragment) adapter.getItem(AVAILABLE_OFFLINE_MAPS_FRAGMENT_INDEX);
         availableOfflineMapsFragment.updateOperationalAreasToDownload(offlineMapModel);
     }
 
@@ -124,20 +132,20 @@ public abstract class OfflineMapsActivity extends AppCompatActivity implements O
 
             @Override
             public void onError(String error) {
-                Timber.e(TAG, "ERROR :: "  + error);
+                Timber.e(TAG, "ERROR :: " + error);
             }
         });
     }
 
     public void setOfflineDownloadedMapNames(Pair<List<String>, Map<String, OfflineRegion>> offlineRegionInfo, boolean refreshDownloadedListOnly) {
-        downloadedOfflineMapsFragment = (DownloadedOfflineMapsFragment)  adapter.getItem(DOWNLOADED_OFFLINE_MAPS_FRAGMENT_INDEX);
+        downloadedOfflineMapsFragment = (DownloadedOfflineMapsFragment) adapter.getItem(DOWNLOADED_OFFLINE_MAPS_FRAGMENT_INDEX);
         downloadedOfflineMapsFragment.setOfflineDownloadedMapNames(offlineRegionInfo);
 
-        if (refreshDownloadedListOnly){
+        if (refreshDownloadedListOnly) {
             return;
         }
 
-        availableOfflineMapsFragment = (AvailableOfflineMapsFragment)  adapter.getItem(AVAILABLE_OFFLINE_MAPS_FRAGMENT_INDEX);
+        availableOfflineMapsFragment = (AvailableOfflineMapsFragment) adapter.getItem(AVAILABLE_OFFLINE_MAPS_FRAGMENT_INDEX);
         List<String> regionNames = offlineRegionInfo != null ? offlineRegionInfo.first : null;
         availableOfflineMapsFragment.setOfflineDownloadedMapNames(regionNames);
     }

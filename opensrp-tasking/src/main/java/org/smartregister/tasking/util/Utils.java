@@ -1,5 +1,6 @@
 package org.smartregister.tasking.util;
 
+import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
@@ -25,10 +26,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.smartregister.CoreLibrary;
 import org.smartregister.clientandeventmodel.Client;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.domain.Location;
+import org.smartregister.domain.SyncEntity;
 import org.smartregister.domain.tag.FormTag;
 import org.smartregister.job.DocumentConfigurationServiceJob;
 import org.smartregister.job.PullUniqueIdsServiceJob;
@@ -36,7 +37,6 @@ import org.smartregister.repository.AllSharedPreferences;
 import org.smartregister.tasking.BuildConfig;
 import org.smartregister.tasking.R;
 import org.smartregister.tasking.TaskingLibrary;
-import org.smartregister.tasking.util.Constants.CONFIGURATION;
 import org.smartregister.tasking.util.Constants.Properties;
 import org.smartregister.tasking.util.Constants.Tags;
 import org.smartregister.util.Cache;
@@ -61,14 +61,11 @@ import static org.smartregister.tasking.util.Constants.CONFIGURATION.KILOMETERS_
 import static org.smartregister.tasking.util.Constants.CONFIGURATION.KILOMETERS_PER_DEGREE_OF_LONGITUDE_AT_EQUITOR;
 import static org.smartregister.tasking.util.Constants.CONFIGURATION.METERS_PER_KILOMETER;
 import static org.smartregister.tasking.util.Constants.DateFormat.CARD_VIEW_DATE_FORMAT;
-import static org.smartregister.tasking.util.Constants.Intervention.FI;
-import static org.smartregister.tasking.util.Constants.Intervention.IRS;
 import static org.smartregister.tasking.util.Constants.Intervention.LARVAL_DIPPING;
-import static org.smartregister.tasking.util.Constants.Intervention.MDA;
 import static org.smartregister.tasking.util.Constants.Intervention.MOSQUITO_COLLECTION;
 import static org.smartregister.tasking.util.Constants.Intervention.PAOT;
 
-public class Utils {
+public class Utils extends org.smartregister.util.Utils {
 
     public static final ArrayList<String> ALLOWED_LEVELS;
     public static final String DEFAULT_LOCATION_LEVEL = Tags.HEALTH_CENTER;
@@ -131,7 +128,7 @@ public class Utils {
         return cache.get(operationalArea, new CacheableData<Location>() {
             @Override
             public Location fetch() {
-                return CoreLibrary.getInstance().context()
+                return DrishtiApplication.getInstance().getContext()
                         .getLocationRepository().getLocationByName(operationalArea);
             }
         });
@@ -389,8 +386,28 @@ public class Utils {
      * @return displayDistanceScale
      */
     public static Boolean displayDistanceScale() {
-        //return Boolean.valueOf(getGlobalConfig(CONFIGURATION.DISPLAY_DISTANCE_SCALE, BuildConfig.DISPLAY_DISTANCE_SCALE + ""));
         return TaskingLibrary.getInstance().getTaskingLibraryConfiguration().displayDistanceScale();
     }
 
+    public static String getSyncEntityString(SyncEntity syncEntity) {
+        Context context = DrishtiApplication.getInstance().getContext().applicationContext();
+        switch (syncEntity) {
+            case EVENTS:
+                return context.getString(R.string.events);
+            case LOCATIONS:
+                return context.getString(R.string.locations);
+            case PLANS:
+                return context.getString(R.string.plans);
+            case STRUCTURES:
+                return context.getString(R.string.structures);
+            case TASKS:
+                return context.getString(R.string.tasks_text);
+            default:
+                throw new IllegalStateException("Invalid Sync Entity");
+        }
+    }
+
+    public static boolean allowMultipleOperationalAreas() {
+        return getBooleanProperty(TaskingConstants.AppProperties.ALLOW_MULTIPLE_OPERATIONAL_AREA_SELECTION);
+    }
 }

@@ -37,22 +37,22 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
 
     private RecyclerView offlineMapRecyclerView;
 
-    private AvailableOfflineMapAdapter adapter;
+    protected AvailableOfflineMapAdapter adapter;
 
-    private AvailableOfflineMapsPresenter presenter;
+    protected AvailableOfflineMapsPresenter presenter;
 
     private List<OfflineMapModel> offlineMapModelList = new ArrayList<>();
 
     private List<Location> operationalAreasToDownload = new ArrayList<>();
 
-    private OfflineMapDownloadCallback callback;
+    protected OfflineMapDownloadCallback callback;
 
     private Button btnDownloadMap;
 
     private String mapStyleAssetPath;
 
-    private static Gson gson = new GsonBuilder().setDateFormat(Constants.DateFormat.EVENT_DATE_FORMAT_Z)
-                .registerTypeAdapter(DateTime.class, new DateTimeTypeConverter())
+    protected static Gson gson = new GsonBuilder().setDateFormat(Constants.DateFormat.EVENT_DATE_FORMAT_Z)
+            .registerTypeAdapter(DateTime.class, new DateTimeTypeConverter())
             .registerTypeAdapter(LocationProperty.class, new PropertiesConverter()).create();
 
     public static AvailableOfflineMapsFragment newInstance(Bundle bundle, @NonNull String mapStyleAssetPath) {
@@ -71,12 +71,16 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initializePresenter();
+
+        btnDownloadMap = null;
+        new FileHttpServerTask(getContext(), getMapStyleAssetPath()).execute();
+    }
+
+    protected void initializePresenter() {
         if (presenter == null) {
             presenter = new AvailableOfflineMapsPresenter(this);
         }
-        btnDownloadMap = null;
-
-        new FileHttpServerTask(getContext(), getMapStyleAssetPath()).execute();
     }
 
     @Nullable
@@ -94,7 +98,6 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
         btnDownloadMap = view.findViewById(R.id.download_map);
 
         btnDownloadMap.setOnClickListener(this);
-
     }
 
     private void initializeAdapter() {
@@ -103,7 +106,6 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
         if (offlineMapModelList != null) {
             setOfflineMapModelList(offlineMapModelList);
         }
-
     }
 
     @Override
@@ -111,12 +113,10 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
         if (offlineMapModelList == null) {
             return;
         }
-        if (adapter == null) {
-            this.offlineMapModelList = offlineMapModelList;
-        } else {
+        if (adapter != null) {
             adapter.setOfflineMapModels(offlineMapModelList);
-            this.offlineMapModelList = offlineMapModelList;
         }
+        this.offlineMapModelList = offlineMapModelList;
     }
 
     public void updateOperationalAreasToDownload(View view) {
@@ -133,12 +133,12 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
 
     @Override
     public void disableCheckBox(String operationalAreaId) {
-        if (adapter ==null) {
+        if (adapter == null) {
             return;
         }
-        for (OfflineMapModel offlineMapModel: offlineMapModelList ) {
+        for (OfflineMapModel offlineMapModel : offlineMapModelList) {
             if (offlineMapModel.getDownloadAreaId().equals(operationalAreaId)
-                    && offlineMapModel.getOfflineMapStatus() != OfflineMapModel.OfflineMapStatus.DOWNLOAD_STARTED){
+                    && offlineMapModel.getOfflineMapStatus() != OfflineMapModel.OfflineMapStatus.DOWNLOAD_STARTED) {
                 offlineMapModel.setOfflineMapStatus(OfflineMapModel.OfflineMapStatus.DOWNLOAD_STARTED);
             }
         }
@@ -148,12 +148,12 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
 
     @Override
     public void enableCheckBox(String operationalAreaId) {
-        if (adapter ==null) {
+        if (adapter == null) {
             return;
         }
-        for (OfflineMapModel offlineMapModel: offlineMapModelList ) {
+        for (OfflineMapModel offlineMapModel : offlineMapModelList) {
             if (offlineMapModel.getDownloadAreaId().equals(operationalAreaId)
-                    && offlineMapModel.getOfflineMapStatus() != OfflineMapModel.OfflineMapStatus.DOWNLOADED){
+                    && offlineMapModel.getOfflineMapStatus() != OfflineMapModel.OfflineMapStatus.DOWNLOADED) {
                 offlineMapModel.setOfflineMapStatus(OfflineMapModel.OfflineMapStatus.READY);
             }
         }
@@ -175,16 +175,13 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
                 break;
             }
         }
-
-        offlineMapModelList.removeAll(toRemoveFromAvailableList);
         operationalAreasToDownload.removeAll(toRemoveFromDownloadList);
-
     }
 
     @Override
     public void removeOperationalAreaToDownload(String operationalAreaId) {
         List<Location> toRemove = new ArrayList<>();
-        for (Location location: this.operationalAreasToDownload ) {
+        for (Location location : this.operationalAreasToDownload) {
             if (location.getId().equals(operationalAreaId)) {
                 toRemove.add(location);
             }
@@ -201,12 +198,16 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
             return;
         }
 
-        for (Location location: this.operationalAreasToDownload ) {
-            Feature operationalAreaFeature = Feature.fromJson(gson.toJson(location));
-            String mapName = location.getId();
-            currentMapDownload = mapName;
-            OfflineMapHelper.downloadMap(operationalAreaFeature, mapName, getActivity());
+        for (Location location : this.operationalAreasToDownload) {
+            downloadLocation(location);
         }
+    }
+
+    protected void downloadLocation(@NonNull Location location) {
+        Feature operationalAreaFeature = Feature.fromJson(gson.toJson(location));
+        String mapName = location.getId();
+        setCurrentMapDownload(mapName);
+        OfflineMapHelper.downloadMap(operationalAreaFeature, mapName, getActivity());
     }
 
     public void setOfflineMapDownloadCallback(OfflineMapDownloadCallback callBack) {
@@ -233,12 +234,12 @@ public class AvailableOfflineMapsFragment extends BaseOfflineMapsFragment implem
         presenter.onDownloadStopped(mapUniqueName);
     }
 
-    public void updateOperationalAreasToDownload(OfflineMapModel offlineMapModel){
+    public void updateOperationalAreasToDownload(OfflineMapModel offlineMapModel) {
         offlineMapModelList.add(offlineMapModel);
         setOfflineMapModelList(offlineMapModelList);
     }
 
-    public void setOfflineDownloadedMapNames (List<String> offlineRegionNames) {
+    public void setOfflineDownloadedMapNames(List<String> offlineRegionNames) {
         presenter.fetchAvailableOAsForMapDownLoad(offlineRegionNames);
     }
 

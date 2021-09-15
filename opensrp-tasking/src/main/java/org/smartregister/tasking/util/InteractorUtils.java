@@ -6,7 +6,6 @@ import net.sqlcipher.database.SQLiteDatabase;
 
 import org.joda.time.DateTime;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.commonregistry.CommonPersonObject;
@@ -178,11 +177,11 @@ public class InteractorUtils {
         try {
 
             if (CASE_CONFIRMATION.equals(taskDetails.getTaskCode()) || BCC.equals(taskDetails.getTaskCode())) {
-                String eventTypeField= null;
+                String eventTypeField = null;
 
                 if (CASE_CONFIRMATION.equals(taskDetails.getTaskCode())) {
                     eventTypeField = CASE_CONFIRMATION_FIELD;
-                } else if(BCC.equals(taskDetails.getTaskCode())) {
+                } else if (BCC.equals(taskDetails.getTaskCode())) {
                     eventTypeField = BEHAVIOUR_CHANGE_COMMUNICATION;
                 }
 

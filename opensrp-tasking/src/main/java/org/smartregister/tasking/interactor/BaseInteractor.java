@@ -21,7 +21,6 @@ import org.smartregister.clientandeventmodel.Event;
 import org.smartregister.commonregistry.CommonPersonObject;
 import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.commonregistry.CommonRepository;
-import org.smartregister.cursoradapter.SmartRegisterQueryBuilder;
 import org.smartregister.domain.Client;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.LocationProperty;
@@ -50,9 +49,7 @@ import org.smartregister.view.activity.DrishtiApplication;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import timber.log.Timber;
@@ -398,15 +395,6 @@ public class BaseInteractor implements BaseContract.BaseInteractor {
         TaskingLibrary.getInstance().getTaskingLibraryConfiguration().saveCaseConfirmation(this, presenterCallBack, jsonForm, eventType);
     }
 
-    protected String getMemberTasksSelect(String mainCondition, String[] memberColumns) {
-        SmartRegisterQueryBuilder queryBuilder = new SmartRegisterQueryBuilder();
-        queryBuilder.selectInitiateMainTable(Constants.DatabaseKeys.STRUCTURES_TABLE, memberColumns, Constants.DatabaseKeys.ID);
-        queryBuilder.customJoin(String.format(" JOIN %s ON %s.%s = %s.%s ",
-                Constants.TABLE_NAME.FAMILY_MEMBER, Constants.TABLE_NAME.FAMILY_MEMBER, Constants.DatabaseKeys.STRUCTURE_ID, Constants.DatabaseKeys.STRUCTURES_TABLE, Constants.DatabaseKeys.ID));
-        queryBuilder.customJoin(String.format(" JOIN %s ON %s.%s = %s.%s ",
-                Constants.Tables.TASK_TABLE, Constants.Tables.TASK_TABLE, Constants.DatabaseKeys.FOR, Constants.TABLE_NAME.FAMILY_MEMBER, Constants.DatabaseKeys.BASE_ENTITY_ID));
-        return queryBuilder.mainCondition(mainCondition);
-    }
 
     public void fetchFamilyDetails(String structureId) {
         appExecutors.diskIO().execute(() -> {

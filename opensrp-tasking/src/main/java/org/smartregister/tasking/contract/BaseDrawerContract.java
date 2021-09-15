@@ -2,6 +2,7 @@ package org.smartregister.tasking.contract;
 
 import android.app.Activity;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.core.util.Pair;
 
@@ -28,6 +29,8 @@ public interface BaseDrawerContract {
 
         void initializeDrawerLayout();
 
+        void setUpViews();
+
         void setPlan(String campaign);
 
         void setOperationalArea(String operationalArea);
@@ -42,6 +45,8 @@ public interface BaseDrawerContract {
 
         void setOperator();
 
+        void lockNavigationDrawerForSelection(int title, int message);
+
         void unlockNavigationDrawer();
 
         void lockNavigationDrawerForSelection();
@@ -54,6 +59,8 @@ public interface BaseDrawerContract {
 
         void openDrawerLayout();
 
+        void closeDrawerLayout();
+
         Presenter getPresenter();
 
         void onResume();
@@ -61,6 +68,13 @@ public interface BaseDrawerContract {
         void openOfflineMapsView();
 
         void checkSynced();
+
+        void toggleProgressBarView(boolean syncing);
+
+        @Nullable
+        String getManifestVersion();
+
+        DrawerActivity getActivity();
     }
 
     interface Presenter {
@@ -77,6 +91,8 @@ public interface BaseDrawerContract {
 
         void onPlansFetched(Set<PlanDefinition> planDefinitionSet);
 
+        void unlockDrawerLayout();
+
         boolean isChangedCurrentSelection();
 
         void setChangedCurrentSelection(boolean changedCurrentSelection);
@@ -92,6 +108,12 @@ public interface BaseDrawerContract {
         void onPlanValidated(boolean isValid);
 
         void updateSyncStatusDisplay(boolean synced);
+
+        void startOtherFormsActivity();
+
+        void onShowFilledForms();
+
+        void checkSynced();
     }
 
     interface Interactor {

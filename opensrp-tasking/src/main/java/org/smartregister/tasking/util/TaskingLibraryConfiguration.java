@@ -9,23 +9,36 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
 
 import net.sqlcipher.database.SQLiteDatabase;
 
 import org.json.JSONObject;
-import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.clientandeventmodel.Event;
+import org.smartregister.commonregistry.CommonPersonObjectClient;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.Task;
+import org.smartregister.tasking.activity.TaskingMapActivity;
 import org.smartregister.tasking.adapter.TaskRegisterAdapter;
 import org.smartregister.tasking.contract.BaseContract;
 import org.smartregister.tasking.contract.BaseDrawerContract;
 import org.smartregister.tasking.contract.BaseFormFragmentContract;
+import org.smartregister.tasking.contract.TaskingMapActivityContract;
+import org.smartregister.tasking.layer.DigitalGlobeLayer;
 import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.model.CardDetails;
+import org.smartregister.tasking.model.BaseLayerSwitchModel;
+import org.smartregister.tasking.model.FamilyCardDetails;
+import org.smartregister.tasking.model.IRSVerificationCardDetails;
+import org.smartregister.tasking.model.MosquitoHarvestCardDetails;
+import org.smartregister.tasking.model.SprayCardDetails;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
-import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
+import org.smartregister.tasking.presenter.TaskingMapPresenter;
+import org.smartregister.tasking.repository.TaskingMappingHelper;
 import org.smartregister.util.AppExecutors;
 
 import java.util.List;
@@ -51,7 +64,6 @@ public abstract class TaskingLibraryConfiguration {
     public abstract int getResolveLocationTimeoutInSeconds();
 
     public abstract String getAdminPasswordNotNearStructures();
-
 
     public abstract boolean isFocusInvestigation();
 
@@ -123,7 +135,7 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract void saveJsonForm(BaseContract.BaseInteractor baseInteractor, String json);
 
-    public abstract  void openFilterActivity(Activity activity, TaskFilterParams filterParams);
+    public abstract void openFilterActivity(Activity activity, TaskFilterParams filterParams);
 
     public abstract void openFamilyProfile(Activity activity, CommonPersonObjectClient family, BaseTaskDetails taskDetails);
 
@@ -133,7 +145,7 @@ public abstract class TaskingLibraryConfiguration {
 
     public abstract void startMapActivity(Activity activity, String searchViewText, TaskFilterParams taskFilterParams);
 
-    public abstract void onTaskRegisterBindViewHolder(@NonNull Context context, @NonNull TaskRegisterViewHolder viewHolder, @NonNull View.OnClickListener registerActionHandler, @NonNull TaskDetails taskDetails, int position);
+    public abstract void onTaskRegisterBindViewHolder(@NonNull Context context, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull View.OnClickListener registerActionHandler, @NonNull TaskDetails taskDetails, int position);
 
     @NonNull
     public abstract AppExecutors getAppExecutors();
@@ -143,4 +155,80 @@ public abstract class TaskingLibraryConfiguration {
     public abstract void showTasksCompleteActionView(TextView actionView);
 
     public abstract Map<String, Object> getServerConfigs();
+
+    public abstract TaskingJsonFormUtils getJsonFormUtils();
+
+    public abstract TaskingMappingHelper getMappingHelper();
+
+    public abstract TaskingMapHelper getMapHelper();
+
+    public abstract boolean isRefreshMapOnEventSaved();
+
+    public abstract void setRefreshMapOnEventSaved(boolean isRefreshMapOnEventSaved);
+
+    public abstract void setFeatureCollection(FeatureCollection featureCollection);
+
+    public abstract DigitalGlobeLayer getDigitalGlobeLayer();
+
+    public abstract List<String> getFacilityLevels();
+
+    public abstract List<String> getLocationLevels();
+
+    public abstract ActivityConfiguration getActivityConfiguration();
+
+    public abstract void registerFamily(Feature selectedFeature);
+
+    public abstract void openTaskRegister(TaskFilterParams filterParams, TaskingMapActivity taskingMapActivity);
+
+    public abstract boolean isCompassEnabled();
+
+    public abstract boolean showCurrentLocationButton();
+
+    public abstract boolean disableMyLocationOnMapMove();
+
+    public abstract Boolean getDrawOperationalAreaBoundaryAndLabel();
+
+    public abstract GeoJsonUtils getGeoJsonUtils();
+
+    public abstract String getProvinceFromTreeDialogValue(List<String> name);
+
+    public abstract String getDistrictFromTreeDialogValue(List<String> name);
+
+    public abstract void onShowFilledForms();
+
+    public abstract void onFeatureSelectedByLongClick(Feature feature, TaskingMapActivityContract.Presenter taskingMapPresenter);
+
+    public abstract void onFeatureSelectedByClick(Feature feature, TaskingMapActivityContract.Presenter taskingMapPresenter);
+
+    public abstract double getOnClickMaxZoomLevel();
+
+    public abstract void fetchPlans(String jurisdictionName, BaseDrawerContract.Presenter presenter);
+
+    public abstract void validateCurrentPlan(String selectedOperationalArea, String currentPlanId, BaseDrawerContract.Presenter presenter);
+
+    public abstract void setFacility(List<String> defaultLocation, BaseDrawerContract.View view);
+
+    public abstract void openFilterTaskActivity(TaskFilterParams filterParams, TaskingMapActivity activity);
+
+    public abstract List<Location> getLocationsIdsForDownload(List<String> locationIds);
+
+    public abstract Pair<Double, Double> getMinMaxZoomMapDownloadPair();
+
+    public abstract List<BaseLayerSwitchModel> getBaseLayers();
+
+    public abstract boolean showBaseLayerSwitcherPlugin();
+
+    public abstract void openStructureProfile(CommonPersonObjectClient family, TaskingMapActivity taskingMapActivity, TaskingMapPresenter taskingMapPresenter);
+
+    public abstract void openCardView(CardDetails cardDetails, TaskingMapActivity taskingMapActivity);
+
+    public abstract void populateFamilyCard(FamilyCardDetails familyCardDetails, Activity activity);
+
+    public abstract void populateAndOpenIRSVerificationCard(IRSVerificationCardDetails cardDetails, Activity activity);
+
+    public abstract void populateAndOpenMosquitoHarvestCard(MosquitoHarvestCardDetails mosquitoHarvestCardDetails, Activity activity);
+
+    public abstract void populateSprayCardTextViews(SprayCardDetails sprayCardDetails, Activity activity);
+
+    public abstract String getStructureNamesSelect(String mainCondition);
 }

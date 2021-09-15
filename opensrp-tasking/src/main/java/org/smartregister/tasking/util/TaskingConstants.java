@@ -106,6 +106,7 @@ public interface TaskingConstants {
         String MDA_CATCHMENT_AREAS = "mda_catchment_areas";
         String DISPLAY_DISTANCE_SCALE = "display_distance_scale";
 
+        String SELECT_PLAN_THEN_AREA = "select_plan_then_area";
     }
 
     interface Preferences {
@@ -149,6 +150,7 @@ public interface TaskingConstants {
         String TASK_CODE_LIST = "task_code_list";
         String FAMILY_MEMBER_NAMES = "family_member_names";
         String PLAN_IDENTIFIER = "planIdentifier";
+        String LOCATION_STATUS = "status";
     }
 
 
@@ -229,6 +231,8 @@ public interface TaskingConstants {
         String EVENT_TABLE = "event";
         String TASK_TABLE = "task";
         String STRUCTURE_TABLE = "structure";
+        String LOCATION_TABLE = "location";
+        String EC_EVENT = "ec_events";
     }
 
     interface BusinessStatus {
@@ -451,6 +455,9 @@ public interface TaskingConstants {
         String CATCHMENT_AREA = "catchment_area";
 
 
+        String VALID_OPERATIONAL_AREA = "valid_operational_area";
+
+        String STRUCTURE = "structure";
     }
 
     interface DateFormat {
@@ -661,5 +668,15 @@ public interface TaskingConstants {
         String STATUS = "task_status";
         String INTERVENTION_UNIT = "intervention_unit";
         String FILTER_SORT_PARAMS = "filter_sort_params";
+    }
+
+    interface Columns {
+        interface Location {
+            String SYNC_STATUS = "sync_status";
+        }
+    }
+
+    interface AppProperties {
+        String ALLOW_MULTIPLE_OPERATIONAL_AREA_SELECTION = "ALLOW_MULTIPLE_OPERATIONAL_AREA_SELECTION";
     }
 }

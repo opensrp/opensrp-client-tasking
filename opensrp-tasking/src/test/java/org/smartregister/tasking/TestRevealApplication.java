@@ -9,7 +9,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
 import com.vijay.jsonwizard.NativeFormLibrary;
 
 import net.sqlcipher.database.SQLiteDatabase;
@@ -24,16 +27,29 @@ import org.smartregister.configurableviews.ConfigurableViewsLibrary;
 import org.smartregister.domain.Location;
 import org.smartregister.domain.Task;
 import org.smartregister.repository.Repository;
+import org.smartregister.tasking.activity.TaskingMapActivity;
 import org.smartregister.tasking.adapter.TaskRegisterAdapter;
 import org.smartregister.tasking.contract.BaseContract;
 import org.smartregister.tasking.contract.BaseDrawerContract;
 import org.smartregister.tasking.contract.BaseFormFragmentContract;
+import org.smartregister.tasking.contract.TaskingMapActivityContract;
+import org.smartregister.tasking.layer.DigitalGlobeLayer;
+import org.smartregister.tasking.model.BaseLayerSwitchModel;
 import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.model.CardDetails;
+import org.smartregister.tasking.model.FamilyCardDetails;
+import org.smartregister.tasking.model.IRSVerificationCardDetails;
+import org.smartregister.tasking.model.MosquitoHarvestCardDetails;
+import org.smartregister.tasking.model.SprayCardDetails;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.model.TaskFilterParams;
-import org.smartregister.tasking.util.TaskingLibraryConfiguration;
-import org.smartregister.tasking.viewholder.TaskRegisterViewHolder;
+import org.smartregister.tasking.presenter.TaskingMapPresenter;
+import org.smartregister.tasking.repository.TaskingMappingHelper;
+import org.smartregister.tasking.util.ActivityConfiguration;
+import org.smartregister.tasking.util.DefaultLocationHierarchyUtils;
+import org.smartregister.tasking.util.GeoJsonUtils;
+import org.smartregister.tasking.util.TaskingJsonFormUtils;
+import org.smartregister.tasking.util.TaskingMapHelper;
 import org.smartregister.util.AppExecutors;
 import org.smartregister.view.activity.DrishtiApplication;
 
@@ -91,6 +107,10 @@ public class TestRevealApplication extends DrishtiApplication {
     }
 
     public static class TaskingLibraryConfiguration extends org.smartregister.tasking.util.TaskingLibraryConfiguration {
+
+        private boolean refreshMapOnEventSaved;
+
+        private boolean synced;
 
         @NonNull
         @Override
@@ -161,7 +181,7 @@ public class TestRevealApplication extends DrishtiApplication {
 
         @Override
         public Boolean displayDistanceScale() {
-            return null;
+            return true;
         }
 
         @Override
@@ -256,12 +276,12 @@ public class TestRevealApplication extends DrishtiApplication {
 
         @Override
         public boolean getSynced() {
-            return false;
+            return synced;
         }
 
         @Override
         public void setSynced(boolean synced) {
-
+            this.synced = synced;
         }
 
         @Override
@@ -315,7 +335,7 @@ public class TestRevealApplication extends DrishtiApplication {
         }
 
         @Override
-        public void onTaskRegisterBindViewHolder(@NonNull android.content.Context context, @NonNull TaskRegisterViewHolder viewHolder, @NonNull View.OnClickListener registerActionHandler, @NonNull TaskDetails taskDetails, int position) {
+        public void onTaskRegisterBindViewHolder(@NonNull android.content.Context context, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull View.OnClickListener registerActionHandler, @NonNull TaskDetails taskDetails, int position) {
 
         }
 
@@ -338,6 +358,196 @@ public class TestRevealApplication extends DrishtiApplication {
         @Override
         public Map<String, Object> getServerConfigs() {
             return new HashMap<>();
+        }
+
+        @Override
+        public TaskingJsonFormUtils getJsonFormUtils() {
+            return new TaskingJsonFormUtils();
+        }
+
+        @Override
+        public TaskingMappingHelper getMappingHelper() {
+            return new TaskingMappingHelper();
+        }
+
+        @Override
+        public TaskingMapHelper getMapHelper() {
+            return new TaskingMapHelper();
+        }
+
+        @Override
+        public boolean isRefreshMapOnEventSaved() {
+            return refreshMapOnEventSaved;
+        }
+
+        @Override
+        public void setRefreshMapOnEventSaved(boolean isRefreshMapOnEventSaved) {
+            refreshMapOnEventSaved = isRefreshMapOnEventSaved;
+        }
+
+        @Override
+        public void setFeatureCollection(FeatureCollection featureCollection) {
+
+        }
+
+        @Override
+        public DigitalGlobeLayer getDigitalGlobeLayer() {
+            return null;
+        }
+
+        @Override
+        public List<String> getFacilityLevels() {
+            return DefaultLocationHierarchyUtils.getFacilityLevels();
+        }
+
+        @Override
+        public List<String> getLocationLevels() {
+            return DefaultLocationHierarchyUtils.getLocationLevels();
+        }
+
+        @Override
+        public ActivityConfiguration getActivityConfiguration() {
+            return null;
+        }
+
+        @Override
+        public void registerFamily(Feature selectedFeature) {
+
+        }
+
+        @Override
+        public void openTaskRegister(TaskFilterParams filterParams, TaskingMapActivity taskingMapActivity) {
+
+        }
+
+        @Override
+        public boolean isCompassEnabled() {
+            return false;
+        }
+
+        @Override
+        public boolean showCurrentLocationButton() {
+            return false;
+        }
+
+        @Override
+        public boolean disableMyLocationOnMapMove() {
+            return false;
+        }
+
+        @Override
+        public Boolean getDrawOperationalAreaBoundaryAndLabel() {
+            return true;
+        }
+
+        @Override
+        public GeoJsonUtils getGeoJsonUtils() {
+            return null;
+        }
+
+        @Override
+        public String getProvinceFromTreeDialogValue(List<String> name) {
+            return name.get(1);
+        }
+
+        @Override
+        public String getDistrictFromTreeDialogValue(List<String> name) {
+            return name.get(0);
+        }
+
+        @Override
+        public void onShowFilledForms() {
+
+        }
+
+        @Override
+        public void onFeatureSelectedByLongClick(Feature feature, TaskingMapActivityContract.Presenter taskingMapPresenter) {
+
+        }
+
+        @Override
+        public void onFeatureSelectedByClick(Feature feature, TaskingMapActivityContract.Presenter taskingMapPresenter) {
+
+        }
+
+        @Override
+        public double getOnClickMaxZoomLevel() {
+            return 11;
+        }
+
+        @Override
+        public void fetchPlans(String jurisdictionName, BaseDrawerContract.Presenter presenter) {
+
+        }
+
+        @Override
+        public void validateCurrentPlan(String selectedOperationalArea, String currentPlanId, BaseDrawerContract.Presenter presenter) {
+
+        }
+
+        @Override
+        public void setFacility(List<String> defaultLocation, BaseDrawerContract.View view) {
+
+        }
+
+        @Override
+        public void openFilterTaskActivity(TaskFilterParams filterParams, TaskingMapActivity activity) {
+
+        }
+
+        @Override
+        public List<Location> getLocationsIdsForDownload(List<String> locationIds) {
+            return null;
+        }
+
+        @Override
+        public Pair<Double, Double> getMinMaxZoomMapDownloadPair() {
+            return null;
+        }
+
+        @Override
+        public List<BaseLayerSwitchModel> getBaseLayers() {
+            return null;
+        }
+
+        @Override
+        public boolean showBaseLayerSwitcherPlugin() {
+            return false;
+        }
+
+        @Override
+        public void openStructureProfile(CommonPersonObjectClient family, TaskingMapActivity taskingMapActivity, TaskingMapPresenter taskingMapPresenter) {
+
+        }
+
+        @Override
+        public void openCardView(CardDetails cardDetails, TaskingMapActivity taskingMapActivity) {
+
+        }
+
+        @Override
+        public void populateFamilyCard(FamilyCardDetails familyCardDetails, Activity activity) {
+
+        }
+
+        @Override
+        public void populateAndOpenIRSVerificationCard(IRSVerificationCardDetails cardDetails, Activity activity) {
+
+        }
+
+        @Override
+        public void populateAndOpenMosquitoHarvestCard(MosquitoHarvestCardDetails mosquitoHarvestCardDetails, Activity activity) {
+
+        }
+
+        @Override
+        public void populateSprayCardTextViews(SprayCardDetails sprayCardDetails, Activity activity) {
+
+        }
+
+        @Override
+        public String getStructureNamesSelect(String mainCondition) {
+            return "";
         }
     }
 }

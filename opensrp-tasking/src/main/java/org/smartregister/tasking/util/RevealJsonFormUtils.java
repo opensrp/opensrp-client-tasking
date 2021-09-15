@@ -24,7 +24,6 @@ import org.smartregister.tasking.TaskingLibrary;
 import org.smartregister.tasking.model.BaseTaskDetails;
 import org.smartregister.tasking.model.TaskDetails;
 import org.smartregister.tasking.util.Constants.CONFIGURATION;
-import org.smartregister.tasking.util.Constants.Intervention;
 import org.smartregister.tasking.util.Constants.JsonForm;
 import org.smartregister.tasking.util.Constants.Properties;
 import org.smartregister.util.JsonFormUtils;
@@ -48,20 +47,11 @@ import static com.vijay.jsonwizard.constants.JsonFormConstants.VALUES;
 import static org.smartregister.AllConstants.JSON_FILE_EXTENSION;
 import static org.smartregister.AllConstants.OPTIONS;
 import static org.smartregister.AllConstants.TEXT;
-import static org.smartregister.tasking.util.Constants.BEDNET_DISTRIBUTION_EVENT;
-import static org.smartregister.tasking.util.Constants.BEHAVIOUR_CHANGE_COMMUNICATION;
-import static org.smartregister.tasking.util.Constants.BLOOD_SCREENING_EVENT;
 import static org.smartregister.tasking.util.Constants.DETAILS;
 import static org.smartregister.tasking.util.Constants.ENTITY_ID;
-import static org.smartregister.tasking.util.Constants.EventType.CASE_CONFIRMATION_EVENT;
-import static org.smartregister.tasking.util.Constants.EventType.IRS_VERIFICATION;
 import static org.smartregister.tasking.util.Constants.JSON_FORM_PARAM_JSON;
 import static org.smartregister.tasking.util.Constants.JsonForm.JSON_FORM_FOLDER;
-import static org.smartregister.tasking.util.Constants.LARVAL_DIPPING_EVENT;
-import static org.smartregister.tasking.util.Constants.MOSQUITO_COLLECTION_EVENT;
-import static org.smartregister.tasking.util.Constants.REGISTER_STRUCTURE_EVENT;
 import static org.smartregister.tasking.util.Constants.RequestCode.REQUEST_CODE_GET_JSON;
-import static org.smartregister.tasking.util.Constants.SPRAY_EVENT;
 import static org.smartregister.tasking.util.Utils.getPropertyValue;
 
 

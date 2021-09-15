@@ -119,6 +119,10 @@ public abstract class BaseOfflineMapsFragment extends Fragment implements Offlin
         }
     }
 
+    public void setCurrentMapDownload(String currentMapDownload) {
+        this.currentMapDownload = currentMapDownload;
+    }
+
     protected boolean isValidDouble(String doubleString) {
         String doubleRegex = "[+-]{0,1}[0-9]*.{0,1}[0-9]*";
         return (!doubleString.isEmpty() && doubleString.matches(doubleRegex));

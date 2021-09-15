@@ -29,7 +29,6 @@ public class AvailableOfflineMapAdapter extends RecyclerView.Adapter<AvailableOf
         this.offlineMapModels = new ArrayList<>();
     }
 
-
     @NonNull
     @Override
     public AvailableOfflineMapViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int i) {
@@ -42,7 +41,6 @@ public class AvailableOfflineMapAdapter extends RecyclerView.Adapter<AvailableOf
         OfflineMapModel offlineMapModel = offlineMapModels.get(position);
         viewHolder.setOfflineMapLabel(offlineMapModel.getDownloadAreaLabel());
         viewHolder.setItemViewListener(offlineMapModel, offlineMapClickHandler);
-
         switch (offlineMapModel.getOfflineMapStatus()) {
             case READY:
                 viewHolder.enableCheckBox(true);
